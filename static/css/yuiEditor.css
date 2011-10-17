@@ -1,0 +1,35 @@
+#leftPart .yui-skin-sam .blockInner {
+	padding: 0;
+	padding-bottom: 10px;
+	background-color: #F2F2D0;
+}
+#leftPart .yui-skin-sam .blockInner h2 {
+	padding: 10px 0 5px 10px;
+}
+#leftPart .yui-skin-sam .blockInner .footer {
+	background-color: #F2F2D0;
+	border-top: solid 1px #E1E1BB;
+	padding-top: 10px;
+	padding-right: 10px;
+}
+
+.yui-skin-sam a:hover {
+	background-color: transparent;
+}
+
+.yui-skin-sam .yui-toolbar-container .yui-toolbar-titlebar {  
+	display: none;
+}
+.yui-skin-sam .yui-editor-container, .yui-skin-sam .yui-editor-container .dompath, .yui-skin-sam .yui-toolbar-container {  
+	border: none;
+	background-color: #F2F2D0 !important;
+}
+.yui-skin-sam .yui-toolbar-container {  
+	border-top: solid 1px #E1E1BB;
+}
+.yui-skin-sam .yui-editor-container .dompath {  
+	display: none;
+}
+.yui-skin-sam .yui-toolbar-container .yui-toolbar-titlebar {
+	background: none;
+}

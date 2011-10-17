@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-cn" lang="zh-cn">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>History</title>
+<style type="text/css">
+</style>
+</head>
+<body onload="return; alert('onload');">
+<span id="mark"></span>
+<button onclick="easyHistory.addHistory('a', '1');">aaa</button>
+<button onclick="easyHistory.addHistory('b', '2');">bbb</button>
+<button onclick="easyHistory.addHistory('c', '3');">ccc</button>
+<script type="text/javascript">
+document.domain = 'qq.com';
+</script>
+<script type="text/javascript" src="/ac/qzfl/release/qzfl_lite.js"></script>
+<script type="text/javascript" src="./json2.js"></script>
+<script type="text/javascript" src="./easy_history.js"></script>
+<script type="text/javascript">
+//alert('loading');
+easyHistory.setListener(function(mark, data) {
+	alert(data);
+	document.getElementById('mark').innerHTML = mark + ':' + data;
+	return mark == 'a' ? false : true;
+});
+</script>
+</body>
+</html>

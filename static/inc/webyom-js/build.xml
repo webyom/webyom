@@ -1,0 +1,60 @@
+<project name="core.build" default="build" basedir=".">
+    <description>Core Build File</description>
+    
+    <import file="../../../../build_tool/build.xml"/>
+    
+    <property name="charset" value="utf-8"/>
+    <property name="src.dir" location="../../../../js_lib/webyom-js/src"/>
+    <property name="build.dir" location="./"/>
+    <property name="copyright.files" value="null"/>
+
+    <target name="concat">
+        <concat destfile="${build.dir}/core.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${src.dir}/core/base.js"/>
+            <path path="${src.dir}/core/error.js"/>
+            <path path="${src.dir}/core/browser.js"/>
+            <path path="${src.dir}/core/class.js"/>
+            <path path="${src.dir}/core/object.js"/>
+            <path path="${src.dir}/core/array.js"/>
+            <path path="${src.dir}/core/string.js"/>
+            <path path="${src.dir}/core/observer.js"/>
+            <path path="${src.dir}/core/event.js"/>
+            <path path="${src.dir}/core/event_delegator.js"/>
+            <path path="${src.dir}/core/event_virtual_handler.js"/>
+            <path path="${src.dir}/core/cookie.js"/>
+            <path path="${src.dir}/core/xhr.js"/>
+            <path path="${src.dir}/core/pos.js"/>
+            <path path="${src.dir}/core/util.js"/>
+            <path path="${src.dir}/core/element.js"/>
+            <path path="${src.dir}/core/element_fx.js"/>
+            <path path="${src.dir}/core/js_loader.js"/>
+            <path path="${src.dir}/core/css.js"/>
+            <path path="${src.dir}/core/tmpl.js"/>
+            <path path="${src.dir}/core/chunker.js"/>
+            <path path="${src.dir}/core/console.js"/>
+            <path path="${src.dir}/core/transition.js"/>
+            <path path="${src.dir}/core/tween.js"/>
+        </concat>
+        
+        <concat destfile="${build.dir}/mouse_event.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${src.dir}/mouse_event/mouse_event.js"/>
+        </concat>
+        
+        <concat destfile="${build.dir}/touch_event.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${src.dir}/touch_event/virtual_touch_event_handler.js"/>
+            <path path="${src.dir}/touch_event/touch_event_handler.js"/>
+            <path path="${src.dir}/touch_event/slide_event_handler.js"/>
+        </concat>
+        
+        <concat destfile="${build.dir}/local_storage.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${src.dir}/local_storage/local_storage.js"/>
+        </concat>
+        
+        <concat destfile="${build.dir}/js.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${src.dir}/core/js.js"/>
+        </concat>
+    </target>
+
+    <target name="build" depends="concat,common.build">
+    </target>
+</project>

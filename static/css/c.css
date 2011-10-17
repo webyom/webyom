@@ -1,0 +1,385 @@
+
+/* @general
+--------------------------------------------------------------------------------------------*/
+html, body {
+	height:100%;
+}
+body {
+	color: #000;
+	padding: 0;
+	margin: 0;
+	font-size: 0.625em;
+	background: #D6FDFF url(/static/img/bg_main.gif) left -10px repeat-x;
+	font-family: "Courier New", Courier, monospace;
+}
+
+a {
+	color: #A19476;
+	text-decoration: none;
+}
+a:hover {
+	color: #A19476;
+	text-decoration: none;
+	background-color: #E0E0BB;
+}
+
+p {
+	clear: both;
+	margin: 10px 0;
+}
+form {
+	margin: 0;
+	padding: 0;
+}
+ul {
+    margin: 0;
+	padding: 0;
+	padding-left: 20px;
+    list-style: circle;
+}
+h1, h2, h3 {
+	margin: 0;
+	font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+.required {
+	color: red;
+}
+
+/* @framework
+--------------------------------------------------------------------------------------------*/
+#header, #breadcrumb, #content, #footer {
+	width: 992px;
+	margin: 0 auto;
+	font-size: 1.2em;
+}
+
+
+/* @header
+--------------------------------------------------------------------------------------------*/
+#header {
+	height: 80px;
+	overflow: hidden;
+	position: relative;
+	left: -800px;
+}
+#header h1 {
+	width: 183px;
+	height: 65px;
+	float: left;
+	text-indent: -9999px;
+	background: url(/static/img/logo.gif) left top no-repeat;
+	margin-top: 12px;
+}
+#header ul#menu {
+	padding: 0;
+	height: 80px;
+	list-style: none;
+	margin-left: 100px;
+	float: left;
+}
+#menu li {
+	float: left;
+	padding-left: 3px;
+}
+#menu li a {
+	float: left;
+	height: 80px;
+	display: block;
+	line-height: 130px;
+	padding: 0 15px;
+	font-size: 1.4em;
+	font-weight: bold;
+	color: #fff;
+}
+#menu li a:hover {
+	text-decoration: none;
+	color: #FFFCD1;
+	background: #9CFAFF;
+}
+
+#header #menu.a li.a a, 
+#header #menu.b li.b a, 
+#header #menu.c li.c a {
+	background: #9CFAFF;
+	font-size: 2em;
+	text-decoration: overline;
+}
+#header #menu.a li.a a:hover, 
+#header #menu.b li.b a:hover, 
+#header #menu.c li.c a:hover {
+	color: #fff;
+}
+
+#header #loginInfo {
+	position: absolute;
+	right: 0;
+	top: 5px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	color: #666;
+}
+
+/* @breadcrumb
+--------------------------------------------------------------------------------------------*/
+#breadcrumb {
+	margin-top: 5px;
+	font-size: 1.3em;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	padding-left: 5px;
+	color: #666;
+}
+
+/* @body
+--------------------------------------------------------------------------------------------*/
+#content {
+	clear: both;
+}
+#content.processing {
+	filter: alpha(opacity=50);
+}
+#content h1 {
+	font-size: 1.3em;
+}
+#content #sidePart {
+	position: relative;
+	top: -800px;
+}
+
+#content .mainPart {
+	width: 720px;
+	float: left;
+	padding-bottom: 5px;
+}
+
+#content .sidePart {
+	float: right;
+	width: 267px;
+	padding-bottom: 5px;
+}
+
+.mainPart .block, .sidePart .block {
+	margin-top: 5px;
+	padding: 5px;
+	background: #F1F6E0 url(/static/img/bg_content_border.gif) right top repeat;
+}
+.mainPart .blockInner, .sidePart .blockInner {
+	background: #fff;
+	padding: 10px;
+}
+.sidePart .blockInner, .mainPart .blockInner.dark {
+	background: #F2F2D0;
+}
+.sidePart .blockInner.light {
+	background: #fff;
+}
+
+.mainPart .block h2, .sidePart .block h2 {
+	margin: 0;
+	font-size: 1.2em;
+	margin-bottom: 5px;
+	color: #888;
+}
+.mainPart .block h2 {
+	margin: 0;
+	font-size: 1.5em;
+	margin-bottom: 5px;
+	color: #888;
+}
+
+
+
+   /* @body - @block
+--------------------------------------------------------------------------------------*/
+
+
+
+
+/* @footer
+--------------------------------------------------------------------------------------------*/
+#footer {
+	color: #777;
+	font-size: 1.2em;
+	clear: both;
+	padding: 5px 0;
+	border-top: solid 1px #B7F2F5;
+}
+#footer span {
+	float: left;
+}
+#footer img {
+	float: right;
+}
+
+
+/* @whoAmI
+--------------------------------------------------------------------------------------------*/
+#whoAmI img {
+	float: left;
+	margin-right: 5px;
+}
+
+/* @articleList
+--------------------------------------------------------------------------------------------*/
+div.article, div.comment {
+	font-size: 1.2em;
+}
+#articleList .article, .comment {
+	border-bottom: solid 1px #F2F2D0;
+	margin-bottom: 10px;
+	padding-bottom: 10px;
+}
+div.comment {
+	padding-bottom: 10px;
+	margin-bottom: 0;
+}
+.article p.credit, .comment p.credit {
+	margin-top: 5px;
+	color: #888;
+	font-size: 0.9em;
+}
+.article a.comments {
+	background-image: url(/static/img/icons.gif);
+	background-position: left top;
+	background-repeat: no-repeat;
+	padding-left: 16px;
+}
+.article a.comments.comments0 {
+	background-position: left -20px;
+}
+.article .updateLog {
+	font-style: italic;
+	color: #aaa;
+	text-align: right;
+	font-size: 0.8em;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	margin-bottom: 0;
+}
+
+
+.author {
+	font-weight: bold;
+}
+
+img.iconOutGoing {
+	width: 12px;
+	height: 9px;
+	border: none;
+	background: url(/static/img/icons.gif) right -40px no-repeat;
+}
+img.iconNewWindow {
+	width: 15px;
+	height: 12px;
+	border: none;
+	background: url(/static/img/icons.gif) right -60px no-repeat;
+}
+
+.clearFix {
+	clear: both;
+}
+
+
+/* @commnetBox
+--------------------------------------------------------------------------------------------*/
+#mainPart .commnetBox .blockInner {
+	padding: 0;
+	padding-bottom: 10px;
+	background-color: #F2F2D0;
+}
+#mainPart .commnetBox .blockInner h2 {
+	padding: 10px 0 5px 10px;
+}
+#mainPart .commnetBox textarea {
+	border: none;
+	border-top: solid 1px #E1E1BB;
+	width: 704px;
+	font-size: 1.2em;
+	padding: 3px;
+}
+#mainPart .commnetBox .blockInner .footer {
+	background-color: #F2F2D0;
+	border-top: solid 1px #E1E1BB;
+	padding-top: 10px;
+	padding-right: 10px;
+}
+
+#mainPart .commnetBox .body {
+	padding: 10px;
+}
+#mainPart .commnetBox .body input {
+	border: none;
+	border-bottom: solid 1px #E1E1BB;
+	background: none;
+	width: 140px;
+	margin-right: 16px;
+}
+
+
+/* @writeArticle
+--------------------------------------------------------------------------------------------*/
+#content #writeArticle {
+	width: 100%;
+}
+#writeArticle #form {
+	padding: 0 0 10px 12px;
+}
+#writeArticle #form table {
+	width: 100%;
+}
+#writeArticle #form table td {
+	padding-top: 5px;
+}
+#writeArticle #form #title, #writeArticle #form #originalUrl {
+	width: 600px;
+}
+#writeArticle #form #originalWriter {
+	width: 160px;
+}
+#writeArticle #form #category {
+	width: 168px;
+	margin-top: 4px;
+}
+#writeArticle .footer {
+	margin-top: 10px;
+}
+#artListPrevLink, #artListNextLink {
+	font-size: 1.3em;
+	float: left;
+	font-family: "Courier New", Courier, monospace;
+}
+#artListNextLink {
+	float: right;
+}
+
+
+.floatl {
+	float: left;
+}
+.floatr {
+	float: right;
+}
+.alignc {
+	text-align: center;
+}
+.desc {
+	color: #888;
+	font-style: italic;
+}
+.clear {
+	clear: both;
+}
+
+.error {
+	color: #f00;
+}
+
+#processingDiv {
+	padding: 5px;
+	background: #FFFBB7;
+	position: fixed !important;
+	position: absolute;
+	right: 0;
+	top: 0;
+	font-size: 1.2em;
+	display: none;
+}

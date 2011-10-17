@@ -1,0 +1,27 @@
+<project name="core.build" default="build" basedir=".">
+    <description>Core Build File</description>
+    
+    <import file="../../../../build_tool/build.xml"/>
+    
+    <property name="charset" value="utf-8"/>
+    <property name="src.dir" location="./"/>
+    <property name="build.dir" location="../"/>
+    <property name="copyright.files" value="null"/>
+
+    <target name="concat">
+        <concat destfile="${build.dir}/c.css" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${src.dir}/main.css"/>
+            <path path="${src.dir}/util.css"/>
+        </concat>
+        <concat destfile="${build.dir}/form.css" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${src.dir}/form.css"/>
+            <path path="${src.dir}/button.css"/>
+        </concat>
+        <concat destfile="${build.dir}/yuiEditor.css" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${src.dir}/yuiEditor.css"/>
+        </concat>
+    </target>
+
+    <target name="build" depends="concat,common.build">
+    </target>
+</project>

@@ -1,0 +1,137 @@
+@charset "utf-8";
+/* CSS Document */
+label {
+	color: #666;
+}
+input {
+	padding: 1px 2px;
+	height: 20px;
+	line-height: 20px;
+	font-family: verdana, arial, "Bitstream Vera Sans", geneva, helvetica, helve, sans-serif;
+	vertical-align: middle;
+}
+select {
+	padding: 1px 2px;
+	height: 30px;
+	line-height: 30px;
+	font-family: verdana, arial, "Bitstream Vera Sans", geneva, helvetica, helve, sans-serif;
+	vertical-align: middle;
+	font-size: 1.4em;
+}
+input.size1 {
+	width: 76px;
+}
+input.size2 {
+	width: 100px;
+}
+input.size3 {
+	width: 150px;
+}
+input.size4 {
+	width: 200px;
+}
+input.size5 {
+	width: 300px;
+}
+/** 
+ *  button
+ *
+ --------------------------------------------------------------------------------------------*/
+/* @button
+--------------------------------------------------------------------------------------------*/
+.buttonGroup {
+	text-align: right;
+}
+
+
+button {
+	height: 26px;
+	line-height: 20px;
+	border: none;
+	cursor: pointer;
+	font-size: 1.2em;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	margin-left: 10px;
+	font-size: 1em;
+}
+button.hl {
+	font-weight: bold;
+}
+button.size1 {
+	width: 80px;
+	background: url(/static/img/buttons.gif) left top no-repeat;
+}
+button.size1hl {
+	background: url(/static/img/buttons.gif) -300px top no-repeat;
+}
+button.size2 {
+	width: 100px;
+	background: url(/static/img/buttons.gif) left -26px no-repeat;
+}
+button.size2hl {
+	background: url(/static/img/buttons.gif) -300px -26px no-repeat;
+}
+button.size3 {
+	width: 150px;
+	background: url(/static/img/buttons.gif) left -52px no-repeat;
+}
+button.size3hl {
+	background: url(/static/img/buttons.gif) -300px -52px no-repeat;
+}
+button.size4 {
+	width: 200px;
+	background: url(/static/img/buttons.gif) left -78px no-repeat;
+}
+button.size4hl {
+	background: url(/static/img/buttons.gif) -300px -78px no-repeat;
+}
+button.size5 {
+	width: 300px;
+	background: url(/static/img/buttons.gif) left -104px no-repeat;
+}
+button.size5hl {
+	background: url(/static/img/buttons.gif) -300px -104px no-repeat;
+}
+
+button.weightButton {
+	height: 45px;
+	line-height: 49px;
+	width: 180px;
+	background: url(/static/img/buttons.png) left -130px no-repeat !important;
+	background: url(/static/img/buttons.gif) left -130px no-repeat;
+	font-size: 1.5em;
+	color: #0B62C2;
+}
+button.weightButton:hover {
+	text-decoration: underline;
+}
+
+
+.userHead {
+	position: relative;
+	padding: 0;
+	display: block;
+	float: left;
+}
+.userHead .frame {
+	position: absolute;
+	left: 0;
+	top: 0;
+	display: block;
+}
+.userHead.size1 img {
+	width: 50px;
+	height: 50px;
+}
+.userHead.size1 .frame {
+	background: url(/static/img/headFrame.png) left top no-repeat !important;
+	background: url(/static/img/headFrame.gif) left top no-repeat;
+}
+.userHead.size1 .frame.blue {
+	background: url(/static/img/headFrame.png) -50px top no-repeat !important;
+	background: url(/static/img/headFrame.gif) -50px top no-repeat;
+}
+.userHead.size1 .frame.red {
+	background: url(/static/img/headFrame.png) -100px top no-repeat !important;
+	background: url(/static/img/headFrame.gif) -100px top no-repeat;
+}

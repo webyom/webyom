@@ -1,0 +1,8 @@
+*.bak
+*.log
+*.pyc
+*~
+/webyomdb
+/blog/migrations/
+/_prd/
+

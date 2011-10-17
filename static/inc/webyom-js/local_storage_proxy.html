@@ -1,0 +1,13 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Webyom LocalStorage Proxy Page</title>
+</head>
+<body>
+<script type="text/javascript" src="local_storage.js"></script>
+<script type="text/javascript">
+$.localStorage._do(frameElement.action, null, {key: frameElement.key, val: frameElement.val, cb: frameElement.cb, life: frameElement.life});
+</script>
+</body>
+</html>

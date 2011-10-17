@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>History Blank</title>
+</head>
+<body>
+History Blank : <span id="mark"></span>
+<script type="text/javascript">
+var mark = location.search.replace(/^\?/, '');
+document.title = parent.document.title;
+parent.location.hash = mark;
+document.getElementById('mark').innerHTML = mark;
+</script>
+</body>
+</html>

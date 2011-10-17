@@ -1,0 +1,35 @@
+@charset "utf-8";
+/* CSS Document */
+label {
+	color: #666;
+}
+input {
+	padding: 1px 2px;
+	height: 20px;
+	line-height: 20px;
+	font-family: verdana, arial, "Bitstream Vera Sans", geneva, helvetica, helve, sans-serif;
+	vertical-align: middle;
+}
+select {
+	padding: 1px 2px;
+	height: 30px;
+	line-height: 30px;
+	font-family: verdana, arial, "Bitstream Vera Sans", geneva, helvetica, helve, sans-serif;
+	vertical-align: middle;
+	font-size: 1.4em;
+}
+input.size1 {
+	width: 76px;
+}
+input.size2 {
+	width: 100px;
+}
+input.size3 {
+	width: 150px;
+}
+input.size4 {
+	width: 200px;
+}
+input.size5 {
+	width: 300px;
+}

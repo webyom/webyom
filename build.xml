@@ -1,0 +1,9 @@
+<project name="all-build" default="build-all" basedir=".">
+    <description>All Build File</description>
+
+    <target name="build-all">
+        <subant target="" failonerror="false" inheritall="false">
+            <fileset dir="static/" includes="**/build.xml"/>
+        </subant>
+    </target>
+</project>

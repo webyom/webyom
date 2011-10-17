@@ -1,0 +1,57 @@
+<!DOCTYPE html> 
+<html lang="en-US"> 
+<head> 
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta name="keywords" content="JavaScript, CSS, HTML, Python, Webyom, Gary, Blog" />
+<meta name="description" content="Gary's Blog. About JavaScript, CSS, HTML, and Python." />
+<title>Webyom - Gary's Blog</title>
+<link rel="shortcut icon" href="/static/img/favicon.ico" />
+<link type="text/css" rel="stylesheet" href="/static/css/c.css" />
+</head>
+<body style="display: none;">
+<div id="header" class=""></div>
+<div id="content"></div>
+<div id="footer"></div>
+
+<script type="text/javascript" src="/static/inc/webyom-js/js.js"></script>
+<script type="text/javascript">
+var $$userName = '';
+{% if user.username %}
+$$userName = '{{ user.username }}';
+{% endif %}
+var $$uiContentTmpl = [
+	'<div id="mainPart" class="mainPart"></div>',
+	'<div id="sidePart" class="sidePart">',
+		'<div id="whoAmI" class="block"><div class="blockInner">',
+			'<h2>Who am I?</h2>',
+			'<div id="sideWhoamiContent"></div>',
+		'</div></div>',
+		{% if is_admin %}
+		'<div class="block"><div class="blockInner light">',
+			'<h2>Admin</h2>',
+			'<ul>',
+				'<li><a href="/view/write">Write Article</a></li>',
+			'</ul>',
+		'</div></div>',
+		{% endif %}
+		'<div class="block"><div class="blockInner">',
+			'<h2>Recent Readings</h2>',
+			'<div id="sideReadingsContent"></div>',
+		'</div></div>',
+		'<div class="block"><div class="blockInner">',
+			'<h2>Recommended Web Sites</h2>',
+			'<div id="sideRecSites"></div>',
+		'</div></div>',
+	'</div>'
+].join('');
+
+(function() {
+        var list = ['/static/inc/webyom-js/core.js', '/static/inc/easy_history/easy_history.js', '/static/js/main.js'];
+        if(!document.querySelectorAll) {
+                list.unshift('/static/inc/sizzle/sizzle.js');
+        }
+        $.js.require(list);
+})();
+</script>
+</body>
+</html>
