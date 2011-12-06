@@ -185,7 +185,7 @@ $$.handler = (function(opt) {
 				history.replaceState(null, document.title, '/' + hash);
 			}
 		} else if(!_getModInfo(hash) && _getModInfo(pathName)) {
-			location.href = '/#!' + pathName;
+			location.hash = '!' + pathName;
 		}
 		
 		$$.ui.init();
@@ -195,9 +195,14 @@ $$.handler = (function(opt) {
 			if(el.tagName == 'A') {
 				pathName = el.pathname.replace(/^\//, '');
 				hash = el.hash.replace(/^#/, '');
-				if(pathName.indexOf(_MARK_PREFIX) === 0 && !(pathName == _curMark && hash)) {
+				if(pathName == _curMark && hash) {
+					return;
+				}
+				$.Event.preventDefault(e);
+				if(!easyHistory.isSupportHistoryState() && location.pathname.replace(/^\//, '')) {
+					location.href = '/#!' + pathName;
+				} else if(pathName.indexOf(_MARK_PREFIX) === 0 && !(pathName == _curMark && hash)) {
 					jump(pathName);
-					$.Event.preventDefault(e);
 				}
 			}
 		});
