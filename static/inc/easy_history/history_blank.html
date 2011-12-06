@@ -9,7 +9,9 @@ History Blank : <span id="mark"></span>
 <script type="text/javascript">
 var mark = location.search.replace(/^\?/, '');
 document.title = parent.document.title;
-parent.location.hash = mark;
+if(mark || parent.location.hash) {
+    parent.location.hash = '!' + mark;
+}
 document.getElementById('mark').innerHTML = mark;
 </script>
 </body>

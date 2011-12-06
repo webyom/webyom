@@ -185,7 +185,7 @@ $$.handler = (function(opt) {
 				history.replaceState(null, document.title, '/' + hash);
 			}
 		} else if(!_getModInfo(hash) && _getModInfo(pathName)) {
-			location.hash = '!' + pathName;
+			location.href = '/#!' + pathName;
 		}
 		
 		$$.ui.init();
