@@ -37,8 +37,7 @@ $$.config = (function() {
 			'read': {p: 2, key: 'read', title: 'Read', id: 301, name: 'READ_ARTICLE', url: '/static/js/mod/read_article.js'},
 			'write': {p: 3, key: 'write', title: 'Write', id: 302, name: 'WRITE_ARTICLE', url: '/static/js/mod/write_article.js'}
 		},
-		SUB_MOD_KEY_INFO_HASH: {},
-		ANCHOR_HASH: {}
+		SUB_MOD_KEY_INFO_HASH: {}
 	};
 	
 	function _update(key) {

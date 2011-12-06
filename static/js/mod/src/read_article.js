@@ -137,7 +137,7 @@
 					$.tmpl.apply('#mainPart', _TMPL, data, {key: 'mod.readArticle'});
 					$$.util.prettyPrint();
 					if(params[1] == 'comment') {
-						$$.handler.jump('anchor_comments');
+						location.hash = 'anchor_comments';
 					}
 					$('#mainPart').tween(1000, {
 						origin: {

@@ -4,7 +4,6 @@
 $$.handler = (function(opt) {
 	var _OPTION = _getOption();
 	var _MOD_KEY_INFO_HASH = $$.config.get('MOD_KEY_INFO_HASH');
-	var _ANCHOR_HASH = $$.config.get('ANCHOR_HASH');
 	var _TITLE_POSTFIX = $$.config.get('TITLE_POSTFIX');
 	var _MARK_PREFIX = $$.config.get('MARK_PREFIX');
 	
@@ -32,10 +31,6 @@ $$.handler = (function(opt) {
 			return mark;
 		}
 		return _MARK_PREFIX + mark;
-	};
-	
-	function _isAnchor(mark) {
-		return mark.indexOf('anchor') === 0 || _ANCHOR_HASH[mark];
 	};
 	
 	function _loadMod(modInfo, subMark, data) {
@@ -74,13 +69,12 @@ $$.handler = (function(opt) {
 			return;
 		}
 		*/
+		if(mark.indexOf(_MARK_PREFIX) !== 0) {
+			return;
+		}
 		var modInfo = _getModInfo(mark);
 		if(!modInfo) {
-			if(_isAnchor(mark)) {
-				location.hash = mark;
-			} else {
-				alert('Sorry, can not find the page you requested.');
-			}
+			alert('Sorry, can not find the page you requested.');
 			return;
 		}
 		if(handler.dispatchEvent(handler.createEvent('beforeunloadmod', {
@@ -181,7 +175,7 @@ $$.handler = (function(opt) {
 		}
 		
 		var pathName = location.pathname.replace(/^\//, '');
-		var hash = location.hash.replace(/^#/, '');
+		var hash = location.hash.replace(/^#!\/?/, '');
 		if(easyHistory.isSupportHistoryState()) {
 			if(!pathName) {
 				if(_getModInfo(hash)) {
@@ -191,18 +185,17 @@ $$.handler = (function(opt) {
 				history.replaceState(null, document.title, '/' + hash);
 			}
 		} else if(!_getModInfo(hash) && _getModInfo(pathName)) {
-			location.hash = pathName;
+			location.hash = '!' + pathName;
 		}
 		
 		$$.ui.init();
-		
 		$.Event.addListener(document.body, 'click', function(e) {
 			var el = $.Event.getTarget(e);
 			var pathName, hash;
 			if(el.tagName == 'A') {
 				pathName = el.pathname.replace(/^\//, '');
 				hash = el.hash.replace(/^#/, '');
-				if(pathName.indexOf(_MARK_PREFIX) === 0 && !(pathName == _curMark && _isAnchor(hash))) {
+				if(pathName.indexOf(_MARK_PREFIX) === 0 && !(pathName == _curMark && hash)) {
 					jump(pathName);
 					$.Event.preventDefault(e);
 				}
