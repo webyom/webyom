@@ -5,14 +5,14 @@
 <title>History Blank</title>
 </head>
 <body>
-History Blank : <span id="mark"></span>
+<textarea id="mark"></textarea>
 <script type="text/javascript">
-var mark = location.search.replace(/^\?/, '');
+var mark = location.hash.replace(/^#/, '');
+document.getElementById('mark').value = mark;
 document.title = parent.document.title;
 if(mark || parent.location.hash) {
     parent.location.hash = '!' + mark;
 }
-document.getElementById('mark').innerHTML = mark;
 </script>
 </body>
 </html>
