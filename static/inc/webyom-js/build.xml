@@ -16,6 +16,7 @@
             <path path="${src.dir}/core/class.js"/>
             <path path="${src.dir}/core/object.js"/>
             <path path="${src.dir}/core/array.js"/>
+            <path path="${src.dir}/core/hash_array.js"/>
             <path path="${src.dir}/core/string.js"/>
             <path path="${src.dir}/core/observer.js"/>
             <path path="${src.dir}/core/event.js"/>
