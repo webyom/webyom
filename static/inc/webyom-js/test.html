@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Webyom CrossDomainPoster Demo Client</title>
+</head>
+<body>
+<script type="text/javascript" src="core.js"></script>
+<script type="text/javascript" src="../sizzle/sizzle.js"></script>
+<script type="text/javascript">
+$.console.turnOn();
+var i = 0;
+for(; i < 10; i++) {
+	(function(i) {
+		var p = new $.CrossDomainPoster('http://www.webyom.org/static/inc/webyom-js/test2.html', {
+			data: {
+				i: i
+			},
+			load: function(o) {
+				$.console.log(i + ': ' + o.msg);
+			},
+			error: function() {
+				$.console.log(i + ': error');
+			},
+			complete: function() {
+				$.console.log(i + ': complete');
+			}
+		});
+		p.post();
+	})(i);
+}
+</script>
+</body>
+</html>
