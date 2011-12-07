@@ -15,8 +15,8 @@
 	}
 	sender.action = cdp._url;
 	var data = cdp._data;
-	if(frameElement.responseUrl) {
-		data._response_url_ = frameElement.responseUrl;
+	if(cdp._crossSite) {
+		data[cdp._proxyParamName] = cdp._crossSiteProxy;
 	}
 	var df = document.createDocumentFragment();
 	for(var p in data) {

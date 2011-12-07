@@ -11,7 +11,7 @@
 $.console.turnOn();
 var i = 0;
 var ch = new $.Chunker(function(i) {
-	var p = new $.CrossDomainPoster('http://qzs.qq.com/qzone/mall/test/test3.html', {
+	var p = new $.CrossDomainPoster('http://www.abc.org/static/inc/webyom-js/test3.html', {
 		data: {
 			i: i
 		},
@@ -23,7 +23,8 @@ var ch = new $.Chunker(function(i) {
 		},
 		complete: function() {
 			$.console.log(i + ': complete');
-		}
+		},
+		proxyParamName: 'rurl'
 	});
 	p.post();
 }, {duration: 0, interval: 30});
