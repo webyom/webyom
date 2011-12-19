@@ -195,13 +195,19 @@ $$.handler = (function(opt) {
 			if(el.tagName == 'A') {
 				pathName = el.pathname.replace(/^\//, '');
 				hash = el.hash.replace(/^#/, '');
+				if(el.target) {
+					return;
+				}
+				if(pathName.indexOf(_MARK_PREFIX) !== 0) {
+					return;
+				}
 				if(pathName == _curMark && hash) {
 					return;
 				}
 				$.Event.preventDefault(e);
 				if(!easyHistory.isSupportHistoryState() && location.pathname.replace(/^\//, '')) {
 					location.href = '/#!' + pathName;
-				} else if(pathName.indexOf(_MARK_PREFIX) === 0 && !(pathName == _curMark && hash)) {
+				} else {
 					jump(pathName);
 				}
 			}

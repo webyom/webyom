@@ -383,3 +383,9 @@ img.iconNewWindow {
 	font-size: 1.2em;
 	display: none;
 }
+
+/* @prettyprint
+--------------------------------------------------------------------------------------------*/
+.prettyprint {
+	word-wrap: break-word;
+}

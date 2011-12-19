@@ -14,7 +14,8 @@ for(; i < 10; i++) {
 	(function(i) {
 		var p = new $.CrossDomainPoster('http://www.webyom.org/static/inc/webyom-js/test2.html', {
 			data: {
-				i: i
+				i: i,
+				ch: '你好'
 			},
 			load: function(o) {
 				$.console.log(i + ': ' + o.msg);

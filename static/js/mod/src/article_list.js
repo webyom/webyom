@@ -1,4 +1,5 @@
 (function(modKey, modName, modId) {
+	var _MARK_PREFIX = $$.config.get('MARK_PREFIX');
 	var _TMPL = [
 		'<div class="block"><div class="blockInner">',
 			'<div id="articleList">',
@@ -21,10 +22,10 @@
 				'<%}%>',
 				'<div>',
 				'<%if(page !== 1) {%>',
-					'<a id="artListPrevLink" href="javascript:void(0);" onclick="$$.handler.jump(\'' + modKey + '<%=page === 2 ? "" : "/p" + (page - 1)%>\');">&lt;Prev</a>',
+					'<a id="artListPrevLink" href="javascript:void(0);" onclick="$$.handler.jump(\'' + _MARK_PREFIX + modKey + '<%=page === 2 ? "" : "/p" + (page - 1)%>\');">&lt;Prev</a>',
 				'<%}%>',
 				'<%if(!is_last_page) {%>',
-					'<a id="artListNextLink" href="javascript:void(0);" onclick="$$.handler.jump(\'' + modKey + '/p<%=page + 1%>\');">Next&gt;</a>',
+					'<a id="artListNextLink" href="javascript:void(0);" onclick="$$.handler.jump(\'' + _MARK_PREFIX + modKey + '/p<%=page + 1%>\');">Next&gt;</a>',
 				'<%}%>',
 				'</div>',
 			'</div>',

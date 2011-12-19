@@ -1,4 +1,5 @@
 (function(modKey, modName, modId) {
+	var _MARK_PREFIX = $$.config.get('MARK_PREFIX');
 	var _TMPL = [
 		'<div id="writeArticle" class="sidePart"><div class="block yui-skin-sam"><div class="blockInner">',
 			'<h2>Write Article</h2>',
@@ -64,7 +65,7 @@
 				load: function(o) {
 					if(o.ret === 0) {
 						$$.handler.clearCache();
-						$$.handler.jump('list');
+						$$.handler.jump(_MARK_PREFIX + 'list');
 					} else {
 						alert('Failed to post article.');
 					}

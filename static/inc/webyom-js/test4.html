@@ -6,8 +6,12 @@
 </head>
 <body>
 <script type="text/javascript">
-window.name = '{"ret": 0, "msg": "成功！"}';
-location.href = 'http://www.webyom.org/static/inc/webyom-js/cdp_cs_proxy.html';
+var frame = document.createElement('iframe');
+frame.addEventListener('load', function() {
+   console.log('loaded'); 
+});
+frame.src = 'http://www.qq.com';
+frame = document.body.appendChild(frame);
 </script>
 </body>
 </html>
