@@ -36,3 +36,7 @@
 .prettyprint {
 	word-wrap: break-word;
 }
+
+.prettyprint code {
+	font-family: "Courier New", Courier, monospace;
+}
