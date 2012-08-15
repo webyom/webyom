@@ -21,12 +21,12 @@ $$.config = (function() {
 		MARK_PREFIX: 'view/',
 		DEFAULT_MOD_KEY: 'list',
 		LIB_NAME_URL_HASH: {
-			'WYJS_MOUSE_EVENT': '/static/inc/webyom-js/mouse_event.js',
+			'YOM_MOUSE_EVENT': '/static/inc/webyom-js/mouse_event.js',
+			'YOM_LOCAL_STORAGE': '/static/inc/webyom-js/local_storage.js',
+			'YOM_DRAGDROP': '/static/inc/webyom-js/dragdrop.js',
+			'YOM_WIDGET_MASK': '/static/inc/webyom-js/widget/mask.js',
+			'YOM_WIDGET_DIALOG': '/static/inc/webyom-js/widget/dialog.js',
 			'PRETTY_PRINT': '/static/inc/prettify/prettify.js'
-		},
-		MOD_NAME_URL_HASH: {
-			'ARTICLE_LIST': '/static/js/mod/article_list.js',
-			'READ_ARTICLE': '/static/js/mod/read_article.js'
 		},
 		MOD_KEY_NAME_HASH: {
 			'list': 'ARTICLE_LIST',
@@ -54,7 +54,7 @@ $$.config = (function() {
 			_updater[key] = _updater[key] || [];
 			_updater[key].push(updater);
 		}
-		return $.object.clone(_config[key]);
+		return $.object.clone(_config[key], true);
 	};
 	
 	function set(key, val) {

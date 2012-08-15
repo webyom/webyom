@@ -9,7 +9,16 @@ $$.handler = (function(opt) {
 	
 	var _curMark;
 	var _curModInfo = {};
-	var _jsLoaderAbortExcludeIdHash = {};
+	var _prevModInfo = {};
+	var _jsLoaderAbortExcludeIdHash = {
+		'/static/js/main.js': 1,
+		'/static/inc/webyom-js/mouse_event.js': 1,
+		'/static/inc/webyom-js/local_storage.js': 1,
+		'/static/inc/webyom-js/dragdrop.js': 1,
+		'/static/inc/webyom-js/widget/mask.js': 1,
+		'/static/inc/webyom-js/widget/dialog.js': 1,
+		'/static/inc/prettify/prettify.js': 1
+	};
 	
 	function _getOption() {
 		var m, n, opt;
@@ -38,12 +47,18 @@ $$.handler = (function(opt) {
 		if(modInfo.url) {
 			$.js.require(modInfo.url, function(ret) {
 				if(ret !== 0) {
-					alert(
+					$$alert(
 					      'Code: ' + ret + '\n' +
 					      'Message: Failed to load module' + modName
 					);
 					return;
 				}
+				handler.dispatchEvent(handler.createEvent('loadmod', {
+					originMark: $.history.ajax.getPrevMark(),
+					targetMark: _curMark,
+					originMod: $.object.clone(_prevModInfo, true),
+					targetMod: $.object.clone(modInfo, true)
+				}));
 				$$.mod[modName].handle(subMark, data);
 			});
 		} else if(modInfo.handler) {
@@ -74,23 +89,24 @@ $$.handler = (function(opt) {
 		}
 		var modInfo = _getModInfo(mark);
 		if(!modInfo) {
-			alert('Sorry, can not find the page you requested.');
+			$$alert('Sorry, can not find the page you requested.');
 			return;
 		}
 		if(handler.dispatchEvent(handler.createEvent('beforeunloadmod', {
 			originMark: _curMark,
 			targetMark: mark,
-			originMod: $.object.clone(_curModInfo),
-			targetMod: $.object.clone(modInfo)
+			originMod: $.object.clone(_curModInfo, true),
+			targetMod: $.object.clone(modInfo, true)
 		})) === false) {
 			return;
 		}
-		easyHistory.setMark(m, modInfo.title + _TITLE_POSTFIX);
+		$.history.ajax.setMark(m, modInfo.title + _TITLE_POSTFIX);
 		_curMark = m;
+		_prevModInfo = _curModInfo;
 		_curModInfo = modInfo;
 		abortAllRequests();
 		setTimeout(function() {
-			_loadMod(modInfo, modInfo.subMark, data || easyHistory.getCache(mark));
+			_loadMod(modInfo, modInfo.subMark, data || $.history.ajax.getCache(mark));
 		}, 300);
 	};
 	
@@ -100,13 +116,13 @@ $$.handler = (function(opt) {
 	
 	function error(e, modName) {
 		if(e instanceof $.Error) {
-			alert(
+			$$alert(
 			      (modName ? 'Module: ' + modName + '\n' : '') +
 			      'Code: ' + e.code + '\n' +
 			      'Message: ' + e.message
 			);
 		} else {
-			alert(
+			$$alert(
 			      (modName ? 'Module: ' + modName + '\n' : '') +
 			      (typeof e == 'number' ? 'Code: ' + e + '\n' : '') +
 			      'Message: Sorry!'
@@ -141,15 +157,15 @@ $$.handler = (function(opt) {
 	};
 	
 	function setCache(mark, data) {
-		easyHistory.setCache(_getPrefixedMark(mark), data);
+		$.history.ajax.setCache(_getPrefixedMark(mark), data);
 	};
 	
 	function getCache(mark) {
-		return easyHistory.getCache(_getPrefixedMark(mark));
+		return $.history.ajax.getCache(_getPrefixedMark(mark));
 	};
 	
 	function clearCache() {
-		return easyHistory.clearCache();
+		return $.history.ajax.clearCache();
 	};
 	
 	var Handler = function() {
@@ -157,7 +173,8 @@ $$.handler = (function(opt) {
 	};
 	$.Class.extend(Handler, $.Event);
 	var handler = $extend(new Handler({
-		beforeunloadmod: new $.Observer()
+		beforeunloadmod: new $.Observer(),
+		loadmod: new $.Observer()
 	}), {
 		_ID: 204,
 		jump: jump,
@@ -176,7 +193,7 @@ $$.handler = (function(opt) {
 		
 		var pathName = location.pathname.replace(/^\//, '');
 		var hash = location.hash.replace(/^#!\/?/, '');
-		if(easyHistory.isSupportHistoryState()) {
+		if($.history.isSupportHistoryState) {
 			if(!pathName) {
 				if(_getModInfo(hash)) {
 					history.replaceState(null, document.title, '/' + hash);
@@ -205,7 +222,7 @@ $$.handler = (function(opt) {
 					return;
 				}
 				$.Event.preventDefault(e);
-				if(!easyHistory.isSupportHistoryState() && location.pathname.replace(/^\//, '')) {
+				if(!$.history.isSupportHistoryState && location.pathname.replace(/^\//, '')) {
 					location.href = '/#!' + pathName;
 				} else {
 					jump(pathName);
@@ -213,8 +230,8 @@ $$.handler = (function(opt) {
 			}
 		});
 		
-		easyHistory.setListener(_handle);
-		easyHistory.init(opt);
+		$.history.ajax.setListener(_handle);
+		$.history.ajax.init(opt);
 	})();
 	
 	return handler;

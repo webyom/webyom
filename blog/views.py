@@ -11,7 +11,7 @@ from webyom.blog.models import *
 from webyom.blog import *
 
 SITE_TIMEZONE = 8 * 3600
-ARTICLE_LIST_PAGER_SIZE = 5
+ARTICLE_LIST_PAGER_SIZE = 2
 
 def main_page(request):
     get_token(request)

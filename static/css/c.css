@@ -16,6 +16,11 @@ body {
 a {
 	color: #A19476;
 	text-decoration: none;
+	transition-duration: .3s;
+	-webkit-transition-duration: .3s;
+	-moz-transition-duration: .3s;
+	-ms-transition-duration: .3s;
+	-o-transition-duration: .3s;
 }
 a:hover {
 	color: #A19476;
@@ -48,10 +53,13 @@ h1, h2, h3 {
 
 /* @framework
 --------------------------------------------------------------------------------------------*/
-#header, #breadcrumb, #content, #footer {
+#wrapper {
 	width: 992px;
 	margin: 0 auto;
 	font-size: 1.2em;
+}
+#header, #breadcrumb, #content, #footer {
+	margin: 0 12px;
 }
 
 
@@ -136,7 +144,6 @@ h1, h2, h3 {
 	clear: both;
 }
 #content.processing {
-	filter: alpha(opacity=50);
 }
 #content h1 {
 	font-size: 1.3em;
@@ -147,14 +154,14 @@ h1, h2, h3 {
 }
 
 #content .mainPart {
-	width: 720px;
+	width: 708px;
 	float: left;
 	padding-bottom: 5px;
 }
 
 #content .sidePart {
 	float: right;
-	width: 267px;
+	width: 255px;
 	padding-bottom: 5px;
 }
 
@@ -162,10 +169,20 @@ h1, h2, h3 {
 	margin-top: 5px;
 	padding: 5px;
 	background: #F1F6E0 url(/static/img/bg_content_border.gif) right top repeat;
+	border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-ms-border-radius: 5px;
+	-o-border-radius: 5px;
 }
 .mainPart .blockInner, .sidePart .blockInner {
 	background: #fff;
 	padding: 10px;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	-ms-border-radius: 2px;
+	-o-border-radius: 2px;
 }
 .sidePart .blockInner, .mainPart .blockInner.dark {
 	background: #F2F2D0;
@@ -211,6 +228,20 @@ h1, h2, h3 {
 	float: right;
 }
 
+/* @sortable
+--------------------------------------------------------------------------------------------*/
+.sortable {
+	position: relative;
+}
+
+.sortable .handle {
+	cursor: move;
+	height: 16px;
+	width: 100%;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
 
 /* @whoAmI
 --------------------------------------------------------------------------------------------*/
@@ -292,7 +323,7 @@ img.iconNewWindow {
 #mainPart .commnetBox textarea {
 	border: none;
 	border-top: solid 1px #E1E1BB;
-	width: 704px;
+	width: 692px;
 	font-size: 1.2em;
 	padding: 3px;
 }
@@ -310,7 +341,7 @@ img.iconNewWindow {
 	border: none;
 	border-bottom: solid 1px #E1E1BB;
 	background: none;
-	width: 140px;
+	width: 136px;
 	margin-right: 16px;
 }
 
@@ -349,6 +380,16 @@ img.iconNewWindow {
 }
 #artListNextLink {
 	float: right;
+}
+
+/* @prettyprint
+--------------------------------------------------------------------------------------------*/
+pre.prettyprint {
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	-ms-border-radius: 3px;
+	-o-border-radius: 3px;	
 }
 
 

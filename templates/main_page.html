@@ -9,9 +9,11 @@
 <link type="text/css" rel="stylesheet" href="/static/css/c.css" />
 </head>
 <body style="display: none;">
-<div id="header" class=""></div>
-<div id="content"></div>
-<div id="footer"></div>
+<div id="wrapper">
+	<div id="header" class=""></div>
+	<div id="content"></div>
+	<div id="footer"></div>
+</div>
 
 <script type="text/javascript" src="/static/inc/webyom-js/js.js"></script>
 <script type="text/javascript">
@@ -22,23 +24,27 @@ $$userName = '{{ user.username }}';
 var $$uiContentTmpl = [
 	'<div id="mainPart" class="mainPart"></div>',
 	'<div id="sidePart" class="sidePart">',
-		'<div id="whoAmI" class="block"><div class="blockInner">',
+		'<div data-mod-id="1" id="whoAmI" class="block sortable" style="position: relative;"><div class="blockInner">',
+			'<div class="handle"></div>',
 			'<h2>Who am I?</h2>',
 			'<div id="sideWhoamiContent"></div>',
 		'</div></div>',
 		{% if is_admin %}
-		'<div class="block"><div class="blockInner light">',
+		'<div data-mod-id="2" class="block sortable"><div class="blockInner light">',
+			'<div class="handle"></div>',
 			'<h2>Admin</h2>',
 			'<ul>',
 				'<li><a href="/view/write">Write Article</a></li>',
 			'</ul>',
 		'</div></div>',
 		{% endif %}
-		'<div class="block"><div class="blockInner">',
+		'<div data-mod-id="3" class="block sortable"><div class="blockInner">',
+			'<div class="handle"></div>',
 			'<h2>Recent Readings</h2>',
 			'<div id="sideReadingsContent"></div>',
 		'</div></div>',
-		'<div class="block"><div class="blockInner">',
+		'<div data-mod-id="4" class="block sortable"><div class="blockInner">',
+			'<div class="handle"></div>',
 			'<h2>Recommended Web Sites</h2>',
 			'<div id="sideRecSites"></div>',
 		'</div></div>',
@@ -46,10 +52,15 @@ var $$uiContentTmpl = [
 ].join('');
 
 (function() {
-        var list = ['/static/inc/webyom-js/core.js', '/static/inc/easy_history/easy_history.js', '/static/js/main.js'];
-        if(!document.querySelectorAll) {
-                list.unshift('/static/inc/sizzle/sizzle.js');
-        }
+        var list = [
+		[
+			true,
+			'/static/inc/webyom-js/core.js',
+			'/static/inc/webyom-js/history.js',
+			document.querySelectorAll ? '' : '/static/inc/sizzle/sizzle.js'
+		],
+		'/static/js/main.js'
+	];
         $.js.require(list);
 })();
 </script>

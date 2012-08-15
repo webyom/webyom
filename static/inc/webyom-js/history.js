@@ -1,17 +1,18 @@
 /**
- * @namespace easyHistory
- * @author Gary Wang, webyom@gmail.com
+ * @namespace YOM.history
  */
+YOM.addModule('history', {
+	_ID: 127,
+	isSupportHistoryState: !!history.pushState
+});
 
-var easyHistory = (function() {
-	var _IE_FRAME_SRC = '/static/inc/easy_history/history_blank.html';
+/**
+ * @namespace YOM.history.ajax
+ */
+YOM.history.addModule('ajax', function(YOM) {
+	var _IE_FRAME_SRC = '/static/inc/webyom-js/history_blank.html';
 	var _INTERVAL = 100;
 	
-	var _userAgent = navigator.userAgent.toLowerCase();
-	var _ua = {
-		ie: (/msie/).test(_userAgent) && !(/opera/).test(_userAgent),
-		safari: (/safari/).test(_userAgent) && !(/chrome/).test(_userAgent) && !(/android/).test(_userAgent)
-	};
 	var _ieFrame = null;
 	var _markCacheIndexHash = {};
 	var _cache = [];
@@ -21,7 +22,7 @@ var easyHistory = (function() {
 	var _currentMark;
 	var _listener = null;
 	var _listenerBind = null;
-	var _isSupportHistoryState = !!history.pushState;
+	var _isSupportHistoryState = YOM.history.isSupportHistoryState;
 	
 	function _updateCurrentMark(mark) {
 		if(mark == _currentMark) {
@@ -34,7 +35,7 @@ var easyHistory = (function() {
 	
 	function _checkMark(mark) {
 		mark = _isValidMark(mark) ? mark : getMark();
-		if(_ua.safari && !_isSupportHistoryState && typeof window.onhashchange == 'undefined') {
+		if(YOM.browser.safari && !_isSupportHistoryState && typeof window.onhashchange == 'undefined') {
 			setTimeout(arguments.callee, _INTERVAL);
 		}
 		if(mark == _currentMark || !_isValidMark(mark)) {
@@ -55,7 +56,7 @@ var easyHistory = (function() {
 	};
 	
 	function _isOldIe() {
-		return _ua.ie && (!document.documentMode || document.documentMode < 8);
+		return YOM.browser.ie && (!document.documentMode || document.documentMode < 8);
 	};
 	
 	function _setIeFrameSrc(mark) {
@@ -116,13 +117,14 @@ var easyHistory = (function() {
 			_addEvent(window, 'popstate', _checkMark);
 		} else if(!_isOldIe() && typeof window.onhashchange != 'undefined') {
 			_addEvent(window, 'hashchange', _checkMark);
-		} else if(_ua.safari) {
+		} else if(YOM.browser.safari) {
 			setTimeout(_checkMark, _INTERVAL);
 		} else {
 			setInterval(_checkMark, _INTERVAL);
 		}
 		var mark = getMark();
 		_checkMark(_isValidMark(mark) ? mark : '');
+		init = $empty;
 	};
 		
 	function setListener(listener, bind) {
@@ -173,10 +175,6 @@ var easyHistory = (function() {
 		return _previousMark;	
 	};
 	
-	function isSupportHistoryState() {
-		return _isSupportHistoryState;
-	};
-	
 	return {
 		init: init,
 		setListener: setListener,
@@ -185,9 +183,7 @@ var easyHistory = (function() {
 		clearCache: clearCache,
 		setMark: setMark,
 		getMark: getMark,
-		getPrevMark: getPrevMark,
-		isSupportHistoryState: isSupportHistoryState
+		getPrevMark: getPrevMark
 	};
-})();
-
+});
 

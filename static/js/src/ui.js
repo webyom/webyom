@@ -18,7 +18,7 @@ $$.ui = (function() {
 			FRAME: $$uiContentTmpl,
 			SIDE_WHOAMI: [
 				'<p>', 
-					'<img src="/static/img/myPhoto.jpg" alt="Who am I?" />', 
+					'<img src="/static/img/myPhoto.jpg" alt="Who am I?" ondblclick="$.console.turnOn();" />', 
 					'Hi, my name is Gary Wang.<br /><br />', 
 					'I\'m living in Shenzhen China, and working as a front-end developer.<br /><br />', 
 					'I love programming in Javascript, CSS, and HTML. Recently I\'m studying Python. I found Python a extramely good programming language, thus I started to build this blog with it.', 
@@ -40,6 +40,8 @@ $$.ui = (function() {
 		FOOTER : '<span>&copy;2009-2011 Webyom. Designed and Programmed by <a href="mailto:webyom@gmail.com" title="Write a mail to Gary.">Gary</a>. Powered by <a href="http://www.djangoproject.com" target="_blank">Django</a> and <a href="http://github.com/webyom/webyom-js" target="_blank">YOM</a></span><img src="/static/img/django_logo.gif" alt="Powered by Django" /><br class="clearFix" />'
 	};
 	
+	var _sortable = null;
+	
 	function _initHeader() {
 		$('#header').get().innerHTML = _TMPL['HEADER'];
 		$('#header').tween(1500, {
@@ -49,6 +51,7 @@ $$.ui = (function() {
 			target: {
 				style: 'left: 0px; opacity: 1;'
 			},
+			css: true,
 			transition: 'easeOut'
 		});
 	};
@@ -63,17 +66,42 @@ $$.ui = (function() {
 	
 	function resetContent() {
 		$('#content').get().innerHTML = _TMPL['CONTENT']['FRAME'];
-		$('#sideWhoamiContent').get().innerHTML = _TMPL['CONTENT']['SIDE_WHOAMI'];
-		$('#sideReadingsContent').get().innerHTML = _TMPL['CONTENT']['SIDE_READINGS'];
-		$('#sideRecSites').get().innerHTML = _TMPL['CONTENT']['SIDE_REC_SITES'];
-		$('#sidePart').tween(1500, {
-			origin: {
-				style: 'top: -800px; opacity: 0; position: relative;'
-			},
-			target: {
-				style: 'top: 0px; opacity: 1; position: static;'
-			},
-			transition: 'easeOut'
+		$.js.require($$_LIB_NAME_URL_HASH.YOM_LOCAL_STORAGE, function(res) {
+			$.localStorage.get('sideModSequence', {proxy: 1, callback: function(res) {
+				if(res) {
+					$.object.each(res.split(' '), function(modId) {
+						$('[data-mod-id="' + modId + '"]', '#sidePart').appendTo($('#sidePart'));
+					});
+				}
+				$('#sideWhoamiContent').get().innerHTML = _TMPL['CONTENT']['SIDE_WHOAMI'];
+				$('#sideReadingsContent').get().innerHTML = _TMPL['CONTENT']['SIDE_READINGS'];
+				$('#sideRecSites').get().innerHTML = _TMPL['CONTENT']['SIDE_REC_SITES'];
+				$('#sidePart').tween(1500, {
+					origin: {
+						style: 'top: -800px; opacity: 0; position: relative;'
+					},
+					target: {
+						style: 'top: 0px; opacity: 1; position: relative;'
+					},
+					css: true,
+					transition: 'easeOut'
+				});
+			}});
+		});
+		$.js.require($$_LIB_NAME_URL_HASH.YOM_DRAGDROP, function(res) {
+			try {
+				_sortable && _sortable.destory();
+			} catch(e) {}
+			_sortable = new $.dragdrop.Sortable('#sidePart .sortable', {cloneContainer: YOM('#sidePart'), handles: '.handle', enterDirection: 'V', boundary: 'PAGE', snap: 0, startOff: {left: 5, top: 5}, clone: 0});
+			_sortable.addEventListener('sortrelease', function() {
+				var tmp = [];
+				$('#sidePart .sortable').each(function(el) {
+					tmp.push(YOM(el).getDatasetVal('mod-id'));
+				});
+				$.js.require($$_LIB_NAME_URL_HASH.YOM_LOCAL_STORAGE, function(res) {
+					$.localStorage.set('sideModSequence', tmp.join(' '), {proxy: 1});
+				});
+			});
 		});
 	};
 	
@@ -115,12 +143,18 @@ $$.ui.processing = (function() {
 	(function() {
 		_div = document.body.appendChild($.Element.create('div', {id: 'processingDiv'}, {display: 'none'}));
 		$.JsLoader.addEventListener('start', function(e) {
+			if(e.opt.silent) {
+				return;
+			}
 			start();
 		});
 		$.JsLoader.addEventListener('allcomplete', function(e) {
 			stop();
 		});
 		$.Xhr.addEventListener('start', function(e) {
+			if(e.opt.silent) {
+				return;
+			}
 			start();
 		});
 		$.Xhr.addEventListener('allcomplete', function(e) {

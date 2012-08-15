@@ -5,4 +5,4 @@ RewriteRule ^(.*)$ http://www.webyom.org/$1 [R=301,L]
 RewriteRule ^static/(.*)$ webyom/static/$1
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_URI} !^/(webyom/static|static)/(.*)$
-RewriteRule ^(.*)$ django.wsgi/$1 [QSA,L]
+RewriteRule ^(.*)$ mysite.fcgi/$1 [QSA,L]

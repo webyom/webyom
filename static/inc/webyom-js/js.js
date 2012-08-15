@@ -1,7 +1,363 @@
-var YOM=function(c,l){return $query(c,l)};YOM._ID=100;if(!$)var $=YOM;
-YOM.js=function(){function c(b,a,e){b.addEventListener?b.addEventListener(a,e,false):b.attachEvent("on"+a,e)}function l(b,a,e){if(a==b[0]){f[a]=g.LOADING;e=e||{};e.complete=function(d){f[a]=d===0?g.LOADED:f[a];for(var h;m[a].length;){h=j[m[a].shift()];!h||h.aborted||h.fn(d)}};e.silent=1;(new YOM.JsLoader(a,e)).load()}}function n(b,a,e){var d=o[a];f[a]=b===0?g.PRELOADED:f[a];for(e&&setTimeout(function(){document.body.removeChild(e)},0);d&&d.length;)d.shift().call(this)}function r(b){var a;if(!f[b]){f[b]=
-g.PRELOADING;if(YOM.browser.ie||YOM.browser.opera){a=new Image;c(a,"load",function(){n(0,b)});c(a,"error",function(){n(0,b)});a.src=b}else{a=document.createElement("object");a.width=0;a.height=0;a.style.position="absolute";a.style.left="-9999px";a.data=b;c(a,"load",function(){n(0,b,a)});c(a,"error",function(){n(1,b,a)});document.body.appendChild(a)}}}var q=0;YOM.JsLoader=function(b,a){this._src=b;this._charset=a.charset;this._oncomplete=a.complete};YOM.JsLoader.prototype.load=function(){var b=this,
-a=document.createElement("script");if(YOM.browser.ie)c(a,"readystatechange",function(){if(a&&(a.readyState=="loaded"||a.readyState=="complete")){if(YOM.browser.v===9)a.src="";document.body.removeChild(a);b._oncomplete.call(this,0)}});else{c(a,"load",function(){document.body.removeChild(a);b._oncomplete.call(this,0)});c(a,"error",function(){document.body.removeChild(a);b._oncomplete.call(this,1)})}if(this._charset)a.charset=this._charset;a.src=this._src;document.body.appendChild(a)};var g={INIT:0,
-PRELOADING:1,PRELOADED:2,LOADING:3,LOADED:4},j=[],f={},m={},o={};return{_ID:113,require:function(b,a,e){var d,h,k;Object.prototype.toString.call(b)=="[object Array]"||(b=[b]);e=e||{};h=j.length;j.push({fn:function(i){var p;if(i===0){for(;b.length;){p=b[0];if(f[p]==g.LOADED)b.shift();else{if(f[p]==g.PRELOADED||!q)l(b,p,e);return}}if(!b.length){a&&a.call(e.bind,i);delete j[h]}}else{a&&a.call(e.bind,i);delete j[h]}},aborted:0});for(k=0;k<b.length;k++){d=b[k];if(f[d]==g.LOADED){b.splice(k,1);k--}else{m[d]=
-m[d]||[];m[d].push(h);if(f[d]!=g.LOADING)if(f[d]==g.PRELOADED||!q)l(b,d,e);else{o[d]=o[d]||[];o[d].push(function(i){return function(){f[i]==g.LOADING||f[i]==g.LOADED||l(b,i,e)}}(d));f[d]!=g.PRELOADING&&r(d)}}}b.length||a.call(e.bind,0);return h},preload:r,abort:function(b){if(b=j[b]){b.aborted=1;return 0}return 1},enableParallel:function(b){q=b?1:0}}}();
-YOM.browser=function(){var c=navigator.userAgent.toLowerCase();return{_ID:104,v:+(c.match(/(?:version|firefox|chrome|safari|opera|msie)[\/: ]([\d]+)/)||[0,0])[1],ie:/msie/.test(c)&&!/opera/.test(c),opera:/opera/.test(c),firefox:/firefox/.test(c),chrome:/chrome/.test(c),safari:/safari/.test(c)&&!/chrome/.test(c)&&!/android/.test(c),iphone:/iphone|ipod/.test(c),ipad:/ipad/.test(c),android:/android/.test(c)}}();
+/**
+ * @fileoverview base of YOM framework
+ * @author Gary Wang webyom@gmail.com webyom.org
+ */
+
+/*
+ID LIST:
+100: base
+101: error
+102: class
+103: array
+104: browser
+105: cookie
+106: css
+107: element
+108: event
+109: js_loader
+110: object
+111: observer
+112: pos
+113: js
+114: tmpl
+115: util
+116: xhr
+117: string
+118: console
+119: transition
+120: tween
+121: localStorage
+122: dragdrop
+123: HashArray
+124: InstanceManager
+125: CrossDomainPoster
+126: json
+127: history
+128: widget
+128001: widget.Mask
+128002: widget.Dialog
+*/
+
+/**
+ * @namespace
+ */
+if(!YOM) {
+	var YOM = function(sel, context) {
+		return $query(sel, context);
+	};
+}
+
+YOM._ID = 100;
+
+YOM.LIB_BASE = YOM.LIB_BASE || '/static/inc/webyom-js/';
+
+YOM.debugMode = 0;
+
+YOM.addModule = (function(YOM) {
+	return function addModule(modName, factory, redefine) {
+		var namespace = this;
+		var module = namespace[modName];
+		if(module && !redefine) {
+			return namespace;
+		}
+		module = namespace[modName] = typeof factory == 'function' ? factory(YOM, namespace) : factory;
+		module.addModule = YOM.addModule;
+		return namespace;
+	};
+})(YOM);
+
+/**
+ * @namespace
+ */
+if(!$) {
+	var $ = YOM;
+}
+
+(function() {
+	var t = document.domain.split('.'), l = t.length;
+	YOM.domain = t.slice(l - 2, l).join('.');
+})();
+
+function $id(id) {
+	return document.getElementById(id);
+};
+
+function $query(sel, context) {
+	var res;
+	if(sel instanceof YOM.Element) {
+		return sel;
+	} else if(typeof sel == 'string') {
+		if(context) {
+			context = new YOM.Element(typeof context == 'string' ? (document.querySelectorAll ? document.querySelectorAll(context) : Sizzle(context)) : context);
+			res = context.find(sel);
+		} else {
+			res = new YOM.Element(document.querySelectorAll ? document.querySelectorAll(sel) : Sizzle(sel));
+		}
+	} else {
+		res = new YOM.Element(sel);
+	}
+	return res;
+};
+
+function $getClean(obj) {
+	var cleaned;
+	if(obj && obj.getClean) {
+		cleaned = obj.getClean();
+	} else if(typeof obj == 'object') {
+		cleaned = {};
+		for(var p in obj) {
+			if(YOM.object.hasOwnProperty(obj, p)) {
+				cleaned[p] = obj[p];
+			}
+		}
+	} else {
+		cleaned = obj;
+	}
+	return cleaned;
+};
+
+function $extend(origin, extend, check) {
+	return YOM.object.extend(origin, extend, check);
+};
+
+function $now() {
+	return +new Date();
+};
+
+function $empty() {};
+
+if(!$getUniqueId) {
+	var $getUniqueId = (function() {
+		var _count = 0;
+		
+		return function getUniqueId() {
+			return 'YOM_UNIQUE_ID_' + _count++;	
+		};
+	})();
+}
+
+/**
+ * @namespace YOM.js
+ */
+YOM.addModule('js', function(YOM) {
+	/**
+	 * Simple implementation of YOM.JsLoader. To be overwriten by core.js
+	 * @namespace YOM.JsLoader
+	 */
+	YOM.addModule('JsLoader', function(YOM) {
+		var _head = document.head || document.getElementsByTagName('head')[0] || document.documentElement;
+		
+		var JsLoader = function(src, opt) {
+			this._src = src;
+			this._charset = opt.charset;
+			this._oncomplete = opt.complete || $empty;
+		};
+		
+		JsLoader.RET = {
+			SUCC: 0,
+			ABORTED: -1,
+			ERROR: 1	
+		};
+		
+		JsLoader.prototype.load = function() {
+			var self = this;
+			var js = document.createElement('script');
+			if(YOM.browser.ie) {
+				_addEventListener(js, 'readystatechange', function() {
+					if(js && (js.readyState == 'loaded' || js.readyState == 'complete')) {
+						if(YOM.browser.v === 9) {
+							js.src = '';
+						}
+						js.parentNode.removeChild(js);
+						js = null;
+						self._oncomplete.call(this, JsLoader.RET.SUCC);
+					}
+				});
+			} else {
+				_addEventListener(js, 'load', function() {
+					js.parentNode.removeChild(js);
+					self._oncomplete.call(this, JsLoader.RET.SUCC);
+				});
+				_addEventListener(js, 'error', function() {
+					js.parentNode.removeChild(js);
+					self._oncomplete.call(this, JsLoader.RET.ERROR);
+				});
+			}
+			if(this._charset) {
+				js.charset = this._charset;
+			}
+			js.type = 'text/javascript';
+			js.async = 'async';
+			js.src = this._src;
+			_head.insertBefore(js, _head.firstChild);
+		};
+		
+		return JsLoader;
+	});
+	
+	var _STATUS = {
+		INIT: 0,
+		LOADING: 1,
+		LOADED: 2
+	};
+	
+	var _srcStatusHash = {};
+	var _srcLoadCbqHash = {};
+	var _abortedRidHash = {};
+	
+	function _isArray(obj) {
+		return Object.prototype.toString.call(obj) == '[object Array]';
+	};
+	
+	function _addEventListener(elem, type, listener) {
+		if(elem.addEventListener) {
+			elem.addEventListener(type, listener, false);
+		} else {
+			elem.attachEvent('on' + type, listener);
+		}
+	};
+	
+	function _requireLoad(src, charset, silent) {
+		var status = _srcStatusHash[src];
+		_srcStatusHash[src] = _STATUS.LOADING;
+		new YOM.JsLoader(src, {
+			complete: function(ret) {
+				_srcStatusHash[src] = ret === YOM.JsLoader.RET.SUCC ? _STATUS.LOADED : status;
+				var q = _srcLoadCbqHash[src];
+				if(!q) {
+					return;
+				}
+				while(q.length) {
+					q.shift()(ret);
+				}
+				delete _srcLoadCbqHash[src];
+			},
+			charset: charset,
+			silent: silent
+		}).load();
+	};
+	
+	function _require(isAsync, rid, srcs, cb, charset, silent) {
+		_checkRequireList();
+		function _onComplete(ret) {
+			if(_abortedRidHash[rid]) {
+				return;
+			}
+			if(ret === 0) {
+				_checkRequireList();
+			} else {
+				cb(ret);
+			}
+		};
+		function _checkRequireList() {
+			if(!srcs) {
+				return;
+			}
+			var src;
+			var srcCharset;
+			var isSrcArray;
+			for(var i = 0; i < srcs.length; i++) {
+				src = srcs[i];
+				srcCharset = charset;
+				isSrcArray = _isArray(src);
+				if(src && typeof src == 'object' && !isSrcArray) {
+					srcCharset = src.charset;
+					src = src.src;
+				}
+				if(!src ||
+				typeof src != 'string' && !isSrcArray ||
+				isSrcArray && !src.length ||
+				_srcStatusHash[src] == _STATUS.LOADED) {
+					srcs.splice(i, 1);
+					i--;
+					continue;
+				}
+				if(isSrcArray) {
+					if(src[0] === true) {
+						_require(true, rid, src, _onComplete, charset, silent);
+					} else {
+						_require(false, rid, src, _onComplete, charset, silent);
+					}
+				} else {
+					_srcLoadCbqHash[src] = _srcLoadCbqHash[src] || [];
+					_srcLoadCbqHash[src].push(_onComplete);
+					if(_srcStatusHash[src] != _STATUS.LOADING) {
+						_requireLoad(src, srcCharset, silent);
+					}
+				}
+				if(!isAsync) {
+					break;
+				}
+			}
+			if(!srcs.length) {
+				srcs = null;//avoid mutilple callback in async mode
+				cb(0);
+			}
+		}
+	};
+	
+	function require(srcs, cb, opt) {
+		var rid, bind, charset, silent;
+		if(!_isArray(srcs)) {
+			srcs = [srcs];
+		}
+		opt = opt || {};
+		bind = opt.bind;
+		charset = opt.charset;
+		silent = opt.silent;
+		rid = $getUniqueId();
+		if(srcs[0] === true) {
+			_require(true, rid, srcs, function(ret) {
+				cb && cb.call(bind, ret);
+			}, charset, silent);
+		} else {
+			_require(false, rid, srcs, function(ret) {
+				cb && cb.call(bind, ret);
+			}, charset, silent);
+		}
+		return rid;
+	};
+	
+	function preload(srcs, opt) {
+		opt = opt || {};
+		if(typeof opt.silent == 'undefined') {
+			opt.silent = 1;
+		}
+		return require(srcs, null, opt);
+	};
+	
+	function abort(rid) {
+		_abortedRidHash[rid] = 1;
+	};
+	
+	return {
+		_ID: 113,
+		require: require,
+		preload: preload,
+		abort: abort
+	};
+});
+
+/**
+ * @namespace YOM.browser
+ */
+YOM.addModule('browser', function(YOM) {
+	var _ua = navigator.userAgent.toLowerCase();
+	
+	return {
+		_ID: 104,
+		v: +(_ua.match(/(?:version|firefox|chrome|safari|opera|msie)[\/: ]([\d]+)/) || [0, 0])[1],
+		ie: (/msie/).test(_ua) && !(/opera/).test(_ua),
+		opera: (/opera/).test(_ua),
+		firefox: (/firefox/).test(_ua),
+		chrome: (/chrome/).test(_ua),
+		safari: (/safari/).test(_ua) && !(/chrome/).test(_ua) && !(/android/).test(_ua),
+		iphone: (/iphone|ipod/).test(_ua),
+		ipad: (/ipad/).test(_ua),
+		android: (/android/).test(_ua),
+		
+		isQuirksMode: function() {
+			return document.compatMode != 'CSS1Compat';
+		}
+	};
+});

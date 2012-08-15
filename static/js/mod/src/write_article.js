@@ -45,8 +45,14 @@
 		'</div></div></div>'
 	].join('');
 	
+	var _cssList = [
+		'http://yui.yahooapis.com/2.7.0/build/assets/skins/sam/skin.css',
+		'/static/css/yuiEditor.css',
+		'/static/css/form.css'
+	];
+	
 	function _render(url, data, aid) {
-		$.tmpl.apply('#content', _TMPL, data, {key: 'mod.writeArticle'});
+		$('#content').setHtml($.tmpl.render(_TMPL, data, {key: 'mod.writeArticle'}));
 		var myEditor = new YAHOO.widget.Editor('msgpost', {   
 			height: '500px',   
 			width: '100%',
@@ -57,7 +63,7 @@
 			myEditor.saveHTML();   
 			var html = myEditor.get('element').value;
 			if(!$.string.trim(html.replace(/<br>/ig, '').replace(/&nbsp;/ig, '')) || !$('#category').getVal() || !$('#title').getVal()) {
-				alert('Please enter category, title, and content.');
+				$$alert('Please enter category, title, and content.');
 				return;
 			}
 			$$.util.xhr.post(url, {
@@ -67,11 +73,11 @@
 						$$.handler.clearCache();
 						$$.handler.jump(_MARK_PREFIX + 'list');
 					} else {
-						alert('Failed to post article.');
+						$$alert('Failed to post article.');
 					}
 				},
 				error: function() {
-					alert('Failed to post article.');
+					$$alert('Failed to post article.');
 				},
 				callbackName: '_post_res'
 			});
@@ -84,6 +90,7 @@
 	};
 	
 	function handle(subMark) {
+		$.css.load(_cssList);
 		$.js.require([
 			'http://yui.yahooapis.com/2.7.0/build/yahoo-dom-event/yahoo-dom-event.js',
 			'http://yui.yahooapis.com/2.7.0/build/element/element-min.js',
@@ -98,11 +105,11 @@
 						if(o.ret === 0) {
 							_render('/data/update/' + subMark, o.data.article, subMark);
 						} else {
-							alert('Failed to get article1.');
+							$$alert('Failed to get article1.');
 						}
 					},
 					error: function() {
-						alert('Failed to get article2.');
+						$$alert('Failed to get article2.');
 					},
 					callbackName: '_get_article_info'
 				});
@@ -112,15 +119,13 @@
 		})
 	};
 	
-	(function() {
-		$.css.load([
-			'http://yui.yahooapis.com/2.7.0/build/assets/skins/sam/skin.css',
-			'/static/css/yuiEditor.css',
-			'/static/css/form.css'
-		]);
-	})();
+	$$.handler.addEventListener('loadmod', function(e) {
+		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
+			$.css.unload(_cssList);
+		}
+	});
 	
 	$$.mod[modName] = {
 		handle: handle
 	};
-})('read', 'WRITE_ARTICLE', 302);
+})('write', 'WRITE_ARTICLE', 302);

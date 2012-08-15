@@ -7,7 +7,21 @@
 <body>
 <script type="text/javascript" src="local_storage.js"></script>
 <script type="text/javascript">
-YOM.localStorage._do(frameElement.action, null, {key: frameElement.key, val: frameElement.val, cb: frameElement.cb, life: frameElement.life});
+YOM.localStorage.proxyPull = function() {
+	var queue = frameElement._queue;
+	if(!queue) {
+		return;
+	}
+	while(queue.length) {
+		(function(p) {
+			setTimeout(function() {
+				YOM.localStorage._do(p[0], null, p[1]);
+			}, 0);
+		})(queue.shift());
+	}
+};
+YOM.localStorage.proxyPull();
+frameElement._loaded = 1;
 </script>
 </body>
 </html>

@@ -22,10 +22,10 @@
 				'<%}%>',
 				'<div>',
 				'<%if(page !== 1) {%>',
-					'<a id="artListPrevLink" href="javascript:void(0);" onclick="$$.handler.jump(\'' + _MARK_PREFIX + modKey + '<%=page === 2 ? "" : "/p" + (page - 1)%>\');">&lt;Prev</a>',
+					'<a id="artListPrevLink" href="/view/list<%=page === 2 ? "" : "/p" + (page - 1)%>">&lt;Prev</a>',
 				'<%}%>',
 				'<%if(!is_last_page) {%>',
-					'<a id="artListNextLink" href="javascript:void(0);" onclick="$$.handler.jump(\'' + _MARK_PREFIX + modKey + '/p<%=page + 1%>\');">Next&gt;</a>',
+					'<a id="artListNextLink" href="/view/list/p<%=page + 1%>">Next&gt;</a>',
 				'<%}%>',
 				'</div>',
 			'</div>',
@@ -33,7 +33,10 @@
 		'</div></div>'
 	].join('');
 	
+	var _cssList = ['/static/inc/prettify/prettify.css'];
+	
 	function handle(subMark, data) {
+		$.css.load(_cssList);
 		var cacheKey;
 		if(!/^p\d+$/.test(subMark)) {
 			subMark = 'p1';
@@ -49,19 +52,25 @@
 				target: {
 					style: 'left: -300px; opacity: 0; position: relative;'
 				},
+				css: true,
+				prior: true,
 				transition: 'easeOut',
 				complete: function() {
-					$.tmpl.apply('#mainPart', _TMPL, data, {key: 'mod.articleList'});
+					$('#mainPart').setHtml($.tmpl.render(_TMPL, data, {key: 'mod.articleList'}));
 					$$.util.prettyPrint();
 					$('#mainPart').tween(1000, {
 						origin: {
 							style: 'left: -300px; opacity: 0; position: relative;'
 						},
 						target: {
-							style: 'left: 0px; opacity: 1; position: static;'
+							style: 'left: 0px; opacity: 1; position: relative;'
 						},
+						css: true,
 						transition: 'easeOut'
 					});
+					setTimeout(function() {
+						$.js.preload($$_MOD_KEY_INFO_HASH['read'].url);
+					}, 2000);
 				}
 			});
 			return;
@@ -70,7 +79,7 @@
 		new $.JsLoader('/' + subMark, {
 			callbackName: '_get_article_list',
 			callback: function(o) {
-				$.tmpl.apply('#mainPart', _TMPL, o.data, {key: 'mod.articleList'});
+				$('#mainPart').setHtml($.tmpl.render(_TMPL, data, {key: 'mod.articleList'}));
 				$$.util.prettyPrint();
 				$$.handler.setCache(mark, o.data);
 			},
@@ -96,9 +105,11 @@
 		$$.ui.turnOnMenu('a');
 	};
 	
-	(function() {
-		$.css.load('/static/inc/prettify/prettify.css');
-	})();
+	$$.handler.addEventListener('loadmod', function(e) {
+		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
+			$.css.unload(_cssList);
+		}
+	});
 	
 	$$.mod[modName] = {
 		handle: handle

@@ -1,0 +1,100 @@
+<html> 
+<head> 
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta name="keywords" content="JavaScript, CSS, HTML, Python, Webyom, Gary, Blog" />
+<meta name="description" content="Gary's Blog. About JavaScript, CSS, HTML, and Python." />
+<title>Webyom - Gary's Blog</title>
+<link rel="shortcut icon" href="/static/img/favicon.ico" />
+<style>
+#box {
+	border: solid 10px #000;
+}
+</style>
+</head>
+<body style="height: 2000px;" data-a-b-c="body">
+<div style="border: solid 10px #000; width: 40px; height: 40px;"></div>
+<div id="risizeBoundary" style="position: relative; width: 500px; height: 500px; background: #ccc;">
+<div id="resize" style="width: 100px; height: 100px; position: absolute; background: #f60; border: solid 2px #AAA;"></div>
+</div>
+<div id="box" style="width: 100px; height: 100px; overflow: scroll;" onclick="YOM.console.log(YOM(this).getRect().left);">
+	<div id="ti" style="width: 150px; height: 150px; background: #ccc;" onclick="YOM.console.log(YOM(this).getRect('#box').left);">...................................</div>
+</div>
+<div id="boundary" style="width: 800px;">
+	<div class="dropbox" id="dropbox1" style="height: 200px; background: #ccc;">
+		<div id="box1" style="margin: 5px; border: solid 1px #000; width: 50px; height: 50px; background: #eee;">
+		</div>
+		<div id="box2" style="margin: 5px; border: solid 1px #000; width: 50px; height: 50px; background: #ccc;">
+		</div>
+	</div>
+	<div class="dropbox" id="dropbox2" style="margin-top: 10px; height: 200px; background: #ccc;"></div>
+</div>
+
+<div>
+	<div id="div1">11111</div>
+	<div id="div2">22222</div>
+	<div id="div3">33333</div>
+</div>
+<div>
+	<div id="div4">44444</div>
+	<div id="div5">55555</div>
+	<div id="div6">66666</div>
+</div>
+
+<script type="text/javascript" src="/static/inc/sizzle/sizzle.js"></script>
+<script type="text/javascript" src="/static/inc/webyom-js/core.js"></script>
+<script type="text/javascript" src="/static/inc/webyom-js/dragdrop.js"></script>
+<script type="text/javascript">
+YOM.console.turnOn();
+var drag = new YOM.dragdrop.Dropable('#box1', '.dropbox', {boundary: '#boundary', snap: 10, startOff: 10, clone: function(el) {el = el.clone(true); el.setStyle({width: '80px', height: '80px'}); return el;}});
+drag.addEventListener('dragmousedown', function(e) {
+	YOM.console.log('dragmousedown: ' + e.pos.now.left + ', ' + e.pos.now.top);
+});
+drag.addEventListener('dragstart', function(e) {
+	YOM.console.log('dragstart: ' + e.pos.now.left + ', ' + e.pos.now.top);
+});
+drag.addEventListener('dragmove', function(e) {
+	//YOM.console.log('dragmove: ' + e.pos.now.left + ', ' + e.pos.now.top);
+});
+drag.addEventListener('dragstop', function(e) {
+	YOM.console.log('dragstop: ' + e.pos.now.left + ', ' + e.pos.now.top);
+});
+drag.addEventListener('dropenter', function(e) {
+	YOM.console.log('dropenter: ' + e.dropbox.getAttr('id') + ' ' + e.moveX + ' ' + e.moveY);
+	e.dropbox.setStyle('background-color', '#ddd');
+});
+drag.addEventListener('dropleave', function(e) {
+	YOM.console.log('dropleave: ' + e.dropbox.getAttr('id'));
+	e.dropbox.setStyle('background-color', '#ccc');
+});
+drag.addEventListener('droprelease', function(e) {
+	YOM.console.log('droprelease: ' + (e.dropbox && e.dropbox.getAttr('id')));
+	if(e.dropbox) {
+		e.dropbox.setStyle('background-color', '#ccc');
+		e.el.appendTo(e.dropbox);
+	} else {
+		var rect = e.el.getRect();
+		e.el.clone().setStyle({
+			position: 'absolute',
+			margin: '0',
+			left: e.rect.now.left + 'px',
+			top: e.rect.now.top + 'px',
+			opacity: 1
+		}).appendTo(document.body).tween(300, {
+			target: {
+				style: {
+					left: e.rect.start.left + 'px', top: e.rect.start.top + 'px', opacity: 0
+				}
+			},
+			complete: function(el) {
+				el.remove();
+			},
+			transition: 'easeOut'
+		});
+	}
+});
+
+var resizeable = new YOM.dragdrop.Resizeable('#resize', {minWidth: 20, minHeight: 20, maxWidth: 2000, maxHeight: 200000, boundary: '#risizeBoundary', scrollContainer: document.body});
+resizeable.enable();
+</script>
+</body>
+</html>
