@@ -41,7 +41,6 @@ YOM.history.addModule('ajax', function(YOM) {
 		if(mark == _currentMark || !_isValidMark(mark)) {
 			return;
 		}
-		$.console.log('easyHistory found mark changed, ' + mark);
 		_updateCurrentMark(mark);
 		_listener && _listener.call(_listenerBind, mark, getCache(mark));
 	};
@@ -100,23 +99,15 @@ YOM.history.addModule('ajax', function(YOM) {
 		return typeof mark == 'string' && !(/^[#!\/]/).test(mark);
 	};
 	
-	function _addEvent(obj, eType, listener) {
-		if(obj.addEventListener) {
-			obj.addEventListener(eType, listener, false);
-		} else {
-			obj.attachEvent('on' + eType, listener);
-		}
-	};
-	
 	//Public
 	function init(opt) {
 		opt = opt || {};
 		_cacheEnabled = typeof opt.cacheEnabled != 'undefined' ? opt.cacheEnabled : _cacheEnabled;
 		_cacheSize = opt.cacheSize || _cacheSize;
 		if(_isSupportHistoryState) {
-			_addEvent(window, 'popstate', _checkMark);
+			YOM.Event.addListener(window, 'popstate', _checkMark);
 		} else if(!_isOldIe() && typeof window.onhashchange != 'undefined') {
-			_addEvent(window, 'hashchange', _checkMark);
+			YOM.Event.addListener(window, 'hashchange', _checkMark);
 		} else if(YOM.browser.safari) {
 			setTimeout(_checkMark, _INTERVAL);
 		} else {
@@ -186,4 +177,3 @@ YOM.history.addModule('ajax', function(YOM) {
 		getPrevMark: getPrevMark
 	};
 });
-

@@ -110,4 +110,3 @@ YOM.widget.addModule('Mask', function(YOM) {
 	
 	return Mask;
 });
-

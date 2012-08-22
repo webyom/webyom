@@ -377,4 +377,3 @@ YOM.widget.addModule('Dialog', function(YOM) {
 	return Dialog;
 });
 
-

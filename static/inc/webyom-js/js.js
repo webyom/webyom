@@ -41,11 +41,9 @@ ID LIST:
 /**
  * @namespace
  */
-if(!YOM) {
-	var YOM = function(sel, context) {
-		return $query(sel, context);
-	};
-}
+var YOM = YOM || function(sel, context) {
+	return $query(sel, context);
+};
 
 YOM._ID = 100;
 
@@ -69,9 +67,7 @@ YOM.addModule = (function(YOM) {
 /**
  * @namespace
  */
-if(!$) {
-	var $ = YOM;
-}
+window.$ = window.$ || YOM;
 
 (function() {
 	var t = document.domain.split('.'), l = t.length;
@@ -126,16 +122,13 @@ function $now() {
 
 function $empty() {};
 
-if(!$getUniqueId) {
-	var $getUniqueId = (function() {
-		var _count = 0;
-		
-		return function getUniqueId() {
-			return 'YOM_UNIQUE_ID_' + _count++;	
-		};
-	})();
-}
-
+var $getUniqueId = $getUniqueId || (function() {
+	var _count = 0;
+	
+	return function getUniqueId() {
+		return 'YOM_UNIQUE_ID_' + _count++;	
+	};
+})();
 /**
  * @namespace YOM.js
  */
@@ -337,7 +330,6 @@ YOM.addModule('js', function(YOM) {
 		abort: abort
 	};
 });
-
 /**
  * @namespace YOM.browser
  */

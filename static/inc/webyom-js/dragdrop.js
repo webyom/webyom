@@ -161,8 +161,8 @@ YOM.dragdrop.addModule('Draggable', function(YOM) {
 					rect: this._rect
 				}));
 			} catch(e) {
-				throw(e);
 				this._checkScroll(mouseX, mouseY);
+				throw(e);
 			}
 			this._checkScroll(mouseX, mouseY);
 		},
@@ -224,7 +224,6 @@ YOM.dragdrop.addModule('Draggable', function(YOM) {
 	
 	return Draggable;
 });
-
 /**
  * @class YOM.dragdrop.Droppable
  */
@@ -447,7 +446,6 @@ YOM.dragdrop.addModule('Droppable', function(YOM) {
 	
 	return Droppable;
 });
-
 /**
  * @class YOM.dragdrop.Sortable
  */
@@ -493,7 +491,7 @@ YOM.dragdrop.addModule('Sortable', function(YOM) {
 				top: parseInt(el.getStyle('padding-top')) || 0,
 				right: parseInt(el.getStyle('padding-right')) || 0,
 				bottom: parseInt(el.getStyle('padding-bottom')) || 0
-			}
+			};
 			el = el.clone(true);
 			el.setStyle({
 				width: ((w || startRect.width) - (YOM.browser.ie && YOM.browser.v < 9 ? padding.left + padding.right : 0)) + 'px',
@@ -739,7 +737,6 @@ YOM.dragdrop.addModule('Sortable', function(YOM) {
 	
 	return Sortable;
 });
-
 /**
  * @class YOM.dragdrop.Resizeable
  */
@@ -1034,4 +1031,3 @@ YOM.dragdrop.addModule('Resizeable', function(YOM) {
 	
 	return Resizeable;
 });
-

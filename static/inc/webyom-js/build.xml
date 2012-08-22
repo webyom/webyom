@@ -4,8 +4,8 @@
     <import file="../../../../build_tool/build.xml"/>
     
     <property name="charset" value="utf-8"/>
-    <property name="widget.src.dir" location="../../../../js_lib/webyom-js/widget/src"/>
-    <property name="src.dir" location="../../../../js_lib/webyom-js/src"/>
+    <property name="widget.src.dir" location="../../../../js-lib/webyom-js/widget/src"/>
+    <property name="src.dir" location="../../../../js-lib/webyom-js/src"/>
     <property name="build.dir" location="./"/>
     <property name="copyright.files" value="null"/>
 

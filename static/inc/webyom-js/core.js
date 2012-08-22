@@ -41,11 +41,9 @@ ID LIST:
 /**
  * @namespace
  */
-if(!YOM) {
-	var YOM = function(sel, context) {
-		return $query(sel, context);
-	};
-}
+var YOM = YOM || function(sel, context) {
+	return $query(sel, context);
+};
 
 YOM._ID = 100;
 
@@ -69,9 +67,7 @@ YOM.addModule = (function(YOM) {
 /**
  * @namespace
  */
-if(!$) {
-	var $ = YOM;
-}
+window.$ = window.$ || YOM;
 
 (function() {
 	var t = document.domain.split('.'), l = t.length;
@@ -126,16 +122,13 @@ function $now() {
 
 function $empty() {};
 
-if(!$getUniqueId) {
-	var $getUniqueId = (function() {
-		var _count = 0;
-		
-		return function getUniqueId() {
-			return 'YOM_UNIQUE_ID_' + _count++;	
-		};
-	})();
-}
-
+var $getUniqueId = $getUniqueId || (function() {
+	var _count = 0;
+	
+	return function getUniqueId() {
+		return 'YOM_UNIQUE_ID_' + _count++;	
+	};
+})();
 /**
  * @class YOM.Error
  */
@@ -251,7 +244,6 @@ YOM.addModule('Class', function(YOM) {
 	return Class;
 });
 
-
 /**
  * @class YOM.InstanceManager
  */
@@ -313,7 +305,6 @@ YOM.addModule('InstanceManager', function(YOM) {
 	
 	return InstanceManager;
 });
-
 /**
  * @namespace YOM.object
  */
@@ -646,7 +637,6 @@ YOM.addModule('HashArray', function(YOM) {
 	
 	return HashArray;
 });
-
 /**
  * @namespace YOM.string
  */
@@ -710,7 +700,7 @@ YOM.addModule('json', function(YOM) {
 		'\r': '\\r',
 		'"' : '\\"',
 		'\\': '\\\\'
-        }
+    };
 	
 	function _quote(str) {
 		_escapable.lastIndex = 0;
@@ -793,7 +783,6 @@ YOM.addModule('json', function(YOM) {
 		}
 	};
 });
-
 // This source code is free for use in the public domain.
 // NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
 
@@ -1342,7 +1331,6 @@ YOM.Event.addModule('Delegator', function(YOM) {
 	
 	return Delegator;
 });
-
 /**
  * @class YOM.Event.VirtualEventHandler
  */
@@ -1407,7 +1395,6 @@ YOM.Event.addModule('VirtualEventHandler', function(YOM) {
 	
 	return VirtualEventHandler;
 });
-
 /**
  * @class YOM.Event.MouseenterEventHandler
  */
@@ -1471,7 +1458,6 @@ YOM.Event.addModule('MouseleaveEventHandler', function(YOM) {
 	
 	return MouseleaveEventHandler;
 });
-
 /**
  * @namespace YOM.cookie
  */
@@ -1632,7 +1618,6 @@ YOM.addModule('Xhr', function(YOM) {
 	
 	return Xhr;
 });
-
 /**
  * @class YOM.CrossDomainPoster
  */
@@ -1782,7 +1767,6 @@ YOM.addModule('CrossDomainPoster', function(YOM) {
 	
 	return CrossDomainPoster;
 });
-
 /**
  * @namespace YOM.pos
  */
@@ -1832,8 +1816,37 @@ YOM.addModule('pos', {
 YOM.addModule('util', {
 	_ID: 115,
 	
+	getUrlParam: function(name, loc) {
+		loc = loc || window.location;
+		var r = new RegExp('(\\?|#|&)' + name + '=(.*?)(&|#|$)');
+		var m = (loc.href || '').match(r);
+		return (m ? m[2] : '');
+	},
+	
+	getUrlParams: function(loc) {
+		loc = loc || window.location;
+		var raw = loc.search, res = {}, p, i;
+		if(raw) {
+			raw = raw.slice(1);
+			raw = raw.split('&');
+			for(i = 0, l = raw.length; i < l; i++) {
+				p = raw[i].split('=');
+				res[p[0]] = p[1] || '';
+			}
+		}
+		raw = loc.hash;
+		if(raw) {
+			raw = raw.slice(1);
+			raw = raw.split('&');
+			for(i = 0, l = raw.length; i < l; i++) {
+				p = raw[i].split('=');
+				res[p[0]] = res[p[0]] || p[1] || '';
+			}
+		}
+		return res;
+	},
+
 	appendQueryString: function(url, param, isHashMode) {
-		var op = isHashMode ? '#' : '?';
 		if(typeof param == 'object') {
 			param = YOM.object.toQueryString(param);
 		} else if(typeof param == 'string') {
@@ -1844,13 +1857,27 @@ YOM.addModule('util', {
 		if(!param) {
 			return url;
 		}
-		if(url.indexOf(op) == -1) {
-			url += op;
-		}
-		if(url.charAt(url.length - 1) == op) {
-			url += param;
+		if(isHashMode) {
+			if(url.indexOf('#') == -1) {
+				url += '#' + param;
+			} else {
+				url += '&' + param;
+			}
 		} else {
-			url += '&' + param;
+			if(url.indexOf('#') == -1) {
+				if(url.indexOf('?') == -1) {
+					url += '?' + param;
+				} else {
+					url += '&' + param;
+				}
+			} else {
+				var tmp = url.split('#');
+				if(tmp[0].indexOf('?') == -1) {
+					url = tmp[0] + '?' + param + '#' + (tmp[1] || '');
+				} else {
+					url = tmp[0] + '&' + param + '#' + (tmp[1] || '');
+				}
+			}
 		}
 		return url;
 	}
@@ -1879,7 +1906,8 @@ YOM.addModule('Element', function(YOM) {
 		
 		setStyle: function(name, value) {
 			var el = this.get();
-			var computer = el.ownerDocument.defaultView && el.ownerDocument.defaultView.getComputedStyle;
+			var computer = el.ownerDocument.defaultView;
+			computer = computer && computer.getComputedStyle;
 			if(typeof name == 'object') {
 				YOM.object.each(name, function(val, key) {
 					new Item(el).setStyle(key, val);
@@ -1912,7 +1940,8 @@ YOM.addModule('Element', function(YOM) {
 			name = YOM.string.toCamelCase(name);
 			var el = this.get();
 			var style = el.style[name];
-			var computer = el.ownerDocument.defaultView && el.ownerDocument.defaultView.getComputedStyle;
+			var computer = el.ownerDocument.defaultView;
+			computer = computer && computer.getComputedStyle;
 			if(style) {
 				return style;
 			}
@@ -2691,7 +2720,6 @@ YOM.addModule('Element', function(YOM) {
 	
 	return Element;
 });
-
 /**
  * YOM.Element FX extention, inspired by KISSY
  */
@@ -2709,6 +2737,7 @@ $extend(YOM.Element.prototype, (function() {
 	
 	function _doFx(type, el, duration, complete) {
 		var conf, iStyle, oStyle, tStyle, isShow, width, height;
+		YOM.Tween.stopAllTween(el);
 		if(type == 'fxToggle') {
 			type = el.getStyle('display') == 'none' ? 'fxShow' : 'fxHide';
 		}
@@ -2741,6 +2770,7 @@ $extend(YOM.Element.prototype, (function() {
 					oStyle.width = '0px';
 					tStyle.width = width;
 				} else {
+					oStyle.width = width;
 					tStyle.width = '0px';
 				}
 				break;
@@ -2752,6 +2782,7 @@ $extend(YOM.Element.prototype, (function() {
 					oStyle.height = '0px';
 					tStyle.height = height;
 				} else {
+					oStyle.height = height;
 					tStyle.height = '0px';
 				}
 				break;
@@ -2764,6 +2795,7 @@ $extend(YOM.Element.prototype, (function() {
 				style: tStyle
 			},
 			transition: 'easeOut',
+			prior: true,
 			complete: function() {
 				isShow || el.hide();
 				el.setStyle(iStyle);
@@ -3002,7 +3034,7 @@ YOM.addModule('css', function(YOM) {
 			id = [];
 			YOM.object.each(href, function(item) {
 				id.push(load(item, force));
-			})
+			});
 			return id;
 		}
 		id = _href_id_hash[href];
@@ -3032,7 +3064,7 @@ YOM.addModule('css', function(YOM) {
 			el = [];
 			YOM.object.each(href, function(item) {
 				el.push(unload(item));
-			})
+			});
 			return el;
 		}
 		el = $id(_href_id_hash[href]);
@@ -3134,6 +3166,7 @@ YOM.addModule('Chunker', function(YOM) {
 		this._batch = opt.batch;
 		this._data = [];
 		this._processer = processer || function() {};
+		this._complete = opt.complete;
 		this._toRef = null;
 	};
 	
@@ -3152,11 +3185,16 @@ YOM.addModule('Chunker', function(YOM) {
 			if(self._toRef) {
 				return this;
 			}
+			var aStartTime = new Date();
+			var total = 0;
 			self._toRef = setTimeout(function() {
 				var item;
 				var count = 0;
-				var startTime = +new Date();
-				while(self._data.length && (+new Date - startTime < self._duration || self._duration === 0 && count === 0)) {
+				var bStartTime = new Date();
+				if(self._data.length && !aStartTime) {
+					aStartTime = bStartTime;
+				}
+				while(self._data.length && (new Date() - bStartTime < self._duration || self._duration === 0 && count === 0)) {
 					item = self._batch ? self._data.splice(0, self._batch) : self._data.shift();
 					if(YOM.object.isArray(item)) {
 						self._processer.apply(self._bind, item);
@@ -3164,13 +3202,21 @@ YOM.addModule('Chunker', function(YOM) {
 						self._processer.call(self._bind, item);
 					}
 					count++;
+					total++;
 				}
 				if(self._data.length) {
 					self._toRef = setTimeout(arguments.callee, self._interval);
-				} else if(self._interval2) {
-					self._toRef = setTimeout(arguments.callee, self._interval2);
 				} else {
-					self._toRef = null;
+					if(self._interval2) {
+						self._toRef = setTimeout(arguments.callee, self._interval2);
+					} else {
+						self._toRef = null;
+					}
+					if(self._complete) {
+						self._complete(new Date() - aStartTime, total);
+					}
+					aStartTime = null;
+					total = 0;
 				}
 			}, self._interval);
 			return this;
@@ -3196,10 +3242,10 @@ YOM.addModule('console', function(YOM) {
 				'<div id="yomConsoleOutputBox" style="line-height: 15px;"></div>',
 				'<div>',
 					'<label for="yomConsoleInputBox" style="font-weight: bold; color: blue;">&gt;&gt;</label>',
-					'<input id="yomConsoleInputBox" type="text" style="width: 458px; border: none; font-family: Courier New, Courier, monospace;" onkeydown="if(event.keyCode === 13) {YOM.console.eval(this.value); return false;}" ondblclick="YOM.console.eval(this.value); return false;" />',
+					'<input id="yomConsoleInputBox" type="text" style="width: 458px; border: none; font-family: Courier New, Courier, monospace;" onkeyup="if(event.keyCode === 13) {YOM.console.eval(this.value); return false;}" ondblclick="YOM.console.eval(this.value); return false;" />',
 				'</div>',
 			'</div>',
-			'<div style="height: 0; line-height: 0; clear: both;"></div>',
+			'<div style="height: 0; line-height: 0; clear: both;">&nbsp;</div>',
 		'</div>'
 	].join('');
 	
@@ -3244,15 +3290,16 @@ YOM.addModule('console', function(YOM) {
 			return;
 		}
 		_inited = true;
+		var isIe6 = YOM.browser.ie && YOM.browser.v === 6;
 		_el.container = document.body.appendChild(YOM.Element.create('div', {
 			id: 'yomConsole'
 		}, {
 			display: _on ? 'block' : 'none',
-			position: 'fixed',
+			position: isIe6 ? 'absolute' : 'fixed',
 			width: '160px',
 			zIndex: '99999',
 			right: 0,
-			bottom: 0
+			bottom: isIe6 ? Math.max(0, YOM.Element.getDocSize().height - YOM.Element.getViewRect().bottom) + 'px' : 0
 		}));
 		_el.container.innerHTML = YOM.tmpl.render(_TMPL, {});
 		_el.output = $id('yomConsoleOutput');
@@ -3318,7 +3365,7 @@ YOM.addModule('console', function(YOM) {
 		} else {
 			this.setAttribute('_exp', '1');
 		}
-		this.setAttribute('_exp', expanded ? '0' : '1')
+		this.setAttribute('_exp', expanded ? '0' : '1');
 	};
 	
 	function _stringifyObj(obj, objLevel, isArritem) {
@@ -3488,8 +3535,8 @@ YOM.addModule('transition', function(YOM) {
 		 */
 		easeInOut: function (t) {
 			return (t *= 2) < 1 ?
-				.5 * t * t :
-				.5 * (1 - (--t) * (t - 2));
+				0.5 * t * t :
+				0.5 * (1 - (--t) * (t - 2));
 		},
 		
 		/**
@@ -3511,15 +3558,15 @@ YOM.addModule('transition', function(YOM) {
 		 */
 		easeInOutStrong: function (t) {
 			return (t *= 2) < 1 ?
-				.5 * t * t * t * t :
-				.5 * (2 - (t -= 2) * t * t * t);
+				0.5 * t * t * t * t :
+				0.5 * (2 - (t -= 2) * t * t * t);
 		},
 		
 		/**
 		 * Snap in elastic effect.
 		 */
 		elasticIn: function (t) {
-			var p = .3, s = p / 4;
+			var p = 0.3, s = p / 4;
 			if (t === 0 || t === 1) return t;
 			return -(Math.pow(2, 10 * (t -= 1)) * Math.sin((t - s) * (2 * Math.PI) / p));
 		},
@@ -3528,7 +3575,7 @@ YOM.addModule('transition', function(YOM) {
 		 * Snap out elastic effect.
 		 */
 		elasticOut: function (t) {
-			var p = .3, s = p / 4;
+			var p = 0.3, s = p / 4;
 			if (t === 0 || t === 1) return t;
 			return Math.pow(2, -10 * t) * Math.sin((t - s) * (2 * Math.PI) / p) + 1;
 		},
@@ -3537,21 +3584,21 @@ YOM.addModule('transition', function(YOM) {
 		 * Snap both elastic effect.
 		 */
 		elasticInOut: function (t) {
-			var p = .45, s = p / 4;
+			var p = 0.45, s = p / 4;
 			if (t === 0 || (t *= 2) === 2) return t / 2;
 			if (t < 1) {
-				return -.5 * (Math.pow(2, 10 * (t -= 1)) *
+				return -0.5 * (Math.pow(2, 10 * (t -= 1)) *
 				Math.sin((t - s) * (2 * Math.PI) / p));
 			}
 			return Math.pow(2, -10 * (t -= 1)) *
-			Math.sin((t - s) * (2 * Math.PI) / p) * .5 + 1;
+			Math.sin((t - s) * (2 * Math.PI) / p) * 0.5 + 1;
 		},
 	
 		/**
 		 * Backtracks slightly, then reverses direction and moves to end.
 		 */
 		backIn: function (t) {
-			if (t === 1) t -= .001;
+			if (t === 1) t -= 0.001;
 			return t * t * ((_BACK_CONST + 1) * t - _BACK_CONST);
 		},
 		
@@ -3568,9 +3615,9 @@ YOM.addModule('transition', function(YOM) {
 		 */
 		backInOut: function (t) {
 			if ((t *= 2 ) < 1) {
-				return .5 * (t * t * (((_BACK_CONST *= (1.525)) + 1) * t - _BACK_CONST));
+				return 0.5 * (t * t * (((_BACK_CONST *= (1.525)) + 1) * t - _BACK_CONST));
 			}
-			return .5 * ((t -= 2) * t * (((_BACK_CONST *= (1.525)) + 1) * t + _BACK_CONST) + 2);
+			return 0.5 * ((t -= 2) * t * (((_BACK_CONST *= (1.525)) + 1) * t + _BACK_CONST) + 2);
 		},
 		
 		/**
@@ -3589,13 +3636,13 @@ YOM.addModule('transition', function(YOM) {
 				r = s * t * t;
 			}
 			else if (t < (2 / 2.75)) {
-				r =  s * (t -= (1.5 / 2.75)) * t + .75;
+				r =  s * (t -= (1.5 / 2.75)) * t + 0.75;
 			}
 			else if (t < (2.5 / 2.75)) {
-				r =  s * (t -= (2.25 / 2.75)) * t + .9375;
+				r =  s * (t -= (2.25 / 2.75)) * t + 0.9375;
 			}
 			else {
-				r =  s * (t -= (2.625 / 2.75)) * t + .984375;
+				r =  s * (t -= (2.625 / 2.75)) * t + 0.984375;
 			}
 			return r;
 		},
@@ -3604,14 +3651,13 @@ YOM.addModule('transition', function(YOM) {
 		 * Bounces off start and end.
 		 */
 		bounceInOut: function (t) {
-			if (t < .5) {
-				return Easing.bounceIn(t * 2) * .5;
+			if (t < 0.5) {
+				return Easing.bounceIn(t * 2) * 0.5;
 			}
-			return Easing.bounceOut(t * 2 - 1) * .5 + .5;
+			return Easing.bounceOut(t * 2 - 1) * 0.5 + 0.5;
 		}
 	};
 });
-
 /**
  * Inspired by KISSY
  * @class YOM.Tween
@@ -3647,7 +3693,7 @@ YOM.addModule('Tween', function(YOM) {
 	|| window.msCancelAnimationFrame
 	|| function(timer) {
 		clearTimeout(timer);
-	}
+	};
 	
 	function _getParserEl() {
 		if(!_parserEl) {
@@ -3823,7 +3869,7 @@ YOM.addModule('Tween', function(YOM) {
 		}
 		Tween.getCssTransitionName = function() {
 			return name;
-		}
+		};
 		return name;
 	};
 	
@@ -3841,14 +3887,18 @@ YOM.addModule('Tween', function(YOM) {
 			}
 		}));
 	};
+
+	Tween.stopAllTween = function(el) {
+		YOM(el).each(function(el) {
+			var tweenObj = _im.get(YOM(el).getDatasetVal('yom-tween-oid'));
+			tweenObj && tweenObj.stop();
+		});
+	};
 	
 	Tween.cancelTimer = _cancelAnimationFrame;
 	
 	Tween.prototype._stopAllTween = function() {
-		this._el.each(function(el) {
-			var tweenObj = _im.get(YOM(el).getDatasetVal('yom-tween-oid'));
-			tweenObj && tweenObj.stop();
-		});
+		YOM.Tween.stopAllTween(this._el);
 	};
 	
 	Tween.prototype._removeTweeningEl = function() {
@@ -3959,11 +4009,9 @@ YOM.addModule('Tween', function(YOM) {
 	
 	return Tween;
 });
-
 /**
  * @namespace
  */
 YOM.addModule('widget', {
 	_ID: 128
 });
-
