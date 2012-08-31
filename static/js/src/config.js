@@ -26,6 +26,7 @@ $$.config = (function() {
 			'YOM_DRAGDROP': '/static/inc/webyom-js/dragdrop.js',
 			'YOM_WIDGET_MASK': '/static/inc/webyom-js/widget/mask.js',
 			'YOM_WIDGET_DIALOG': '/static/inc/webyom-js/widget/dialog.js',
+			'YOM_WIDGET_TOOLTIP': '/static/inc/webyom-js/widget/tooltip.js',
 			'PRETTY_PRINT': '/static/inc/prettify/prettify.js'
 		},
 		MOD_KEY_NAME_HASH: {

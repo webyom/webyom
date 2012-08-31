@@ -111,15 +111,16 @@ $$.ui = (function() {
 	
 	function init() {
 		$(document.body).show();
-                _initHeader();
+		_initHeader();
 		_initContent();
 		_initFooter();
+		$$.tooltip.bindAttr('title');
 	};
 	
 	return {
 		resetContent: resetContent,
 		turnOnMenu: turnOnMenu,
-                init: init
+		init: init
 	};
 })();
 

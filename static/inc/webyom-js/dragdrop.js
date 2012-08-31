@@ -31,10 +31,10 @@ YOM.dragdrop.addModule('Draggable', function(YOM) {
 		};
 		this._rect = {start: null, now: null};
 		this._bound = {
-			mousedown: YOM.object.bind(this, this._mousedown),
-			startCheck: YOM.object.bind(this, this._startCheck),
-			move: YOM.object.bind(this, this._move),
-			stop: YOM.object.bind(this, this.stop),
+			mousedown: $bind(this, this._mousedown),
+			startCheck: $bind(this, this._startCheck),
+			move: $bind(this, this._move),
+			stop: $bind(this, this.stop),
 			preventSelect: function(e) {YOM.Event.preventDefault(e);}
 		};
 		this._handles = this._opts.handles ? YOM(this._opts.handles, this._el) : this._el;
@@ -461,15 +461,15 @@ YOM.dragdrop.addModule('Sortable', function(YOM) {
 		});
 		this._id = $getUniqueId();
 		this._opts = opts || {};
-		this._opts.clone = typeof this._opts.clone == 'function' ? this._opts.clone : YOM.object.bind(this, this._clone);
+		this._opts.clone = typeof this._opts.clone == 'function' ? this._opts.clone : $bind(this, this._clone);
 		this._opts.enterDirection = _DIRECTION_MAP[this._opts.enterDirection];
 		this._sortDirection = this._opts.enterDirection || _DIRECTION_MAP[this._opts.sortDirection] || 'V';
 		this._droppables = [];
 		this._bound = {
-			start: YOM.object.bind(this, this._start),
-			enter: YOM.object.bind(this, this._enter),
-			move: YOM.object.bind(this, this._move),
-			release: YOM.object.bind(this, this._release)
+			start: $bind(this, this._start),
+			enter: $bind(this, this._enter),
+			move: $bind(this, this._move),
+			release: $bind(this, this._release)
 		};
 		this._placeHolder = this._getHolder();
 		this._lastDropbox = null;
@@ -809,8 +809,8 @@ YOM.dragdrop.addModule('Resizeable', function(YOM) {
 		this._startPos = null;
 		this._startRect = null;
 		this.bound = {
-			mousedown: YOM.object.bind(this, this._mousedown),
-			move: YOM.object.bind(this, this._move)	
+			mousedown: $bind(this, this._mousedown),
+			move: $bind(this, this._move)	
 		};
 		this._resizeHandles = [];
 		this._init();

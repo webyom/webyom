@@ -126,7 +126,7 @@ $$.util.dialog = (function() {
 	function popup(opt) {
 		$.js.require([true, $$_LIB_NAME_URL_HASH['YOM_WIDGET_MASK'], $$_LIB_NAME_URL_HASH['YOM_WIDGET_DIALOG']], function(ret) {
 			_init();
-			new $.widget.Dialog(opt);
+			new $.widget.Dialog(opt).popup();
 		});
 	};
 	

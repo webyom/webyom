@@ -1,0 +1,57 @@
+.yom-tooltip-wrapper {
+	
+}
+.yom-tooltip-outer {
+	
+}
+.yom-tooltip-inner {
+	position: relative;
+}
+.yom-tooltip-close-btn {
+	display: block;
+	background: url(tooltip.gif) left top no-repeat;
+	text-indent: -99999px;
+	width: 13px;
+	height: 13px;
+	cursor: pointer;
+	position: absolute;
+	right: 0px;
+	top: 0px;
+}
+.yom-tooltip-content {
+	-webkit-border-radius: 2px;
+	background: #555;
+	color: #fff;
+	padding: 6px;
+	font-size: 12px;
+	line-height: 16px;
+}
+.yom-tooltip-arrow-rt, .yom-tooltip-arrow-lt, .yom-tooltip-arrow-bl, .yom-tooltip-arrow-tl {
+	display: block;
+	position: absolute;
+	border-width: 5px;
+	border-style: solid;
+	height: 0px;
+	width: 0px;
+	line-height: 0px;
+}
+.yom-tooltip-arrow-rt {
+	top: 10px;
+	right: -9px;
+	border-color: transparent transparent transparent #555;
+}
+.yom-tooltip-arrow-lt {
+	top: 10px;
+	left: -9px;
+	border-color: transparent #555 transparent transparent;
+}
+.yom-tooltip-arrow-bl {
+	left: 10px;
+	bottom: -9px;
+	border-color: #555 transparent transparent transparent;
+}
+.yom-tooltip-arrow-tl {
+	left: 10px;
+	top: -9px;
+	border-color: transparent transparent #555 transparent;
+}

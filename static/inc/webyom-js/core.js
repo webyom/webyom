@@ -36,6 +36,7 @@ ID LIST:
 128: widget
 128001: widget.Mask
 128002: widget.Dialog
+128003: widget.Tooltip
 */
 
 /**
@@ -114,6 +115,16 @@ function $getClean(obj) {
 
 function $extend(origin, extend, check) {
 	return YOM.object.extend(origin, extend, check);
+};
+
+function $bind(that, fn) {
+	if(fn.bind) {
+		return fn.bind(that);
+	} else {
+		return function() {
+			return fn.apply(that, YOM.array.getArray(arguments));
+		};
+	}
 };
 
 function $now() {
@@ -228,7 +239,7 @@ YOM.addModule('Class', function(YOM) {
 	
 	Class.genericize = function(obj, props, opt) {
 		opt = opt || {};
-		if(!YOM.object.isArray(props)) {
+		if(!YOM.array.isArray(props)) {
 			props = [props];
 		}
 		YOM.object.each(props, function(prop) {
@@ -318,7 +329,7 @@ YOM.addModule('object', {
 	},
 	
 	isArray: function(obj) {
-		return this.toString(obj) == '[object Array]';
+		return YOM.array.isArray(obj);
 	},
 	
 	isFunction: function(obj) {
@@ -331,13 +342,9 @@ YOM.addModule('object', {
 	
 	each: function(obj, fn, bind) {
 		var val;
-		if(this.isArray(obj)) {
-			for(var i = 0, l = obj.length; i < l; i++) {
-				if(fn.call(bind || obj, obj[i], i, obj) === false) {
-					break;
-				}
-			}
-		} else if(typeof obj == 'object') {
+		if(YOM.array.isArray(obj)) {
+			YOM.array.each(obj, fn, bind);
+		} else {
 			for(var p in obj) {
 				if(YOM.object.hasOwnProperty(obj, p)) {
 					try {
@@ -364,14 +371,12 @@ YOM.addModule('object', {
 	},
 	
 	bind: function(obj, fn) {
-		return function() {
-			return fn.apply(obj, YOM.array.getArray(arguments));
-		};
+		return $bind(obj, fn);
 	},
 
 	clone: function(obj, deep) {
 		if(typeof obj == 'object') {
-			var res = this.isArray(obj) ? [] : {};
+			var res = YOM.array.isArray(obj) ? [] : {};
 			for(var i in obj) {
 				res[i] = deep ? this.clone(obj[i], deep) : obj[i];
 			}
@@ -405,8 +410,22 @@ YOM.addModule('object', {
 /**
  * @namespace YOM.array
  */
-YOM.addModule('array', function(YOM) {
-	function remove(arr, item) {
+YOM.addModule('array', {
+	_ID: 103,
+	
+	isArray: Array.isArray || function(obj) {
+		return YOM.object.toString(obj) == '[object Array]';
+	},
+
+	each: function(arr, fn, bind) {
+		for(var i = 0, l = arr.length; i < l; i++) {
+			if(fn.call(bind || arr, arr[i], i, arr) === false) {
+				break;
+			}
+		}
+	},
+	
+	remove: function(arr, item) {
 		var isFn = typeof item == 'function';
 		var flag;
 		for(var i = arr.length - 1; i >= 0; i--) {
@@ -419,13 +438,13 @@ YOM.addModule('array', function(YOM) {
 			}
 		}
 		return arr;
-	};
+	},
 	
-	function getArray(obj) {
+	getArray: function(obj) {
 		return Array.prototype.slice.call(obj);
-	};
+	},
 	
-	function filter(arr, fn) {
+	filter: function(arr, fn) {
 		if(typeof arr.filter == 'function') {
 			return arr.filter(fn);
 		} else {
@@ -437,14 +456,7 @@ YOM.addModule('array', function(YOM) {
 			});
 			return res;
 		}
-	};
-	
-	return {
-		_ID: 103,
-		remove: remove,
-		getArray: getArray,
-		filter: filter
-	};
+	}
 });
 /**
  * @class YOM.HashArray
@@ -673,7 +685,11 @@ YOM.addModule('string', {
 	},
 	
 	trim: function(str) {
-		return str ? (str + '').replace(/^\s+|\s+$/, '') : '';
+		if(str.trim) {
+			return str.trim();
+		} else {
+			return str.replace(/^\s+|\s+$/, '');
+		}
 	},
 	
 	toCamelCase: function(str) {
@@ -737,7 +753,7 @@ YOM.addModule('json', function(YOM) {
 					throw new YOM.Error(YOM.Error.getCode(_ID, 1), 'YOM.json.stringify can not deal with circular reference.');
 				}
 				obj.__YOM_JSON_STRINGIFY_MARKED__ = 1;
-				if(YOM.object.isArray(obj)) {
+				if(YOM.array.isArray(obj)) {
 					YOM.object.each(obj, function(val) {
 						var s = YOM.json.stringify(val, prettify, objIndentLevel);
 						s && tmp.push(s);
@@ -1031,7 +1047,7 @@ YOM.addModule('Observer', function(YOM) {
 	
 	Observer.prototype = {
 		subscribe: function(subscriber, bind) {
-			subscriber = bind ? YOM.object.bind(bind, subscriber) : subscriber;
+			subscriber = bind ? $bind(bind, subscriber) : subscriber;
 			for(var i = 0, l = this._subscribers.length; i < l; i++) {
 				if(subscriber == this._subscribers[i]) {
 					return null;
@@ -1162,7 +1178,7 @@ YOM.addModule('Event', function(YOM) {
 	Event.addListener = function(el, eType, listener, bind) {
 		var cEvent, cEventHandler;
 		eType = eType.toLowerCase();
-		listener = bind ? YOM.object.bind(bind, listener) : listener;
+		listener = bind ? $bind(bind, listener) : listener;
 		cEvent = _customizedEventHash[eType];
 		if(cEvent) {
 			el.elEventRef = el.elEventRef || ++_elRefCount;
@@ -1289,7 +1305,7 @@ YOM.Event.addModule('Delegator', function(YOM) {
 				flag.maxBubble = Math.max(flag.maxBubble, maxBubble);
 				return;
 			} else {
-				var listener = YOM.object.bind(this, this._eventListener);
+				var listener = $bind(this, this._eventListener);
 				this._ele.addEventListener(type, listener);
 				this._handlers[type] = {};
 				this._delegatedTypes[type] = {maxBubble: maxBubble, listener: listener};
@@ -1305,8 +1321,8 @@ YOM.Event.addModule('Delegator', function(YOM) {
 			}
 			maxBubble = this._delegatedTypes[type].maxBubble;
 			bubbleTimes = 0;
-			while(target && target != this._ele && target.tagName != 'HTML') {
-				if(target.disabled || !target.getAttribute || target.getAttribute('disabled')) {
+			while(target && target.nodeType === 1 && target != this._ele && target.tagName != 'HTML') {
+				if(target.disabled || target.getAttribute('disabled')) {
 					return;
 				}
 				flag = YOM(target).getDatasetVal('yom-' + type);
@@ -1403,7 +1419,7 @@ YOM.Event.addModule('MouseenterEventHandler', function(YOM) {
 		this.name = 'mouseenter';
 		MouseenterEventHandler.superClass.constructor.apply(this, YOM.array.getArray(arguments));
 		this._bound = {
-			mouseover: YOM.object.bind(this, this._mouseover)
+			mouseover: $bind(this, this._mouseover)
 		};
 		YOM.Event.addListener(this._delegateEl, 'mouseover', this._bound.mouseover);
 	};
@@ -1435,7 +1451,7 @@ YOM.Event.addModule('MouseleaveEventHandler', function(YOM) {
 		this.name = 'mouseleave';
 		MouseleaveEventHandler.superClass.constructor.apply(this, YOM.array.getArray(arguments));
 		this._bound = {
-			mouseout: YOM.object.bind(this, this._mouseout)
+			mouseout: $bind(this, this._mouseout)
 		};
 		YOM.Event.addListener(this._delegateEl, 'mouseout', this._bound.mouseout);
 	};
@@ -1593,7 +1609,7 @@ YOM.addModule('Xhr', function(YOM) {
 		if(this._opt.withCredentials) {
 			this._xhr.withCredentials = true;
 		}
-		this._xhr.onreadystatechange = YOM.object.bind(this, _onReadyStateChange);
+		this._xhr.onreadystatechange = $bind(this, _onReadyStateChange);
 		this._status = _STATUS.LOADING;
 		this._opt.silent || _loading_count++;
 		this._xhr.send(this._method == 'POST' ? this._param : null);
@@ -1735,7 +1751,7 @@ YOM.addModule('CrossDomainPoster', function(YOM) {
 	CrossDomainPoster.prototype.post = function() {
 		this._frameEl = YOM.Element.create('iframe', {src: this._proxy}, {display: 'none'});
 		this._frameEl.instanceId = this.getId();
-		this._frameEl.callback = YOM.object.bind(this, function(o) {
+		this._frameEl.callback = $bind(this, function(o) {
 			this._clear();
 			if(this._status == _STATUS.ABORTED) {
 				return;
@@ -1745,7 +1761,7 @@ YOM.addModule('CrossDomainPoster', function(YOM) {
 			this._oncomplete.call(this._bind, CrossDomainPoster.RET.SUCC);
 			this._onload.call(this._bind, o);
 		});
-		this._frameOnLoadListener = YOM.object.bind(this, this._frameOnLoad);
+		this._frameOnLoadListener = $bind(this, this._frameOnLoad);
 		YOM.Event.addListener(this._frameEl, 'load', this._frameOnLoadListener);
 		this._frameEl = document.body.appendChild(this._frameEl);
 		this._status = _STATUS.LOADING;
@@ -1974,7 +1990,7 @@ YOM.addModule('Element', function(YOM) {
 		},
 		
 		storeStyle: function(name) {
-			if(YOM.object.isArray(name)) {
+			if(YOM.array.isArray(name)) {
 				YOM.object.each(name, function(nm) {
 					this.storeStyle(nm);
 				}, this);
@@ -1985,7 +2001,7 @@ YOM.addModule('Element', function(YOM) {
 		},
 		
 		restoreStyle: function(name) {
-			if(YOM.object.isArray(name)) {
+			if(YOM.array.isArray(name)) {
 				YOM.object.each(name, function(nm) {
 					this.restoreStyle(nm);
 				}, this);
@@ -2003,7 +2019,7 @@ YOM.addModule('Element', function(YOM) {
 		this._items = [];
 		if(el instanceof Element) {
 			return el;
-		} else if(YOM.object.isArray(el)) {
+		} else if(YOM.array.isArray(el)) {
 			YOM.object.each(el, function(item) {
 				if(_isElementNode(item)) {
 					this._items.push(new Item(item));
@@ -2054,7 +2070,7 @@ YOM.addModule('Element', function(YOM) {
 					return;
 				}
 				tmp = document.querySelectorAll ? el.querySelectorAll(sel) : Sizzle(sel, el);
-				if(YOM.object.isArray(tmp)) {
+				if(YOM.array.isArray(tmp)) {
 					res = res.concat(tmp);
 				} else if(YOM.object.toString(tmp) == '[object NodeList]') {
 					res = res.concat(YOM.array.getArray(tmp));
@@ -2834,11 +2850,13 @@ $extend(YOM.Element.prototype, (function() {
  * @class YOM.JsLoader
  */
 YOM.addModule('JsLoader', function(YOM) {
+	var _TIMEOUT = 60000;
 	var _STATUS = {
 		INIT: 0,
 		LOADING: 1,
 		LOADED: 2,
-		ABORTED: 3
+		ABORTED: 3,
+		TIMEOUT: 4
 	};
 	
 	var _callbackQueueHash = {};
@@ -2881,7 +2899,8 @@ YOM.addModule('JsLoader', function(YOM) {
 	JsLoader.RET = {
 		SUCC: 0,
 		ABORTED: -1,
-		ERROR: 1	
+		ERROR: 1,
+		TIMEOUT: 2
 	};
 	
 	JsLoader.abortAll = function(excludeIdHash) {
@@ -2941,6 +2960,7 @@ YOM.addModule('JsLoader', function(YOM) {
 		if(this._status != _STATUS.INIT) {
 			return 1;
 		}
+		var self = this;
 		if(this._callback) {
 			if(_callbackLoadingHash[this._callbackName]) {
 				_callbackQueueHash[this._callbackName] = _callbackQueueHash[this._callbackName] || [];
@@ -2948,7 +2968,7 @@ YOM.addModule('JsLoader', function(YOM) {
 				return -1;
 			}
 			_callbackLoadingHash[this._callbackName] = 1;
-			window[this._callbackName] = YOM.object.bind(this, function() {
+			window[this._callbackName] = $bind(this, function() {
 				this._callbacked = true;
 				if(this._status == _STATUS.LOADED) {
 					return;
@@ -2958,10 +2978,10 @@ YOM.addModule('JsLoader', function(YOM) {
 			});
 		}
 		function onload() {
-			if(this._status == _STATUS.ABORTED) {
+			if(this._status != _STATUS.LOADING) {
 				return;
 			}
-			this._status == _STATUS.LOADED;
+			this._status = _STATUS.LOADED;
 			this._complete(JsLoader.RET.SUCC);
 			if(this._callback && !this._callbacked) {
 				this._dealError(YOM.Error.getCode(JsLoader._ID, 1));
@@ -2969,17 +2989,17 @@ YOM.addModule('JsLoader', function(YOM) {
 			this._onload.call(this._bind);
 		};
 		function onerror() {
-			if(this._status == _STATUS.ABORTED) {
+			if(this._status != _STATUS.LOADING) {
 				return;
 			}
-			this._status == _STATUS.LOADED;
+			this._status = _STATUS.LOADED;
 			this._complete(JsLoader.RET.ERROR);
 			this._dealError(YOM.Error.getCode(JsLoader._ID, 0));
 		};
 		this._jsEl = document.createElement('script');
 		if(YOM.browser.ie) {
 			YOM.Event.addListener(this._jsEl, 'readystatechange', function() {
-				if(this._status != _STATUS.LOADED && (this._jsEl.readyState == 'loaded' || this._jsEl.readyState == 'complete')) {
+				if(this._jsEl.readyState == 'loaded' || this._jsEl.readyState == 'complete') {
 					onload.call(this);
 					return;
 				}
@@ -3001,6 +3021,14 @@ YOM.addModule('JsLoader', function(YOM) {
 		this._status = _STATUS.LOADING;
 		this._opt.silent || _loading_count++;
 		this._jsEl = YOM.Element.head.insertBefore(this._jsEl, YOM.Element.head.firstChild);
+		setTimeout(function() {
+			if(self._status != _STATUS.LOADING) {
+				return;
+			}
+			self._status = _STATUS.TIMEOUT;
+			self._complete(JsLoader.RET.TIMEOUT);
+			self._dealError(YOM.Error.getCode(JsLoader._ID, 2));
+		}, this._opt.timeout || _TIMEOUT);
 		JsLoader.dispatchEvent(JsLoader.createEvent('start', {src: this._src, opt: this._opt}));
 		return 0;
 	};
@@ -3030,7 +3058,7 @@ YOM.addModule('css', function(YOM) {
 	
 	function load(href, force) {
 		var id, el;
-		if(YOM.object.isArray(href)) {
+		if(YOM.array.isArray(href)) {
 			id = [];
 			YOM.object.each(href, function(item) {
 				id.push(load(item, force));
@@ -3060,7 +3088,7 @@ YOM.addModule('css', function(YOM) {
 	
 	function unload(href) {
 		var el;
-		if(YOM.object.isArray(href)) {
+		if(YOM.array.isArray(href)) {
 			el = [];
 			YOM.object.each(href, function(item) {
 				el.push(unload(item));
@@ -3172,7 +3200,7 @@ YOM.addModule('Chunker', function(YOM) {
 	
 	Chunker.prototype = {
 		push: function(o, flatten) {
-			if(flatten && YOM.object.isArray(o)) {
+			if(flatten && YOM.array.isArray(o)) {
 				this._data = this._data.concat(o);
 			} else {
 				this._data.push(o);
@@ -3196,7 +3224,7 @@ YOM.addModule('Chunker', function(YOM) {
 				}
 				while(self._data.length && (new Date() - bStartTime < self._duration || self._duration === 0 && count === 0)) {
 					item = self._batch ? self._data.splice(0, self._batch) : self._data.shift();
-					if(YOM.object.isArray(item)) {
+					if(YOM.array.isArray(item)) {
 						self._processer.apply(self._bind, item);
 					} else {
 						self._processer.call(self._bind, item);
@@ -3330,7 +3358,7 @@ YOM.addModule('console', function(YOM) {
 		for(var i = 0; i < objLevel; i++) {
 			indent.push('&nbsp;&nbsp;&nbsp;&nbsp;');
 		}
-		if(YOM.object.isArray(obj)) {
+		if(YOM.array.isArray(obj)) {
 			this.innerHTML = expanded ? 'Array[' + obj.length + ']' : _stringifyObj(obj, objLevel);
 		} else {
 			if(expanded) {
@@ -3374,7 +3402,7 @@ YOM.addModule('console', function(YOM) {
 		var rdm = new Date().getTime() + '' + parseInt(Math.random() * 10000);
 		if(typeof obj == 'string') {
 			res = '"' + YOM.string.encodeHtml(obj) + '"';
-		} else if(YOM.object.isArray(obj)) {
+		} else if(YOM.array.isArray(obj)) {
 			if(isArritem) {
 				_getEvtDelegator().delegate('click', 'consoleItem' + rdm, function(e) {
 					_expandObjStr.call(this, obj, objLevel);

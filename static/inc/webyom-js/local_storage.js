@@ -36,6 +36,7 @@ ID LIST:
 128: widget
 128001: widget.Mask
 128002: widget.Dialog
+128003: widget.Tooltip
 */
 
 /**
@@ -114,6 +115,16 @@ function $getClean(obj) {
 
 function $extend(origin, extend, check) {
 	return YOM.object.extend(origin, extend, check);
+};
+
+function $bind(that, fn) {
+	if(fn.bind) {
+		return fn.bind(that);
+	} else {
+		return function() {
+			return fn.apply(that, YOM.array.getArray(arguments));
+		};
+	}
 };
 
 function $now() {

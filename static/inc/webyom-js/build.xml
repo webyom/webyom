@@ -82,6 +82,9 @@
         <concat destfile="${build.dir}/widget/dialog.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
             <path path="${widget.src.dir}/dialog/dialog.js"/>
         </concat>
+        <concat destfile="${build.dir}/widget/tooltip.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${widget.src.dir}/tooltip/tooltip.js"/>
+        </concat>
     </target>
 
     <target name="build" depends="concat,common.build">
