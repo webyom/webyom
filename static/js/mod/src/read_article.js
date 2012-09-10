@@ -59,6 +59,15 @@
 	var _cssList = ['/static/inc/prettify/prettify.css', '/static/css/form.css'];
 	var _sortable = null;
 	
+	function _loadmodHook(e) {
+		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
+			_sortable && _sortable.destory();
+			_sortable = null;
+			$.css.unload(_cssList);
+			$$.handler.removeEventListener('loadmod', _loadmodHook);
+		}
+	};
+	
 	function _bindEvent(aid) {
 		$('#btnSubmit').addEventListener('click', function() {
 			var username = $.string.trim($('#username').getVal());
@@ -136,10 +145,10 @@
 		});
 	};
 	
-	function handle(subMark, data) {
+	function handle(modInfo, data) {
 		$.css.load(_cssList);
 		var cacheKey, params, aid;
-		params = subMark.split('/');
+		params = modInfo.subMark.split('/');
 		aid = params[0];
 		if(!aid) {
 			$$.handler.error(new $.Error(modId + '01', 'Invalid article id.'), modName);
@@ -148,6 +157,8 @@
 		cacheKey = modKey + '/' + aid;
 		data = data || $$.handler.getCache(cacheKey);
 		if(data) {
+			$$.handler.addEventListener('loadmod', _loadmodHook);
+			$.history.ajax.setMark(modInfo.requestMark, data.article.title + ' - ' + modInfo.title + $$.config.get('TITLE_POSTFIX'));
 			$('#mainPart').size() || $$.ui.resetContent();
 			$('#mainPart').tween(1000, {
 				origin: {
@@ -160,7 +171,6 @@
 				prior: true,
 				transition: 'easeOut',
 				complete: function() {
-					document.title = data.article.title + ' - ' + document.title;
 					$('#mainPart').setHtml($.tmpl.render(_TMPL, data, {key: 'mod.readArticle'}));
 					$.js.require($$_LIB_NAME_URL_HASH.YOM_LOCAL_STORAGE, function(res) {
 						$.localStorage.get('commentModSequence', {proxy: 1, callback: function(res) {
@@ -208,7 +218,7 @@
 			callbackName: '_get_article_info',
 			load: function(o) {
 				$$.handler.setCache(cacheKey, o.data);
-				handle(subMark, o.data);
+				handle(modInfo, o.data);
 			},
 			error: function(code) {
 				$$.handler.error(new $.Error(code, 'Failed to read article ' + aid), modName);
@@ -218,15 +228,7 @@
 			noCache: true
 		});
 		$$.ui.turnOnMenu('a');
-	};
-	
-	$$.handler.addEventListener('loadmod', function(e) {
-		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
-			_sortable && _sortable.destory();
-			_sortable = null;
-			$.css.unload(_cssList);
-		}
-	});
+	};	
 	
 	$$.mod[modName] = {
 		delComment: delComment,

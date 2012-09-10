@@ -89,6 +89,63 @@ var $$_SUB_MOD_KEY_INFO_HASH = $$.config.get('SUB_MOD_KEY_INFO_HASH', function(u
 	$$_SUB_MOD_KEY_INFO_HASH = updated;
 });
 /**
+ * @namespace $$.storage
+ */
+$$.storage = (function() {
+	function _do(cb) {
+		$.js.require($$.LIB_NAME_URL_HASH['YOM_LOCALSTORAGE'], function(ret) {
+			cb();
+		});
+	};
+	
+	function get(key, cb) {
+		_do(function() {
+			$.localStorage.get(key, {proxy: 1, callback: function(res) {
+				cb(res);
+			}});
+		});
+	};
+	
+	function set(key, val, cb) {
+		_do(function() {
+			$.localStorage.set(key, val, {proxy: 1, callback: function(res) {
+				cb && cb(res);
+			}});
+		});
+	};
+	
+	function remove(key, cb) {
+		_do(function() {
+			$.localStorage.clear(key, {proxy: 1, callback: function(res) {
+				cb && cb(res);
+			}});
+		});
+	};
+	
+	function doUnlessKey(key, cb, opt) {
+		opt = opt || {};
+		get(key, function(val) {
+			if(val || opt.test && opt.test(val)) {
+				return;
+			}
+			cb();
+			if(typeof opt.set == 'function') {
+				val = opt.set(val);
+				val === false || set(key, val);
+			} else if(opt.set) {
+				set(key, opt.set);
+			}
+		});
+	};
+	
+	return {
+		get: get,
+		set: set,
+		remove: remove,
+		doUnlessKey: doUnlessKey
+	};
+})();
+/**
  * @namespace $$.util
  */
 $$.util = {};
@@ -539,7 +596,6 @@ $$.ui.processing = (function() {
 $$.handler = (function(opt) {
 	var _OPTION = _getOption();
 	var _MOD_KEY_INFO_HASH = $$.config.get('MOD_KEY_INFO_HASH');
-	var _TITLE_POSTFIX = $$.config.get('TITLE_POSTFIX');
 	var _MARK_PREFIX = $$.config.get('MARK_PREFIX');
 	
 	var _curMark;
@@ -577,7 +633,7 @@ $$.handler = (function(opt) {
 		return _MARK_PREFIX + mark;
 	};
 	
-	function _loadMod(modInfo, subMark, data) {
+	function _loadMod(modInfo, data) {
 		var modName = modInfo.name;
 		if(modInfo.url) {
 			$.js.require(modInfo.url, function(ret) {
@@ -594,10 +650,10 @@ $$.handler = (function(opt) {
 					originMod: $.object.clone(_prevModInfo, true),
 					targetMod: $.object.clone(modInfo, true)
 				}));
-				$$.mod[modName].handle(subMark, data);
+				$$.mod[modName].handle(modInfo, data);
 			});
 		} else if(modInfo.handler) {
-			modInfo.handler(subMark);
+			modInfo.handler(modInfo);
 		}
 	};
 	
@@ -612,13 +668,8 @@ $$.handler = (function(opt) {
 		return modInfo;
 	};
 	
-	function _handle(m, data) {
-		var mark = m || (_MARK_PREFIX + $$.config.get('DEFAULT_MOD_KEY'));
-		/*
-		if(mark == _curMark) {
-			return;
-		}
-		*/
+	function _handle(requestMark, data) {
+		var mark = requestMark || (_MARK_PREFIX + $$.config.get('DEFAULT_MOD_KEY'));
 		if(mark.indexOf(_MARK_PREFIX) !== 0) {
 			return;
 		}
@@ -627,6 +678,7 @@ $$.handler = (function(opt) {
 			$$alert('Sorry, can not find the page you requested.');
 			return;
 		}
+		modInfo.requestMark = requestMark;
 		if(handler.dispatchEvent(handler.createEvent('beforeunloadmod', {
 			originMark: _curMark,
 			targetMark: mark,
@@ -635,13 +687,12 @@ $$.handler = (function(opt) {
 		})) === false) {
 			return;
 		}
-		$.history.ajax.setMark(m, modInfo.title + _TITLE_POSTFIX);
-		_curMark = m;
+		_curMark = mark;
 		_prevModInfo = _curModInfo;
 		_curModInfo = modInfo;
 		abortAllRequests();
 		setTimeout(function() {
-			_loadMod(modInfo, modInfo.subMark, data || $.history.ajax.getCache(mark));
+			_loadMod(modInfo, data || $.history.ajax.getCache(mark));
 		}, 300);
 	};
 	

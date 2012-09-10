@@ -11,6 +11,7 @@
     <target name="concat">
         <concat destfile="${build.dir}/main.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
             <path path="${src.dir}/config.js"/>
+			<path path="${src.dir}/storage.js"/>
             <path path="${src.dir}/util.js"/>
             <path path="${src.dir}/tooltip.js"/>
             <path path="${src.dir}/ui.js"/>

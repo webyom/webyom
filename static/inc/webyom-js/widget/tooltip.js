@@ -3,10 +3,6 @@
  */
 YOM.widget.addModule('Tooltip', function(YOM) {
 	var _ID = 128003;
-	var _INIT_WIDTH = 'auto';
-	var _INIT_HEIGHT = 'auto';
-	var _DEFAULT_WIDTH = 200;
-	var _DEFAULT_HEIGHT = 200;
 	var _FX_DURATION = 300;
 	var _MIN_CLOSE_TIMEOUT = 1000;
 	var _DIRECTION_HASH = {L: 'L', R: 'R', T: 'T', B: 'B'};
@@ -42,6 +38,7 @@ YOM.widget.addModule('Tooltip', function(YOM) {
 		this._opt = opt;
 		this._id = _im.add(this);
 		this._closed = 1;
+		this._closeToRef = null;
 		this._fx = opt.fx;
 		this._fxDuration = opt.fxDuration || _FX_DURATION;
 		this._beforeClose = opt.beforeClose || $empty;
@@ -79,8 +76,6 @@ YOM.widget.addModule('Tooltip', function(YOM) {
 	};
 	
 	$extend(Tooltip.prototype, {
-		_closeToRef: null,
-		
 		_bindEvent: function() {
 			var opt = this._opt;
 			var btns = opt.btns;
@@ -283,6 +278,7 @@ YOM.widget.addModule('Tooltip', function(YOM) {
 			if(!this._el) {
 				return this;
 			}
+			clearTimeout(this._closeToRef);
 			this._closed = 0;
 			this._show();
 			this._locate(opt);

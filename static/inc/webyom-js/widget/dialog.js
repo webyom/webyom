@@ -81,6 +81,7 @@ YOM.widget.addModule('Dialog', function(YOM) {
 		this._opt = opt;
 		this._id = _im.add(this);
 		this._closed = 1;
+		this._closeToRef = null;
 		this._width = _INIT_WIDTH;
 		this._height = _INIT_HEIGHT;
 		this._fx = opt.fx;
@@ -141,8 +142,6 @@ YOM.widget.addModule('Dialog', function(YOM) {
 	};
 	
 	$extend(Dialog.prototype, {
-		_closeToRef: null,
-		
 		_dragstart: function() {
 			this._dragging = true;
 		},
@@ -357,9 +356,10 @@ YOM.widget.addModule('Dialog', function(YOM) {
 		popup: function() {
 			var self = this;
 			var opt = this._opt;
-			if(!this.isClosed() || !this._el) {
+			if(!this._el) {
 				return this;
 			}
+			clearTimeout(this._closeToRef);
 			this._closed = 0;
 			this._show();
 			if(this._fx == 'fade') {

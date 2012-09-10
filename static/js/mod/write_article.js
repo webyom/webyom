@@ -51,6 +51,13 @@
 		'/static/css/form.css'
 	];
 	
+	function _loadmodHook(e) {
+		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
+			$.css.unload(_cssList);
+			$$.handler.removeEventListener('loadmod', _loadmodHook);
+		}
+	};
+	
 	function _render(url, data, aid) {
 		$('#content').setHtml($.tmpl.render(_TMPL, data, {key: 'mod.writeArticle'}));
 		var myEditor = new YAHOO.widget.Editor('msgpost', {   
@@ -89,7 +96,8 @@
 		$$.ui.turnOnMenu('a');
 	};
 	
-	function handle(subMark) {
+	function handle(modInfo) {
+		var subMark = modInfo;
 		$.css.load(_cssList);
 		$.js.require([
 			'http://yui.yahooapis.com/2.7.0/build/yahoo-dom-event/yahoo-dom-event.js',
@@ -103,6 +111,8 @@
 				$$.util.xhr.get('/data/update/' + subMark, {
 					load: function(o) {
 						if(o.ret === 0) {
+							$$.handler.addEventListener('loadmod', _loadmodHook);
+							$.history.ajax.setMark(modInfo.requestMark, modInfo.title + $$.config.get('TITLE_POSTFIX'));
 							_render('/data/update/' + subMark, o.data.article, subMark);
 						} else {
 							$$alert('Failed to get article1.');
@@ -114,19 +124,14 @@
 					callbackName: '_get_article_info'
 				});
 			} else {
+				$$.handler.addEventListener('loadmod', _loadmodHook);
+				$.history.ajax.setMark(modInfo.requestMark, modInfo.title + $$.config.get('TITLE_POSTFIX'));
 				_render('/data/write', {title: '', content: ''});
 			}
 		})
 	};
 	
-	$$.handler.addEventListener('loadmod', function(e) {
-		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
-			$.css.unload(_cssList);
-		}
-	});
-	
 	$$.mod[modName] = {
 		handle: handle
 	};
 })('write', 'WRITE_ARTICLE', 302);
-

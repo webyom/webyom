@@ -22,9 +22,21 @@
 	-webkit-border-radius: 2px;
 	background: #555;
 	color: #fff;
-	padding: 6px;
+	padding: 5px 7px;
 	font-size: 12px;
-	line-height: 16px;
+	line-height: 18px;
+}
+.yom-tooltip-content h4 {
+	color: #fff;
+}
+.yom-tooltip-content a {
+	color: #ffffcc;
+}
+.yom-tooltip-content a:hover {
+	color: #ffff88;
+}
+.yom-tooltip-content p {
+	margin: 10px 0 0 0;
 }
 .yom-tooltip-arrow-rt, .yom-tooltip-arrow-lt, .yom-tooltip-arrow-bl, .yom-tooltip-arrow-tl {
 	display: block;
