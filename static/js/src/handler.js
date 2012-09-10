@@ -104,8 +104,17 @@ $$.handler = (function(opt) {
 		}, 300);
 	};
 	
+	var _jumpCount = 0;
 	function jump(mark) {
-		_handle(mark);
+		if(_jumpCount++ >= 10) {
+			if($.history.isSupportHistoryState) {
+				location.href = '/' + mark;
+			} else {
+				location.href = '/?' + $now() + '#!' + mark;
+			}
+		} else {
+			_handle(mark);
+		}
 	};
 	
 	function error(e, modName) {
