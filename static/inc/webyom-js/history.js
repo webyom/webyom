@@ -10,9 +10,10 @@ YOM.addModule('history', {
  * @namespace YOM.history.ajax
  */
 YOM.history.addModule('ajax', function(YOM) {
-	var _IE_FRAME_SRC = '/static/inc/webyom-js/history_blank.html';
 	var _INTERVAL = 100;
 	
+	var _ieFrameSrc = '/static/inc/webyom-js/history_blank.html';
+	var _domain = '';
 	var _ieFrame = null;
 	var _markCacheIndexHash = {};
 	var _cache = [];
@@ -23,7 +24,8 @@ YOM.history.addModule('ajax', function(YOM) {
 	var _listener = null;
 	var _listenerBind = null;
 	var _isSupportHistoryState = YOM.history.isSupportHistoryState;
-	var _isSupportHashChange = !_isOldIe() && typeof window.onhashchange != 'undefined';
+	var _isFrameNeeded = YOM.browser.ie && (!document.documentMode || document.documentMode < 8);
+	var _isSupportHashChange = !_isFrameNeeded && typeof window.onhashchange != 'undefined';
 	
 	function _updateCurrentMark(mark) {
 		if(mark == _currentMark) {
@@ -31,7 +33,7 @@ YOM.history.addModule('ajax', function(YOM) {
 		}
 		_previousMark = _currentMark;
 		_currentMark = mark;
-		_isOldIe() && _setIeFrameSrc(mark);
+		_isFrameNeeded && _setIeFrameSrc(mark);
 	};
 	
 	function _checkMark() {
@@ -55,15 +57,12 @@ YOM.history.addModule('ajax', function(YOM) {
 		delete _cache[_markCacheIndexHash[mark] - _cacheSize];
 	};
 	
-	function _isOldIe() {
-		return YOM.browser.ie && (!document.documentMode || document.documentMode < 8);
-	};
-	
 	function _setIeFrameSrc(mark) {
 		if(_ieFrame) {
 			if(_ieFrame.contentWindow && _ieFrame.contentWindow.document) {
 				var doc = _ieFrame.contentWindow.document;
-				if(mark == doc.getElementById('mark').value) {
+				var markEl = doc.getElementById('mark');
+				if(markEl && mark == markEl.value) {
 					return;
 				}
 				doc.open();
@@ -73,6 +72,7 @@ YOM.history.addModule('ajax', function(YOM) {
 						'<body>',
 							'<textarea id="mark">' + mark + '</textarea>',
 							'<script type="text/javascript">',
+								_domain ? 'document.domain = "' + _domain + '";' : '',
 								'var mark = document.getElementById("mark").value;',
 								'if(mark || parent.location.hash) {',
 									'parent.location.hash = "!" + mark;',
@@ -88,11 +88,9 @@ YOM.history.addModule('ajax', function(YOM) {
 				}, 100);
 			}
 		} else {
-			_ieFrame = document.createElement('iframe');
-			_ieFrame.id = 'easyHistoryIeFrame';
-			_ieFrame.style.display = 'none';
-			_ieFrame.src = _IE_FRAME_SRC + '#' + mark;
-			_ieFrame = document.body.appendChild(_ieFrame);
+			var src = _domain ? _ieFrameSrc + '#' + mark : 'about:blank';
+			_ieFrame = document.body.appendChild(YOM.Element.create('iframe', {src: src}, {display: 'none'}));
+			_domain || _setIeFrameSrc(mark);
 		}
 	};
 	
@@ -103,6 +101,8 @@ YOM.history.addModule('ajax', function(YOM) {
 	//Public
 	function init(opt) {
 		opt = opt || {};
+		_ieFrameSrc = opt.ieFrameSrc || _ieFrameSrc;
+		_domain = opt.domain || _domain;
 		_cacheEnabled = typeof opt.cacheEnabled != 'undefined' ? opt.cacheEnabled : _cacheEnabled;
 		_cacheSize = opt.cacheSize || _cacheSize;
 		if(_isSupportHistoryState) {
@@ -162,6 +162,10 @@ YOM.history.addModule('ajax', function(YOM) {
 		return _previousMark;	
 	};
 	
+	function needFrame() {
+		return _isFrameNeeded;
+	};
+	
 	return {
 		init: init,
 		setListener: setListener,
@@ -170,6 +174,7 @@ YOM.history.addModule('ajax', function(YOM) {
 		clearCache: clearCache,
 		setMark: setMark,
 		getMark: getMark,
-		getPrevMark: getPrevMark
+		getPrevMark: getPrevMark,
+		needFrame: needFrame
 	};
 });

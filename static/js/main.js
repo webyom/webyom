@@ -698,14 +698,14 @@ $$.handler = (function(opt) {
 	
 	var _jumpCount = 0;
 	function jump(mark) {
-		if(_jumpCount++ >= 10) {
+		if(_jumpCount++ < 10 || $.history.ajax.needFrame()) {
+			_handle(mark);
+		} else {
 			if($.history.isSupportHistoryState) {
 				location.href = '/' + mark;
 			} else {
 				location.href = '/?' + $now() + '#!' + mark;
 			}
-		} else {
-			_handle(mark);
 		}
 	};
 	
