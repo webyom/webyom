@@ -637,10 +637,12 @@ $$.handler = (function(opt) {
 		var modName = modInfo.name;
 		if(modInfo.url) {
 			$.js.require(modInfo.url, function(ret) {
-				if(ret !== 0) {
+				if(ret == $.JsLoader.RET.ABORTED) {
+					return;
+				} else if(ret != $.JsLoader.RET.SUCC) {
 					$$alert(
 					      'Code: ' + ret + '\n' +
-					      'Message: Failed to load module' + modName
+					      'Message: Failed to load module ' + modName
 					);
 					return;
 				}
