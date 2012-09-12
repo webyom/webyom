@@ -61,11 +61,7 @@
 	
 	function _loadmodHook(e) {
 		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
-			_sortable && _sortable.destory();
-			_sortable = null;
-			$.css.unload(_cssList);
-			$.js.unload(e.originMod.url);
-			$$.mod[modName] = null;
+			unload();
 			$$.handler.removeEventListener('loadmod', _loadmodHook);
 		}
 	};
@@ -230,10 +226,19 @@
 			noCache: true
 		});
 		$$.ui.turnOnMenu('a');
-	};	
+	};
+	
+	function unload() {
+		_sortable && _sortable.destory();
+		_sortable = null;
+		$.css.unload(_cssList);
+		$.js.unload($$.config.get('MOD_KEY_INFO_HASH')[modKey].url);
+		$$.mod[modName] = null;
+	};
 	
 	$$.mod[modName] = {
 		delComment: delComment,
-		handle: handle
+		handle: handle,
+		unload: unload
 	};
 })('read', 'READ_ARTICLE', 301);

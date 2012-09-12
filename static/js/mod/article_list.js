@@ -37,9 +37,7 @@
 	
 	function _loadmodHook(e) {
 		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
-			$.css.unload(_cssList);
-			$.js.unload(e.originMod.url);
-			$$.mod[modName] = null;
+			unload();
 			$$.handler.removeEventListener('loadmod', _loadmodHook);
 		}
 	};
@@ -117,7 +115,14 @@
 		$$.ui.turnOnMenu('a');
 	};
 	
+	function unload() {
+		$.css.unload(_cssList);
+		$.js.unload($$.config.get('MOD_KEY_INFO_HASH')[modKey].url);
+		$$.mod[modName] = null;
+	};
+	
 	$$.mod[modName] = {
-		handle: handle
+		handle: handle,
+		unload: unload
 	};
 })('list', 'ARTICLE_LIST', 300);

@@ -698,7 +698,7 @@ $$.handler = (function(opt) {
 	
 	var _jumpCount = 0;
 	function jump(mark) {
-		if(_jumpCount++ < 10 || $.history.ajax.needFrame()) {
+		if(_jumpCount++ < 10000 || $.history.ajax.needFrame()) {
 			_handle(mark);
 		} else {
 			if($.history.isSupportHistoryState) {

@@ -53,9 +53,7 @@
 	
 	function _loadmodHook(e) {
 		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
-			$.css.unload(_cssList);
-			$.js.unload(e.originMod.url);
-			$$.mod[modName] = null;
+			unload();
 			$$.handler.removeEventListener('loadmod', _loadmodHook);
 		}
 	};
@@ -130,10 +128,17 @@
 				$.history.ajax.setMark(modInfo.requestMark, modInfo.title + $$.config.get('TITLE_POSTFIX'));
 				_render('/data/write', {title: '', content: ''});
 			}
-		})
+		});
+	};
+	
+	function unload() {
+		$.css.unload(_cssList);
+		$.js.unload($$.config.get('MOD_KEY_INFO_HASH')[modKey].url);
+		$$.mod[modName] = null;
 	};
 	
 	$$.mod[modName] = {
-		handle: handle
+		handle: handle,
+		unload: unload
 	};
 })('write', 'WRITE_ARTICLE', 302);
