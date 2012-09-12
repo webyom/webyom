@@ -58,6 +58,7 @@
 	
 	var _cssList = ['/static/inc/prettify/prettify.css', '/static/css/form.css'];
 	var _sortable = null;
+	var _unloaded = false;
 	
 	function _loadmodHook(e) {
 		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
@@ -108,6 +109,9 @@
 	
 	function _makeSortable() {
 		$.js.require($$_LIB_NAME_URL_HASH.YOM_DRAGDROP, function(res) {
+			if(_unloaded) {
+				return
+			}
 			_sortable && _sortable.destory();
 			_sortable = new $.dragdrop.Sortable('#mainPart .sortable', {scrollContainer: document.body, cloneContainer: YOM('#mainPart'), handles: '.handle', enterDirection: 'V', boundary: 'PAGE', snap: 0, startOff: {left: 5, top: 5}, clone: 0});
 			_sortable.addEventListener('sortrelease', function() {
@@ -234,6 +238,7 @@
 		$.css.unload(_cssList);
 		$.js.unload($$.config.get('MOD_KEY_INFO_HASH')[modKey].url);
 		$$.mod[modName] = null;
+		_unloaded = true;
 	};
 	
 	$$.mod[modName] = {

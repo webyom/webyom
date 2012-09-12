@@ -50,6 +50,7 @@
 		'/static/css/yuiEditor.css',
 		'/static/css/form.css'
 	];
+	var _unloaded = false;
 	
 	function _loadmodHook(e) {
 		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
@@ -135,6 +136,7 @@
 		$.css.unload(_cssList);
 		$.js.unload($$.config.get('MOD_KEY_INFO_HASH')[modKey].url);
 		$$.mod[modName] = null;
+		_unloaded = true;
 	};
 	
 	$$.mod[modName] = {
