@@ -9,7 +9,7 @@ YOM.widget.addModule('Tooltip', function(YOM) {
 	var _TMPL = [
 		'<div data-type="yom-tooltip-outer" class="yom-tooltip-outer">',
 			'<div data-type="yom-tooltip-inner" class="yom-tooltip-inner">',
-				'<span data-type="yom-tooltip-arrow">&nbsp;</span>',
+				'<span data-type="yom-tooltip-arrow" class="yom-tooltip-arrow-tl">&nbsp;</span>',
 				'<%if(!noCloseBtn) {%>',
 					'<span data-type="yom-tooltip-close-btn" class="yom-tooltip-close-btn">X</span>',
 				'<%}%>',

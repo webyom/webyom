@@ -38,6 +38,8 @@
 	function _loadmodHook(e) {
 		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
 			$.css.unload(_cssList);
+			$.js.unload(e.originMod.url);
+			$$.mod[modName] = null;
 			$$.handler.removeEventListener('loadmod', _loadmodHook);
 		}
 	};
@@ -79,7 +81,7 @@
 						transition: 'easeOut'
 					});
 					setTimeout(function() {
-						$.js.preload($$_MOD_KEY_INFO_HASH['read'].url);
+						//$.js.preload($$_MOD_KEY_INFO_HASH['read'].url);
 					}, 2000);
 				}
 			});

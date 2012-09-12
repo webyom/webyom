@@ -199,6 +199,7 @@ YOM.addModule('js', function(YOM) {
 		return JsLoader;
 	});
 	
+	var _ROOT_REGEXP_STR = ('^(?:' + location.protocol + '\\/\\/)?' + location.host + '\\/').replace('.', '\\.');
 	var _STATUS = {
 		INIT: 0,
 		LOADING: 1,
@@ -241,6 +242,14 @@ YOM.addModule('js', function(YOM) {
 		}).load();
 	};
 	
+	function _getSrc(src) {
+		if(typeof src == 'string') {
+			return src.replace(new RegExp(_ROOT_REGEXP_STR, 'i'), '/');
+		} else {
+			return src;
+		}
+	};
+	
 	function _require(isAsync, rid, srcs, cb, charset, silent) {
 		_checkRequireList();
 		function _onComplete(ret) {
@@ -261,7 +270,7 @@ YOM.addModule('js', function(YOM) {
 			var srcCharset;
 			var isSrcArray;
 			for(var i = 0; i < srcs.length; i++) {
-				src = srcs[i];
+				src = _getSrc(srcs[i]);
 				srcCharset = charset;
 				isSrcArray = _isArray(src);
 				if(src && typeof src == 'object' && !isSrcArray) {
@@ -330,6 +339,20 @@ YOM.addModule('js', function(YOM) {
 		return require(srcs, null, opt);
 	};
 	
+	function unload(srcs) {
+		var i, src;
+		if(!_isArray(srcs)) {
+			srcs = [srcs];
+		}
+		for(i = 0, l = srcs.length; i < l; i++) {
+			src = srcs[i];
+			if(_srcStatusHash[src] != _STATUS.LOADED) {
+				continue;
+			}
+			_srcStatusHash[src] = _STATUS.INIT;
+		}
+	};
+	
 	function abort(rid) {
 		_abortedRidHash[rid] = 1;
 	};
@@ -338,6 +361,7 @@ YOM.addModule('js', function(YOM) {
 		_ID: 113,
 		require: require,
 		preload: preload,
+		unload: unload,
 		abort: abort
 	};
 });
