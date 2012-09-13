@@ -50,14 +50,6 @@
 		'/static/css/yuiEditor.css',
 		'/static/css/form.css'
 	];
-	var _unloaded = false;
-	
-	function _loadmodHook(e) {
-		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
-			unload();
-			$$.handler.removeEventListener('loadmod', _loadmodHook);
-		}
-	};
 	
 	function _render(url, data, aid) {
 		$('#content').setHtml($.tmpl.render(_TMPL, data, {key: 'mod.writeArticle'}));
@@ -78,8 +70,8 @@
 				param: $('#writeArticle').toQueryString(),
 				load: function(o) {
 					if(o.ret === 0) {
-						$$.handler.clearCache();
-						$$.handler.jump(_MARK_PREFIX + 'list');
+						$.history.ajax.clearCache();
+						$$.mod['ROOT'].jump(_MARK_PREFIX + 'list');
 					} else {
 						$$alert('Failed to post article.');
 					}
@@ -97,8 +89,21 @@
 		$$.ui.turnOnMenu('a');
 	};
 	
-	function handle(modInfo) {
-		var subMark = modInfo;
+	var Handler = function(observers, modName, parent, opt) {
+		Handler.superClass.constructor.apply(this, $.array.getArray(arguments));
+	};
+	
+	$.Class.extend(Handler, $$.Handler);
+	
+	Handler.prototype._loadmodHook = function(e) {
+		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
+			this.unload();
+			this._parent.removeEventListener('loadmod', this._loadmodHook);
+		}
+	};
+	
+	Handler.prototype.handle = function(mark, fullMark, reqInfo) {
+		var self = this;
 		$.css.load(_cssList);
 		$.js.require([
 			'http://yui.yahooapis.com/2.7.0/build/yahoo-dom-event/yahoo-dom-event.js',
@@ -108,13 +113,13 @@
 			'http://yui.yahooapis.com/2.7.0/build/button/button-min.js',
 			'http://yui.yahooapis.com/2.7.0/build/editor/editor-min.js'
 		], function() {
-			if(subMark) {
-				$$.util.xhr.get('/data/update/' + subMark, {
+			if(mark) {
+				$$.util.xhr.get('/data/update/' + mark, {
 					load: function(o) {
 						if(o.ret === 0) {
-							$$.handler.addEventListener('loadmod', _loadmodHook);
-							$.history.ajax.setMark(modInfo.requestMark, modInfo.title + $$.config.get('TITLE_POSTFIX'));
-							_render('/data/update/' + subMark, o.data.article, subMark);
+							self._parent.addEventListener('loadmod', self._loadmodHook, self);
+							$.history.ajax.setMark(fullMark, reqInfo.modInfo.title + $$.config.get('TITLE_POSTFIX'));
+							_render('/data/update/' + mark, o.data.article, mark);
 						} else {
 							$$alert('Failed to get article1.');
 						}
@@ -125,22 +130,22 @@
 					callbackName: '_get_article_info'
 				});
 			} else {
-				$$.handler.addEventListener('loadmod', _loadmodHook);
-				$.history.ajax.setMark(modInfo.requestMark, modInfo.title + $$.config.get('TITLE_POSTFIX'));
+				self._parent.addEventListener('loadmod', self._loadmodHook, self);
+				$.history.ajax.setMark(fullMark, reqInfo.modInfo.title + $$.config.get('TITLE_POSTFIX'));
 				_render('/data/write', {title: '', content: ''});
 			}
 		});
+		this._reqInfo = reqInfo;
 	};
 	
-	function unload() {
+	Handler.prototype.unload = function() {
 		$.css.unload(_cssList);
-		$.js.unload($$.config.get('MOD_KEY_INFO_HASH')[modKey].url);
-		$$.mod[modName] = null;
-		_unloaded = true;
+		$.js.unload(this._reqInfo.modInfo.url);
+		Handler.superClass.unload.call(this);
 	};
 	
-	$$.mod[modName] = {
-		handle: handle,
-		unload: unload
-	};
+	new Handler({
+		beforeunloadmod: new $.Observer(),
+		loadmod: new $.Observer()
+	}, modName, $$.mod['ROOT']);
 })('write', 'WRITE_ARTICLE', 302);

@@ -45,13 +45,14 @@ YOM.history.addModule('ajax', function(YOM) {
 			return;
 		}
 		_updateCurrentMark(mark);
-		_listener && _listener.call(_listenerBind, mark, getCache(mark));
+		_listener && _listener.call(_listenerBind, mark);
 	};
 	
 	function _setCache(mark, data) {
 		if(!_cacheEnabled) {
 			return;
 		}
+		delete _cache[_markCacheIndexHash[mark]];
 		_cache.push(data);
 		_markCacheIndexHash[mark] = _cache.length - 1;
 		delete _cache[_markCacheIndexHash[mark] - _cacheSize];

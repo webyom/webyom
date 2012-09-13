@@ -34,27 +34,31 @@
 	].join('');
 	
 	var _cssList = ['/static/inc/prettify/prettify.css'];
-	var _unloaded = false;
 	
-	function _loadmodHook(e) {
+	var Handler = function(observers, modName, parent, opt) {
+		Handler.superClass.constructor.apply(this, $.array.getArray(arguments));
+	};
+	
+	$.Class.extend(Handler, $$.Handler);
+	
+	Handler.prototype._loadmodHook = function(e) {
 		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
-			unload();
-			$$.handler.removeEventListener('loadmod', _loadmodHook);
+			this.unload();
+			this._parent.removeEventListener('loadmod', this._loadmodHook);
 		}
 	};
 	
-	function handle(modInfo, data) {
+	Handler.prototype.handle = function(mark, fullMark, reqInfo, data) {
 		$.css.load(_cssList);
-		var cacheKey;
-		var subMark = modInfo.subMark;
-		if(!/^p\d+$/.test(subMark)) {
-			subMark = 'p1';
+		var self = this;
+		if(!/^p\d+$/.test(mark)) {
+			mark = 'p1';
 		}
-		cacheKey = modKey + '/' + subMark;
-		data = data || $$.handler.getCache(cacheKey);
+		this._reqInfo = reqInfo;
+		data = data || $.history.ajax.getCache(fullMark);
 		if(data) {
-			$$.handler.addEventListener('loadmod', _loadmodHook);
-			$.history.ajax.setMark(modInfo.requestMark, modInfo.title + $$.config.get('TITLE_POSTFIX'));
+			this._parent.addEventListener('loadmod', this._loadmodHook, this);
+			$.history.ajax.setMark(fullMark, reqInfo.modInfo.title + $$.config.get('TITLE_POSTFIX'));
 			$('#mainPart').size() || $$.ui.resetContent();
 			$('#mainPart').tween(1000, {
 				origin: {
@@ -87,7 +91,7 @@
 			return;
 		}
 		/*
-		new $.JsLoader('/' + subMark, {
+		new $.JsLoader('/' + mark, {
 			callbackName: '_get_article_list',
 			callback: function(o) {
 				$('#mainPart').setHtml($.tmpl.render(_TMPL, data, {key: 'mod.articleList'}));
@@ -95,20 +99,20 @@
 				$$.handler.setCache(mark, o.data);
 			},
 			error: function(code) {
-				$$.handler.error(new $.Error(code, 'Failed to load article list ' + subMark), modName);
+				$$.handler.error(new $.Error(code, 'Failed to load article list ' + mark), modName);
 			}, 
 			complete: function() {
 			}
 		}).load();
 		*/
-		$$.util.xhr.get('/data/' + subMark, {
+		$$.util.xhr.get('/data/' + mark, {
 			callbackName: '_get_article_list',
 			load: function(o) {
-				$$.handler.setCache(cacheKey, o.data);
-				handle(modInfo, o.data)
+				$.history.ajax.setCache(fullMark, o.data);
+				self.handle(mark, fullMark, reqInfo, data)
 			},
 			error: function(code) {
-				$$.handler.error(new $.Error(code, 'Failed to load article list ' + subMark), modName);
+				self.error(new $.Error(code, 'Failed to load article list ' + mark), modName);
 			}, 
 			complete: function() {
 			}
@@ -116,15 +120,14 @@
 		$$.ui.turnOnMenu('a');
 	};
 	
-	function unload() {
+	Handler.prototype.unload = function() {
 		$.css.unload(_cssList);
-		$.js.unload($$.config.get('MOD_KEY_INFO_HASH')[modKey].url);
-		$$.mod[modName] = null;
-		_unloaded = true;
+		$.js.unload(this._reqInfo.modInfo.url);
+		Handler.superClass.unload.call(this);
 	};
 	
-	$$.mod[modName] = {
-		handle: handle,
-		unload: unload
-	};
+	new Handler({
+		beforeunloadmod: new $.Observer(),
+		loadmod: new $.Observer()
+	}, modName, $$.mod['ROOT']);
 })('list', 'ARTICLE_LIST', 300);

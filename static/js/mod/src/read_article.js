@@ -46,7 +46,7 @@
 					'<%}%>',
 					' at <%=comment.creation_datetime%>',
 					'<%if(is_admin) {%>',
-						'<a href="javascript:void(0);" onclick="$$.mod[\'' + modName + '\'].delComment(\'<%=comment.key_name%>\', \'<%=article.key_name%>\');">[Delete]</a>',
+						'<a href="javascript:void(0);" onclick="$$.mod[\'ROOT\'][\'' + modName + '\'].delComment(\'<%=comment.key_name%>\', \'<%=article.key_name%>\');">[Delete]</a>',
 					'<%}%>',
 				'</p>',
 				'<%=comment.content%>',
@@ -58,14 +58,6 @@
 	
 	var _cssList = ['/static/inc/prettify/prettify.css', '/static/css/form.css'];
 	var _sortable = null;
-	var _unloaded = false;
-	
-	function _loadmodHook(e) {
-		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
-			unload();
-			$$.handler.removeEventListener('loadmod', _loadmodHook);
-		}
-	};
 	
 	function _bindEvent(aid) {
 		$('#btnSubmit').addEventListener('click', function() {
@@ -107,9 +99,23 @@
 		YOM(document.body).scrollTopTo(YOM('#comments'));
 	};
 	
-	function _makeSortable() {
+	var Handler = function(observers, modName, parent, opt) {
+		Handler.superClass.constructor.apply(this, $.array.getArray(arguments));
+	};
+	
+	$.Class.extend(Handler, $$.Handler);
+	
+	Handler.prototype._loadmodHook = function(e) {
+		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
+			this.unload();
+			this._parent.removeEventListener('loadmod', this._loadmodHook);
+		}
+	};
+	
+	Handler.prototype._makeSortable = function() {
+		var self = this;
 		$.js.require($$_LIB_NAME_URL_HASH.YOM_DRAGDROP, function(res) {
-			if(_unloaded) {
+			if(self._unloaded) {
 				return
 			}
 			_sortable && _sortable.destory();
@@ -126,16 +132,17 @@
 		});
 	};
 	
-	function delComment(cid, aid) {
+	Handler.prototype.delComment = function(cid, aid) {
 		if(!confirm('Confirm to delete this comment?')) {
 			return;
 		}
+		var self = this;
 		$$.util.xhr.post('/data/del_comment', {
 			param: {cid: cid},
 			load: function(o) {
 				if(o.ret === 0) {
-					$$.handler.clearCache();
-					handle(aid);
+					$.history.ajax.clearCache();
+					self.handle(self.reqInfo.mark, self.reqInfo.fullMark, self.reqInfo);
 				} else {
 					$$alert('Failed to delete comment.');
 				}
@@ -147,20 +154,21 @@
 		});
 	};
 	
-	function handle(modInfo, data) {
+	Handler.prototype.handle = function(mark, fullMark, reqInfo, data) {
 		$.css.load(_cssList);
-		var cacheKey, params, aid;
-		params = modInfo.subMark.split('/');
+		var self = this;
+		var params, aid;
+		params = mark.split('/');
 		aid = params[0];
 		if(!aid) {
 			$$.handler.error(new $.Error(modId + '01', 'Invalid article id.'), modName);
 			return;
 		}
-		cacheKey = modKey + '/' + aid;
-		data = data || $$.handler.getCache(cacheKey);
+		this._reqInfo = reqInfo;
+		data = data || $.history.ajax.getCache(fullMark);
 		if(data) {
-			$$.handler.addEventListener('loadmod', _loadmodHook);
-			$.history.ajax.setMark(modInfo.requestMark, data.article.title + ' - ' + modInfo.title + $$.config.get('TITLE_POSTFIX'));
+			this._parent.addEventListener('loadmod', this._loadmodHook, this);
+			$.history.ajax.setMark(fullMark, data.article.title + ' - ' + reqInfo.modInfo.title + $$.config.get('TITLE_POSTFIX'));
 			$('#mainPart').size() || $$.ui.resetContent();
 			$('#mainPart').tween(1000, {
 				origin: {
@@ -196,7 +204,7 @@
 						},
 						css: true,
 						transition: 'easeOut',
-						complete: _makeSortable
+						complete: $bind(self, self._makeSortable)
 					});
 					_bindEvent(aid);
 					$.js.require($$_LIB_NAME_URL_HASH.YOM_LOCAL_STORAGE, function() {
@@ -219,11 +227,11 @@
 		$$.util.xhr.get('/data/' + modKey + '/' + aid, {
 			callbackName: '_get_article_info',
 			load: function(o) {
-				$$.handler.setCache(cacheKey, o.data);
-				handle(modInfo, o.data);
+				$.history.ajax.setCache(fullMark, o.data);
+				self.handle(mark, fullMark, reqInfo, data)
 			},
 			error: function(code) {
-				$$.handler.error(new $.Error(code, 'Failed to read article ' + aid), modName);
+				self.error(new $.Error(code, 'Failed to read article ' + aid), modName);
 			}, 
 			complete: function() {
 			},
@@ -232,18 +240,16 @@
 		$$.ui.turnOnMenu('a');
 	};
 	
-	function unload() {
+	Handler.prototype.unload = function() {
 		_sortable && _sortable.destory();
 		_sortable = null;
 		$.css.unload(_cssList);
-		$.js.unload($$.config.get('MOD_KEY_INFO_HASH')[modKey].url);
-		$$.mod[modName] = null;
-		_unloaded = true;
+		$.js.unload(this._reqInfo.modInfo.url);
+		Handler.superClass.unload.call(this);
 	};
 	
-	$$.mod[modName] = {
-		delComment: delComment,
-		handle: handle,
-		unload: unload
-	};
+	new Handler({
+		beforeunloadmod: new $.Observer(),
+		loadmod: new $.Observer()
+	}, modName, $$.mod['ROOT']);
 })('read', 'READ_ARTICLE', 301);

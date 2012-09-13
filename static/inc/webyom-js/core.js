@@ -2999,7 +2999,7 @@ YOM.addModule('JsLoader', function(YOM) {
 		this._jsEl = document.createElement('script');
 		if(YOM.browser.ie) {
 			YOM.Event.addListener(this._jsEl, 'readystatechange', function() {
-				if(this._jsEl.readyState == 'loaded' || this._jsEl.readyState == 'complete') {
+				if(this._jsEl && (this._jsEl.readyState == 'loaded' || this._jsEl.readyState == 'complete')) {
 					onload.call(this);
 					return;
 				}
