@@ -158,6 +158,7 @@
 	};
 	
 	Handler.prototype.handle = function(mark, fullMark, reqInfo, data) {
+		this.isCurrentHandler() || return;
 		$.css.load(_cssList);
 		var self = this;
 		var params, aid;

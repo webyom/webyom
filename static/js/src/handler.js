@@ -69,6 +69,15 @@ $$.Handler = (function() {
 			return this._curMark;
 		},
 		
+		getCurrentModInfo: function() {
+			return this._curModInfo;
+		},
+		
+		isCurrentHandler: function() {
+			var modInfo = this._parent.getCurrentModInfo();
+			return modInfo && modInfo.name == this._name;
+		},
+		
 		error: function(e, modName) {
 			if(e instanceof $.Error) {
 				$$alert(

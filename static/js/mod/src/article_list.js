@@ -52,6 +52,7 @@
 	};
 	
 	Handler.prototype.handle = function(mark, fullMark, reqInfo, data) {
+		this.isCurrentHandler() || return;
 		$.css.load(_cssList);
 		var self = this;
 		if(!/^p\d+$/.test(mark)) {

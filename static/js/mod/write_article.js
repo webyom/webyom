@@ -106,6 +106,7 @@
 	};
 	
 	Handler.prototype.handle = function(mark, fullMark, reqInfo) {
+		this.isCurrentHandler() || return;
 		var self = this;
 		$.css.load(_cssList);
 		$.js.require([
