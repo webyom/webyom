@@ -303,7 +303,10 @@ YOM.addModule('InstanceManager', function(YOM) {
 		
 		each: function(cb, bind) {
 			YOM.object.each(this._pool, function(item) {
-				item && cb.call(bind, item.inst, item.id);
+				if(item) {
+					return cb.call(bind, item.inst, item.id);
+				}
+				return true;
 			});
 		},
 		
@@ -1073,9 +1076,13 @@ YOM.addModule('Observer', function(YOM) {
 		},
 		
 		dispatch: function(e, bind) {
-			var res, tmp;
+			var res, tmp, subscriber;
 			for(var i = 0, l = this._subscribers.length; i < l; i++) {
-				tmp = this._subscribers[i].call(bind, e);
+				subscriber = this._subscribers[i];
+				if(!subscriber) {
+					continue;				
+				}
+				tmp = subscriber.call(bind, e);
 				res = tmp === false || res === false ? false : tmp;
 			}
 			return res;
@@ -1556,6 +1563,20 @@ YOM.addModule('Xhr', function(YOM) {
 		});
 	};
 	
+	Xhr.isUrlLoading = function(url, fullMatch) {
+		var res = false;
+		if(!url) {
+			return res;
+		}
+		_im.each(function(inst) {
+			if(fullMatch && url == inst._url || inst._url.indexOf(url) === 0) {
+				res = true;
+				return false;
+			}
+		});
+		return res;
+	};
+	
 	_onReadyStateChange = function() {
 		if(this._xhr.readyState !== 4 || this._status == _STATUS.ABORTED) {
 			return;
@@ -1692,6 +1713,20 @@ YOM.addModule('CrossDomainPoster', function(YOM) {
 		SUCC: 0,
 		ABORTED: -1,
 		ERROR: 1	
+	};
+	
+	CrossDomainPoster.isUrlLoading = function(url, fullMatch) {
+		var res = false;
+		if(!url) {
+			return res;
+		}
+		_im.each(function(inst) {
+			if(fullMatch && url == inst._url || inst._url.indexOf(url) === 0) {
+				res = true;
+				return false;
+			}
+		});
+		return res;
 	};
 	
 	CrossDomainPoster.getInstance = function(id) {
@@ -2920,6 +2955,20 @@ YOM.addModule('JsLoader', function(YOM) {
 				inst.abort();
 			}
 		});
+	};
+	
+	JsLoader.isUrlLoading = function(url, fullMatch) {
+		var res = false;
+		if(!url) {
+			return res;
+		}
+		_im.each(function(inst) {
+			if(fullMatch && url == inst._src || inst._src.indexOf(url) === 0) {
+				res = true;
+				return false;
+			}
+		});
+		return res;
 	};
 	
 	JsLoader.prototype._clear = function() {

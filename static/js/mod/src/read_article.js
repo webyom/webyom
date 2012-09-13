@@ -227,7 +227,11 @@
 			});
 			return;
 		}
-		$$.util.xhr.get('/data/' + modKey + '/' + aid, {
+		var url = '/data/' + modKey + '/' + aid;
+		if($.Xhr.isUrlLoading(url)) {
+			return;
+		}
+		$$.util.xhr.get(url, {
 			gid: this._id,
 			callbackName: '_get_article_info',
 			load: function(o) {

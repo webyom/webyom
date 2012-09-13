@@ -117,7 +117,11 @@
 			'http://yui.yahooapis.com/2.7.0/build/editor/editor-min.js'
 		], function() {
 			if(mark) {
-				$$.util.xhr.get('/data/update/' + mark, {
+				var url = '/data/update/' + mark;
+				if($.Xhr.isUrlLoading(url)) {
+					return;
+				}
+				$$.util.xhr.get(url, {
 					gid: self._id,
 					load: function(o) {
 						if(o.ret === 0) {

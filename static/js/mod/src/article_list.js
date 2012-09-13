@@ -93,8 +93,12 @@
 			});
 			return;
 		}
+		var url = '/data/' + mark;
+		if($.Xhr.isUrlLoading(url)) {
+			return;
+		}
 		/*
-		new $.JsLoader('/' + mark, {
+		new $.JsLoader(url, {
 			callbackName: '_get_article_list',
 			callback: function(o) {
 				$('#mainPart').setHtml($.tmpl.render(_TMPL, data, {key: 'mod.articleList'}));
@@ -108,7 +112,7 @@
 			}
 		}).load();
 		*/
-		$$.util.xhr.get('/data/' + mark, {
+		$$.util.xhr.get(url, {
 			gid: this._id,
 			callbackName: '_get_article_list',
 			load: function(o) {
