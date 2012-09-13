@@ -91,6 +91,9 @@
 	
 	var Handler = function(observers, modName, parent, opt) {
 		Handler.superClass.constructor.apply(this, $.array.getArray(arguments));
+		this._bound = {
+			loadmodHook: $bind(this, this._loadmodHook)
+		};
 	};
 	
 	$.Class.extend(Handler, $$.Handler);
@@ -98,7 +101,7 @@
 	Handler.prototype._loadmodHook = function(e) {
 		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
 			this.unload();
-			this._parent.removeEventListener('loadmod', this._loadmodHook);
+			this._parent.removeEventListener('loadmod', this._bound.loadmodHook);
 		}
 	};
 	
@@ -115,9 +118,10 @@
 		], function() {
 			if(mark) {
 				$$.util.xhr.get('/data/update/' + mark, {
+					gid: self._id,
 					load: function(o) {
 						if(o.ret === 0) {
-							self._parent.addEventListener('loadmod', self._loadmodHook, self);
+							self._parent.addEventListener('loadmod', self._bound.loadmodHook);
 							$.history.ajax.setMark(fullMark, reqInfo.modInfo.title + $$.config.get('TITLE_POSTFIX'));
 							_render('/data/update/' + mark, o.data.article, mark);
 						} else {
@@ -130,7 +134,7 @@
 					callbackName: '_get_article_info'
 				});
 			} else {
-				self._parent.addEventListener('loadmod', self._loadmodHook, self);
+				self._parent.addEventListener('loadmod', self._bound.loadmodHook);
 				$.history.ajax.setMark(fullMark, reqInfo.modInfo.title + $$.config.get('TITLE_POSTFIX'));
 				_render('/data/write', {title: '', content: ''});
 			}

@@ -611,6 +611,7 @@ $$.Handler = (function() {
 		this._name = modName;
 		this._parent = parent;
 		this._parent.mod[this._name] = this;
+		this._id = $getUniqueId();
 	};
 	
 	$.Class.extend(Handler, $.Event);
@@ -676,6 +677,11 @@ $$.Handler = (function() {
 			}
 		},
 		
+		abort: function() {
+			$.JsLoader.abortAll(this._id);
+			$.Xhr.abortAll(this._id);
+		},
+		
 		unload: function() {
 			this._parent.mod[this._name] = null;
 			this._unloaded = true;
@@ -702,6 +708,11 @@ $$.Handler = (function() {
 			})) === false) {
 				return;
 			}
+			/*
+			try {
+				this.mod[this._curModInfo.name].abort();
+			} catch(e) {}
+			*/
 			this._curMark = mark;
 			this._prevModInfo = this._curModInfo;
 			this._curModInfo = subReqInfo.modInfo;

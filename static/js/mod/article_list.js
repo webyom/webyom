@@ -37,6 +37,9 @@
 	
 	var Handler = function(observers, modName, parent, opt) {
 		Handler.superClass.constructor.apply(this, $.array.getArray(arguments));
+		this._bound = {
+			loadmodHook: $bind(this, this._loadmodHook)
+		};
 	};
 	
 	$.Class.extend(Handler, $$.Handler);
@@ -44,7 +47,7 @@
 	Handler.prototype._loadmodHook = function(e) {
 		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
 			this.unload();
-			this._parent.removeEventListener('loadmod', this._loadmodHook);
+			this._parent.removeEventListener('loadmod', this._bound.loadmodHook);
 		}
 	};
 	
@@ -57,7 +60,7 @@
 		this._reqInfo = reqInfo;
 		data = data || $.history.ajax.getCache(fullMark);
 		if(data) {
-			this._parent.addEventListener('loadmod', this._loadmodHook, this);
+			this._parent.addEventListener('loadmod', this._bound.loadmodHook);
 			$.history.ajax.setMark(fullMark, reqInfo.modInfo.title + $$.config.get('TITLE_POSTFIX'));
 			$('#mainPart').size() || $$.ui.resetContent();
 			$('#mainPart').tween(1000, {
@@ -106,6 +109,7 @@
 		}).load();
 		*/
 		$$.util.xhr.get('/data/' + mark, {
+			gid: this._id,
 			callbackName: '_get_article_list',
 			load: function(o) {
 				$.history.ajax.setCache(fullMark, o.data);

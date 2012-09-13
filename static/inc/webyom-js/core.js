@@ -1527,6 +1527,7 @@ YOM.addModule('Xhr', function(YOM) {
 		this._oncomplete = opt.complete || $empty;
 		this._bind = opt.bind;
 		this._xhr = null;
+		this._gid = opt.gid;//group id
 		this._id = _im.add(this);
 	};
 	
@@ -1546,12 +1547,12 @@ YOM.addModule('Xhr', function(YOM) {
 		ERROR: 1	
 	};
 	
-	Xhr.abortAll = function(excludeIdHash) {
+	Xhr.abortAll = function(gid) {
+		var noGid = typeof gid == 'undefined';
 		_im.each(function(inst) {
-			if(excludeIdHash && excludeIdHash[inst.getId()]) {
-				return;
+			if(noGid || inst.getGid() == gid) {
+				inst.abort();
 			}
-			inst.abort();
 		});
 	};
 	
@@ -1588,6 +1589,10 @@ YOM.addModule('Xhr', function(YOM) {
 		return this._id;
 	};
 	
+	Xhr.prototype.getGid = function() {
+		return this._gid;
+	};
+	
 	Xhr.prototype.send = function() {
 		if(this._status != _STATUS.INIT) {
 			return 1;
@@ -1618,11 +1623,11 @@ YOM.addModule('Xhr', function(YOM) {
 	};
 	
 	Xhr.prototype.abort = function () {
-		if(!(this._status == _STATUS.INIT || this._status == _STATUS.LOADING)) {
+		if(this._status != _STATUS.LOADING) {
 			return 1;
 		}
-		this._status = _STATUS.ABORTED;
 		this._xhr.abort();
+		this._status = _STATUS.ABORTED;
 		this._complete(Xhr.RET.ABORTED);
 		this._onabort.call(this._bind);
 		return 0;
@@ -1695,6 +1700,7 @@ YOM.addModule('CrossDomainPoster', function(YOM) {
 	
 	CrossDomainPoster.prototype._complete = function(ret) {
 		_loading_count > 0 && _loading_count--;
+		this._clear();
 		try {
 			_loading_count === 0 && CrossDomainPoster.dispatchEvent(CrossDomainPoster.createEvent('allcomplete', {url: this._url, opt: this._opt}));
 		CrossDomainPoster.dispatchEvent(CrossDomainPoster.createEvent('complete', {url: this._url, opt: this._opt, ret: ret}));
@@ -1703,33 +1709,36 @@ YOM.addModule('CrossDomainPoster', function(YOM) {
 				throw new YOM.Error(YOM.Error.getCode(_ID, 1));
 			}
 		}
-	};
-	
-	CrossDomainPoster.prototype._error = function() {
-		this._clear();
-		this._complete(CrossDomainPoster.RET.ERROR);
-		this._oncomplete.call(this._bind, CrossDomainPoster.RET.ERROR);
-		this._onerror.call(this._bind);
+		this._oncomplete.call(this._bind, ret);
 	};
 	
 	CrossDomainPoster.prototype._frameOnLoad = function() {
 		if(this._crossSite) {
-			if(this._status == _STATUS.ABORTED) {
-				this._clear();
+			if(this._status =! _STATUS.LOADING) {
 				return;
 			}
 			this._status = _STATUS.LOADED;
+			var data;
+			var parseError = false;
 			try {
-				this._onload.call(this._bind, YOM.json.parse(this._frameEl.contentWindow.name));
-				this._clear();
-				this._complete(CrossDomainPoster.RET.SUCC);
-				this._oncomplete.call(this._bind, CrossDomainPoster.RET.SUCC);
+				data = YOM.json.parse(this._frameEl.contentWindow.name);
 			} catch(e) {
-				this._error();
+				parseError = true;
+			}
+			if(parseError) {
+				this._complete(CrossDomainPoster.RET.ERROR);
+				this._onerror.call(this._bind);
+				if(YOM.debugMode) {
+					throw new YOM.Error(YOM.Error.getCode(_ID, 1));
+				}
+			} else {
+				this._complete(CrossDomainPoster.RET.SUCC);
+				this._onload.call(this._bind, data);
 			}
 		} else {
 			if(this._frameEl) {
-				this._error();
+				this._complete(CrossDomainPoster.RET.ERROR);
+				this._onerror.call(this._bind);
 			}
 		}
 	};
@@ -1749,16 +1758,17 @@ YOM.addModule('CrossDomainPoster', function(YOM) {
 	};
 		
 	CrossDomainPoster.prototype.post = function() {
+		if(this._status != _STATUS.INIT) {
+			return 1;
+		}
 		this._frameEl = YOM.Element.create('iframe', {src: this._proxy}, {display: 'none'});
 		this._frameEl.instanceId = this.getId();
 		this._frameEl.callback = $bind(this, function(o) {
-			this._clear();
-			if(this._status == _STATUS.ABORTED) {
+			if(this._status =! _STATUS.LOADING) {
 				return;
 			}
 			this._status = _STATUS.LOADED;
 			this._complete(CrossDomainPoster.RET.SUCC);
-			this._oncomplete.call(this._bind, CrossDomainPoster.RET.SUCC);
 			this._onload.call(this._bind, o);
 		});
 		this._frameOnLoadListener = $bind(this, this._frameOnLoad);
@@ -1766,17 +1776,15 @@ YOM.addModule('CrossDomainPoster', function(YOM) {
 		this._frameEl = document.body.appendChild(this._frameEl);
 		this._status = _STATUS.LOADING;
 		_loading_count++;
-		this.post = $empty;
 		CrossDomainPoster.dispatchEvent(CrossDomainPoster.createEvent('start', {url: this._url, opt: this._opt}));
 	};
 	
 	CrossDomainPoster.prototype.abort = function() {
-		if(this._status == _STATUS.LOADED || this._status == _STATUS.ABORTED) {
+		if(this._status != _STATUS.LOADING) {
 			return 1;
 		}
 		this._status = _STATUS.ABORTED;
 		this._complete(CrossDomainPoster.RET.ABORTED);
-		this._oncomplete.call(this._bind, CrossDomainPoster.RET.ABORTED);
 		this._onabort.call(this._bind);
 		return 0;
 	};
@@ -2881,6 +2889,7 @@ YOM.addModule('JsLoader', function(YOM) {
 		this._jsEl = null;
 		this._status = _STATUS.INIT;
 		this._callbacked = false;
+		this._gid = opt.gid;//group id
 		this._id = _im.add(this);
 	};
 	
@@ -2903,12 +2912,13 @@ YOM.addModule('JsLoader', function(YOM) {
 		TIMEOUT: 2
 	};
 	
-	JsLoader.abortAll = function(excludeIdHash) {
+	JsLoader.abortAll = function(gid) {
+		var noGid = typeof gid == 'undefined';
 		_im.each(function(inst) {
-			if(inst._opt.noAbortAll || excludeIdHash && (excludeIdHash[inst.getId()] || excludeIdHash[inst._rawSrc])) {
-				return;
-			}
 			inst.abort();
+			if(noGid || inst.getGid() == gid) {
+				inst.abort();
+			}
 		});
 	};
 	
@@ -2954,6 +2964,10 @@ YOM.addModule('JsLoader', function(YOM) {
 	
 	JsLoader.prototype.getId = function() {
 		return this._id;
+	};
+	
+	JsLoader.prototype.getGid = function() {
+		return this._gid;
 	};
 	
 	JsLoader.prototype.load = function() {
@@ -3034,14 +3048,10 @@ YOM.addModule('JsLoader', function(YOM) {
 	};
 	
 	JsLoader.prototype.abort = function() {
-		if(!(this._status == _STATUS.INIT || this._status == _STATUS.LOADING)) {
+		if(this._status != _STATUS.LOADING) {
 			return 1;
 		}
 		this._status = _STATUS.ABORTED;
-		if(this._status == _STATUS.INIT) {
-			_im.remove(this.getId());
-			return 0;
-		}
 		this._complete(JsLoader.RET.ABORTED);
 		this._onabort.call(this._bind);
 		return 0;
