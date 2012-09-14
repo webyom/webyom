@@ -37,19 +37,9 @@
 	
 	var Handler = function(observers, modName, parent, opt) {
 		Handler.superClass.constructor.apply(this, $.array.getArray(arguments));
-		this._bound = {
-			loadmodHook: $bind(this, this._loadmodHook)
-		};
 	};
 	
 	$.Class.extend(Handler, $$.Handler);
-	
-	Handler.prototype._loadmodHook = function(e) {
-		if(e.originMod.key == modKey && e.targetMod.key != modKey) {
-			this.unload();
-			this._parent.removeEventListener('loadmod', this._bound.loadmodHook);
-		}
-	};
 	
 	Handler.prototype.handle = function(mark, fullMark, reqInfo, data) {
 		this.isCurrentHandler() || return;
@@ -61,7 +51,6 @@
 		this._reqInfo = reqInfo;
 		data = data || $.history.ajax.getCache(fullMark);
 		if(data) {
-			this._parent.addEventListener('loadmod', this._bound.loadmodHook);
 			$.history.ajax.setMark(fullMark, reqInfo.modInfo.title + $$.config.get('TITLE_POSTFIX'));
 			$('#mainPart').size() || $$.ui.resetContent();
 			$('#mainPart').tween(1000, {

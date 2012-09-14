@@ -10,6 +10,7 @@ $$.Handler = (function() {
 		this._modKeyInfoHash = opt.modKeyInfoHash || {};
 		this._defaultModkey = opt.defaultModkey || '';
 		this._markPrefix = opt.markPrefix || '';
+		this._prevMark = '';
 		this._curMark = '';
 		this._prevModInfo = null;
 		this._curModInfo = null;
@@ -19,12 +20,43 @@ $$.Handler = (function() {
 		this._name = modName;
 		this._parent = parent;
 		this._parent.mod[this._name] = this;
+		this._bound = {
+			beforeunloadmodHook: $bind(this, this._beforeunloadmodHook),
+			loadmodHook: $bind(this, this._loadmodHook)
+		};
+		if(this._name != 'ROOT') {
+			this._parent.addEventListener('beforeunloadmodHook', this._bound.beforeunloadmodHook);
+			this._parent.addEventListener('loadmod', this._bound.loadmodHook);
+		}
 		this._id = $getUniqueId();
 	};
 	
 	$.Class.extend(Handler, $.Event);
 	
 	$extend(Handler.prototype, {
+		_beforeunloadmodHook: function(e) {
+			return this.dispatchEvent(this.createEvent('beforeunloadmod', {
+				originMark: this._curMark,
+				targetMark: '',
+				originMod: $.object.clone(this._curModInfo, true),
+				targetMod: $.object.clone(e.targetMod, true)
+			}));
+		},
+		
+		_loadmodHook: function(e) {
+			if(e.originMod.name == this._reqInfo.modInfo.name && e.targetMod.name != this._reqInfo.modInfo.name) {
+				this.dispatchEvent(self.createEvent('loadmod', {
+					originMark: this._curMark,
+					targetMark: '',
+					originMod: $.object.clone(this._curModInfo, true),
+					targetMod: $.object.clone(e.targetMod, true)
+				}));
+				this.unload();
+				this._parent.removeEventListener('beforeunloadmodHook', this._bound.beforeunloadmodHook);
+				this._parent.removeEventListener('loadmod', this._bound.loadmodHook);
+			}
+		},
+	
 		_loadMod: function(subReqInfo) {
 			var self = this;
 			var modInfo = subReqInfo.modInfo;
@@ -41,7 +73,7 @@ $$.Handler = (function() {
 						return;
 					}
 					self.dispatchEvent(self.createEvent('loadmod', {
-						originMark: $.history.ajax.getPrevMark(),
+						originMark: self._prevMark,
 						targetMark: self._curMark,
 						originMod: $.object.clone(self._prevModInfo, true),
 						targetMod: $.object.clone(modInfo, true)
@@ -115,7 +147,7 @@ $$.Handler = (function() {
 			var subReqInfo = this._getSubReqInfo(mark, fullMark);
 			if(!subReqInfo.modInfo) {
 				$$alert('Sorry, can not find the page you requested.');
-				return;
+				return 1;
 			}
 			if(this.dispatchEvent(this.createEvent('beforeunloadmod', {
 				originMark: this._curMark,
@@ -123,13 +155,14 @@ $$.Handler = (function() {
 				originMod: $.object.clone(this._curModInfo, true),
 				targetMod: $.object.clone(subReqInfo.modInfo, true)
 			})) === false) {
-				return;
+				return 2;
 			}
 			/*
 			try {
 				this.mod[this._curModInfo.name].abort();
 			} catch(e) {}
 			*/
+			this._prevMark = this._curMark;
 			this._curMark = mark;
 			this._prevModInfo = this._curModInfo;
 			this._curModInfo = subReqInfo.modInfo;
@@ -137,6 +170,7 @@ $$.Handler = (function() {
 			setTimeout(function() {
 				self._loadMod(subReqInfo);
 			}, 300);
+			return 0;
 		}
 	});
 	

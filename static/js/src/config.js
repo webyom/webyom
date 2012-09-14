@@ -33,7 +33,7 @@ $$.config = (function() {
 			'list': 'ARTICLE_LIST',
 			'read': 'READ_ARTICLE'
 		},
-		MOD_KEY_INFO_HASH: {//p: 预加载优先级，p越大优先级越高。
+		MOD_KEY_INFO_HASH: {//p: priority of preload，this bigger p the higher priority。key，id and name must be unique
 			'list': {p: 1, key: 'list', title: 'List', id: 300, name: 'ARTICLE_LIST', url: '/static/js/mod/article_list.js'},
 			'read': {p: 2, key: 'read', title: 'Read', id: 301, name: 'READ_ARTICLE', url: '/static/js/mod/read_article.js'},
 			'write': {p: 3, key: 'write', title: 'Write', id: 302, name: 'WRITE_ARTICLE', url: '/static/js/mod/write_article.js'}
