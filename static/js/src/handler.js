@@ -25,7 +25,7 @@ $$.Handler = (function() {
 			loadmodHook: $bind(this, this._loadmodHook)
 		};
 		if(this._name != 'ROOT') {
-			this._parent.addEventListener('beforeunloadmodHook', this._bound.beforeunloadmodHook);
+			this._parent.addEventListener('beforeunloadmod', this._bound.beforeunloadmodHook);
 			this._parent.addEventListener('loadmod', this._bound.loadmodHook);
 		}
 		this._id = $getUniqueId();
@@ -44,15 +44,15 @@ $$.Handler = (function() {
 		},
 		
 		_loadmodHook: function(e) {
-			if(e.originMod.name == this._reqInfo.modInfo.name && e.targetMod.name != this._reqInfo.modInfo.name) {
-				this.dispatchEvent(self.createEvent('loadmod', {
+			if(e.originMod && this._reqInfo && e.originMod.name == this._reqInfo.modInfo.name && e.targetMod.name != this._reqInfo.modInfo.name) {
+				this.dispatchEvent(this.createEvent('loadmod', {
 					originMark: this._curMark,
 					targetMark: '',
 					originMod: $.object.clone(this._curModInfo, true),
 					targetMod: $.object.clone(e.targetMod, true)
 				}));
 				this.unload();
-				this._parent.removeEventListener('beforeunloadmodHook', this._bound.beforeunloadmodHook);
+				this._parent.removeEventListener('beforeunloadmod', this._bound.beforeunloadmodHook);
 				this._parent.removeEventListener('loadmod', this._bound.loadmodHook);
 			}
 		},

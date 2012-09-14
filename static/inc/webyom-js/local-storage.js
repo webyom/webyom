@@ -145,7 +145,7 @@ var $getUniqueId = $getUniqueId || (function() {
  */
 YOM.addModule('localStorage', function(YOM) {
 	var _DB_NAME = 'WEBYOM_LOCAL_STORAGE';
-	var _PROXY = '/static/inc/webyom-js/local_storage_proxy.html';
+	var _PROXY = '/static/inc/webyom-js/local-storage-proxy.html';
 	var _COOKIE_DOMAIN = 'webyom.org';
 	var _COOKIE_PATH = '/static/inc/webyom-js/';
 	

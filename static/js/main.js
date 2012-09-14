@@ -21,8 +21,8 @@ $$.config = (function() {
 		MARK_PREFIX: 'view/',
 		DEFAULT_MOD_KEY: 'list',
 		LIB_NAME_URL_HASH: {
-			'YOM_MOUSE_EVENT': '/static/inc/webyom-js/mouse_event.js',
-			'YOM_LOCAL_STORAGE': '/static/inc/webyom-js/local_storage.js',
+			'YOM_MOUSE_EVENT': '/static/inc/webyom-js/mouse-event.js',
+			'YOM_LOCAL_STORAGE': '/static/inc/webyom-js/local-storage.js',
 			'YOM_DRAGDROP': '/static/inc/webyom-js/dragdrop.js',
 			'YOM_WIDGET_MASK': '/static/inc/webyom-js/widget/mask.js',
 			'YOM_WIDGET_DIALOG': '/static/inc/webyom-js/widget/dialog.js',
@@ -33,10 +33,10 @@ $$.config = (function() {
 			'list': 'ARTICLE_LIST',
 			'read': 'READ_ARTICLE'
 		},
-		MOD_KEY_INFO_HASH: {//p: priority of preload，this bigger p the higher priority。key and name must be unique
-			'list': {p: 1, key: 'list', title: 'List', id: 300, name: 'ARTICLE_LIST', url: '/static/js/mod/article_list.js'},
-			'read': {p: 2, key: 'read', title: 'Read', id: 301, name: 'READ_ARTICLE', url: '/static/js/mod/read_article.js'},
-			'write': {p: 3, key: 'write', title: 'Write', id: 302, name: 'WRITE_ARTICLE', url: '/static/js/mod/write_article.js'}
+		MOD_KEY_INFO_HASH: {//p: priority of preload，this bigger p the higher priority。key，id and name must be unique
+			'list': {p: 1, key: 'list', title: 'List', id: 300, name: 'ARTICLE_LIST', url: '/static/js/mod/article-list.js'},
+			'read': {p: 2, key: 'read', title: 'Read', id: 301, name: 'READ_ARTICLE', url: '/static/js/mod/read-article.js'},
+			'write': {p: 3, key: 'write', title: 'Write', id: 302, name: 'WRITE_ARTICLE', url: '/static/js/mod/write-article.js'}
 		},
 		SUB_MOD_KEY_INFO_HASH: {}
 	};
@@ -459,7 +459,7 @@ $$.ui = (function() {
 				'</ul>'
 			].join('')
 		},
-		FOOTER : '<span>&copy;2009-2011 Webyom. Designed and Programmed by <a href="mailto:webyom@gmail.com" title="Write a mail to Gary.">Gary</a>. Powered by <a href="http://www.djangoproject.com" target="_blank">Django</a> and <a href="http://github.com/webyom/webyom-js" target="_blank">YOM</a></span><img src="/static/img/django_logo.gif" alt="Powered by Django" /><br class="clearFix" />'
+		FOOTER : '<span>&copy;2009-2011 Webyom. Designed and Programmed by <a href="mailto:webyom@gmail.com" title="Write a mail to Gary.">Gary</a>. Powered by <a href="http://www.djangoproject.com" target="_blank">Django</a> and <a href="http://github.com/webyom/webyom-js" target="_blank">YOM</a></span><img src="/static/img/django-logo.gif" alt="Powered by Django" /><br class="clearFix" />'
 	};
 	
 	var _sortable = null;
@@ -617,7 +617,7 @@ $$.Handler = (function() {
 			loadmodHook: $bind(this, this._loadmodHook)
 		};
 		if(this._name != 'ROOT') {
-			this._parent.addEventListener('beforeunloadmodHook', this._bound.beforeunloadmodHook);
+			this._parent.addEventListener('beforeunloadmod', this._bound.beforeunloadmodHook);
 			this._parent.addEventListener('loadmod', this._bound.loadmodHook);
 		}
 		this._id = $getUniqueId();
@@ -636,15 +636,15 @@ $$.Handler = (function() {
 		},
 		
 		_loadmodHook: function(e) {
-			if(e.originMod.name == this._reqInfo.modInfo.name && e.targetMod.name != this._reqInfo.modInfo.name) {
-				this.dispatchEvent(self.createEvent('loadmod', {
+			if(e.originMod && this._reqInfo && e.originMod.name == this._reqInfo.modInfo.name && e.targetMod.name != this._reqInfo.modInfo.name) {
+				this.dispatchEvent(this.createEvent('loadmod', {
 					originMark: this._curMark,
 					targetMark: '',
 					originMod: $.object.clone(this._curModInfo, true),
 					targetMod: $.object.clone(e.targetMod, true)
 				}));
 				this.unload();
-				this._parent.removeEventListener('beforeunloadmodHook', this._bound.beforeunloadmodHook);
+				this._parent.removeEventListener('beforeunloadmod', this._bound.beforeunloadmodHook);
 				this._parent.removeEventListener('loadmod', this._bound.loadmodHook);
 			}
 		},

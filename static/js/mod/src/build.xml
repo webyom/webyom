@@ -9,14 +9,14 @@
     <property name="copyright.files" value="null"/>
 
     <target name="concat">
-        <concat destfile="${build.dir}/article_list.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
-            <path path="${src.dir}/article_list.js"/>
+        <concat destfile="${build.dir}/article-list.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${src.dir}/article-list.js"/>
         </concat>
-        <concat destfile="${build.dir}/read_article.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
-            <path path="${src.dir}/read_article.js"/>
+        <concat destfile="${build.dir}/read-article.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${src.dir}/read-article.js"/>
         </concat>
-        <concat destfile="${build.dir}/write_article.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
-            <path path="${src.dir}/write_article.js"/>
+        <concat destfile="${build.dir}/write-article.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${src.dir}/write-article.js"/>
         </concat>
     </target>
 

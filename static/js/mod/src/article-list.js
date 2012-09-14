@@ -42,7 +42,9 @@
 	$.Class.extend(Handler, $$.Handler);
 	
 	Handler.prototype.handle = function(mark, fullMark, reqInfo, data) {
-		this.isCurrentHandler() || return;
+		if(!this.isCurrentHandler()) {
+			return;
+		}
 		$.css.load(_cssList);
 		var self = this;
 		if(!/^p\d+$/.test(mark)) {

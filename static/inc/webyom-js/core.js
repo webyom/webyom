@@ -1671,8 +1671,8 @@ YOM.addModule('CrossDomainPoster', function(YOM) {
 		LOADED: 2,
 		ABORTED: 3
 	};
-	var _PROXY = '/static/inc/webyom-js/cdp_proxy.html';
-	var _CROSS_SITE_PROXY = 'http://www.webyom.org/static/inc/webyom-js/cdp_cs_proxy.html';
+	var _PROXY = '/static/inc/webyom-js/cdp-proxy.html';
+	var _CROSS_SITE_PROXY = 'http://www.webyom.org/static/inc/webyom-js/cdp-cs-proxy.html';
 	
 	var _sameSiteTester = new RegExp(':\\/\\/(?:[^\\.]+\\.)*' + YOM.domain + '\\/');
 	var _im = new YOM.InstanceManager();

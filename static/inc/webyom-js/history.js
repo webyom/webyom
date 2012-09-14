@@ -12,7 +12,7 @@ YOM.addModule('history', {
 YOM.history.addModule('ajax', function(YOM) {
 	var _INTERVAL = 100;
 	
-	var _ieFrameSrc = '/static/inc/webyom-js/history_blank.html';
+	var _ieFrameSrc = '/static/inc/webyom-js/history-blank.html';
 	var _domain = '';
 	var _ieFrame = null;
 	var _markCacheIndexHash = {};

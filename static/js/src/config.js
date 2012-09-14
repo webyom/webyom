@@ -21,8 +21,8 @@ $$.config = (function() {
 		MARK_PREFIX: 'view/',
 		DEFAULT_MOD_KEY: 'list',
 		LIB_NAME_URL_HASH: {
-			'YOM_MOUSE_EVENT': '/static/inc/webyom-js/mouse_event.js',
-			'YOM_LOCAL_STORAGE': '/static/inc/webyom-js/local_storage.js',
+			'YOM_MOUSE_EVENT': '/static/inc/webyom-js/mouse-event.js',
+			'YOM_LOCAL_STORAGE': '/static/inc/webyom-js/local-storage.js',
 			'YOM_DRAGDROP': '/static/inc/webyom-js/dragdrop.js',
 			'YOM_WIDGET_MASK': '/static/inc/webyom-js/widget/mask.js',
 			'YOM_WIDGET_DIALOG': '/static/inc/webyom-js/widget/dialog.js',
@@ -34,9 +34,9 @@ $$.config = (function() {
 			'read': 'READ_ARTICLE'
 		},
 		MOD_KEY_INFO_HASH: {//p: priority of preload，this bigger p the higher priority。key，id and name must be unique
-			'list': {p: 1, key: 'list', title: 'List', id: 300, name: 'ARTICLE_LIST', url: '/static/js/mod/article_list.js'},
-			'read': {p: 2, key: 'read', title: 'Read', id: 301, name: 'READ_ARTICLE', url: '/static/js/mod/read_article.js'},
-			'write': {p: 3, key: 'write', title: 'Write', id: 302, name: 'WRITE_ARTICLE', url: '/static/js/mod/write_article.js'}
+			'list': {p: 1, key: 'list', title: 'List', id: 300, name: 'ARTICLE_LIST', url: '/static/js/mod/article-list.js'},
+			'read': {p: 2, key: 'read', title: 'Read', id: 301, name: 'READ_ARTICLE', url: '/static/js/mod/read-article.js'},
+			'write': {p: 3, key: 'write', title: 'Write', id: 302, name: 'WRITE_ARTICLE', url: '/static/js/mod/write-article.js'}
 		},
 		SUB_MOD_KEY_INFO_HASH: {}
 	};

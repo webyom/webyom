@@ -9,7 +9,7 @@ body {
 	padding: 0;
 	margin: 0;
 	font-size: 0.625em;
-	background: #D6FDFF url(/static/img/bg_main.gif) left -10px repeat-x;
+	background: #D6FDFF url(/static/img/bg-main.gif) left -10px repeat-x;
 	font-family: "Courier New", Courier, monospace;
 }
 
@@ -168,7 +168,7 @@ h1, h2, h3 {
 .mainPart .block, .sidePart .block {
 	margin-top: 5px;
 	padding: 5px;
-	background: #F1F6E0 url(/static/img/bg_content_border.gif) right top repeat;
+	background: #F1F6E0 url(/static/img/bg-content-border.gif) right top repeat;
 	border-radius: 5px;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;

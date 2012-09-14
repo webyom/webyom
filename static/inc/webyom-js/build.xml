@@ -15,26 +15,26 @@
             <path path="${src.dir}/core/error.js"/>
             <path path="${src.dir}/core/browser.js"/>
             <path path="${src.dir}/core/class.js"/>
-            <path path="${src.dir}/core/instance_manager.js"/>
+            <path path="${src.dir}/core/instance-manager.js"/>
             <path path="${src.dir}/core/object.js"/>
             <path path="${src.dir}/core/array.js"/>
-            <path path="${src.dir}/core/hash_array.js"/>
+            <path path="${src.dir}/core/hash-array.js"/>
             <path path="${src.dir}/core/string.js"/>
             <path path="${src.dir}/core/json.js"/>
-            <path path="${src.dir}/core/json_sans_eval.js"/>
+            <path path="${src.dir}/core/json-sans-eval.js"/>
             <path path="${src.dir}/core/observer.js"/>
             <path path="${src.dir}/core/event.js"/>
-            <path path="${src.dir}/core/event_delegator.js"/>
-            <path path="${src.dir}/core/event_virtual_handler.js"/>
-            <path path="${src.dir}/core/event_mouseenter.js"/>
+            <path path="${src.dir}/core/event-delegator.js"/>
+            <path path="${src.dir}/core/event-virtual-handler.js"/>
+            <path path="${src.dir}/core/event-mouseenter.js"/>
             <path path="${src.dir}/core/cookie.js"/>
             <path path="${src.dir}/core/xhr.js"/>
-            <path path="${src.dir}/core/cross_domain_poster.js"/>
+            <path path="${src.dir}/core/cross-domain-poster.js"/>
             <path path="${src.dir}/core/pos.js"/>
             <path path="${src.dir}/core/util.js"/>
             <path path="${src.dir}/core/element.js"/>
-            <path path="${src.dir}/core/element_fx.js"/>
-            <path path="${src.dir}/core/js_loader.js"/>
+            <path path="${src.dir}/core/element-fx.js"/>
+            <path path="${src.dir}/core/js-loader.js"/>
             <path path="${src.dir}/core/css.js"/>
             <path path="${src.dir}/core/tmpl.js"/>
             <path path="${src.dir}/core/chunker.js"/>
@@ -44,19 +44,19 @@
             <path path="${src.dir}/core/widget.js"/>
         </concat>
         
-        <concat destfile="${build.dir}/mouse_event.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
-            <path path="${src.dir}/mouse_event/mouse_event.js"/>
+        <concat destfile="${build.dir}/mouse-event.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${src.dir}/mouse-event/mouse-event.js"/>
         </concat>
         
-        <concat destfile="${build.dir}/touch_event.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
-            <path path="${src.dir}/touch_event/virtual_touch_event_handler.js"/>
-            <path path="${src.dir}/touch_event/touch_event_handler.js"/>
-            <path path="${src.dir}/touch_event/slide_event_handler.js"/>
+        <concat destfile="${build.dir}/touch-event.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${src.dir}/touch-event/virtual-touch-event-handler.js"/>
+            <path path="${src.dir}/touch-event/touch-event-handler.js"/>
+            <path path="${src.dir}/touch-event/slide-event-handler.js"/>
         </concat>
         
-        <concat destfile="${build.dir}/local_storage.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+        <concat destfile="${build.dir}/local-storage.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
             <path path="${src.dir}/core/base.js"/>
-            <path path="${src.dir}/local_storage/local_storage.js"/>
+            <path path="${src.dir}/local-storage/local-storage.js"/>
         </concat>
         
         <concat destfile="${build.dir}/history.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
