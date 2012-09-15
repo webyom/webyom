@@ -41,6 +41,12 @@
 	
 	$.Class.extend(Handler, $$.Handler);
 	
+	Handler.prototype._unload = function() {
+		$.css.unload(_cssList);
+		$.js.unload(this._reqInfo.modInfo.url);
+		return Handler.superClass._unload.call(this);
+	};
+	
 	Handler.prototype.handle = function(mark, fullMark, reqInfo, data) {
 		if(!this.isCurrentHandler()) {
 			return;
@@ -118,12 +124,6 @@
 			}
 		});
 		$$.ui.turnOnMenu('a');
-	};
-	
-	Handler.prototype.unload = function() {
-		$.css.unload(_cssList);
-		$.js.unload(this._reqInfo.modInfo.url);
-		Handler.superClass.unload.call(this);
 	};
 	
 	new Handler({

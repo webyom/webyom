@@ -643,10 +643,17 @@ $$.Handler = (function() {
 					originMod: $.object.clone(this._curModInfo, true),
 					targetMod: $.object.clone(e.targetMod, true)
 				}));
-				this.unload();
-				this._parent.removeEventListener('beforeunloadmod', this._bound.beforeunloadmodHook);
-				this._parent.removeEventListener('loadmod', this._bound.loadmodHook);
+				if(this._unload()) {
+					this._parent.removeEventListener('beforeunloadmod', this._bound.beforeunloadmodHook);
+					this._parent.removeEventListener('loadmod', this._bound.loadmodHook);
+				}
 			}
+		},
+		
+		_unload: function() {
+			this._parent.mod[this._name] = null;
+			this._unloaded = true;
+			return this._unloaded;
 		},
 	
 		_loadMod: function(subReqInfo) {
@@ -721,11 +728,6 @@ $$.Handler = (function() {
 		abort: function() {
 			$.JsLoader.abortAll(this._id);
 			$.Xhr.abortAll(this._id);
-		},
-		
-		unload: function() {
-			this._parent.mod[this._name] = null;
-			this._unloaded = true;
 		},
 		
 		handle: function(mark, fullMark, reqInfo) {

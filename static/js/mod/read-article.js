@@ -105,6 +105,14 @@
 	
 	$.Class.extend(Handler, $$.Handler);
 	
+	Handler.prototype._unload = function() {
+		_sortable && _sortable.destory();
+		_sortable = null;
+		$.css.unload(_cssList);
+		$.js.unload(this._reqInfo.modInfo.url);
+		return Handler.superClass._unload.call(this);
+	};
+	
 	Handler.prototype._makeSortable = function() {
 		var self = this;
 		$.js.require($$_LIB_NAME_URL_HASH.YOM_DRAGDROP, function(res) {
@@ -238,14 +246,6 @@
 			noCache: true
 		});
 		$$.ui.turnOnMenu('a');
-	};
-	
-	Handler.prototype.unload = function() {
-		_sortable && _sortable.destory();
-		_sortable = null;
-		$.css.unload(_cssList);
-		$.js.unload(this._reqInfo.modInfo.url);
-		Handler.superClass.unload.call(this);
 	};
 	
 	new Handler({
