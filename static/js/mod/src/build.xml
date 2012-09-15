@@ -18,6 +18,13 @@
         <concat destfile="${build.dir}/write-article.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
             <path path="${src.dir}/write-article.js"/>
         </concat>
+        <concat destfile="${build.dir}/about.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${src.dir}/about.js"/>
+            <path path="${src.dir}/about-profile.js"/>
+        </concat>
+        <concat destfile="${build.dir}/about-work.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${src.dir}/about-work.js"/>
+        </concat>
     </target>
 
     <target name="build" depends="concat,common.build">

@@ -1,5 +1,4 @@
 (function(modKey, modName, modId) {
-	var _MARK_PREFIX = $$.config.get('MARK_PREFIX');
 	var _TMPL = [
 		'<div class="block"><div class="blockInner">',
 			'<div class="article">',
@@ -109,7 +108,7 @@
 		_sortable && _sortable.destory();
 		_sortable = null;
 		$.css.unload(_cssList);
-		$.js.unload(this._reqInfo.modInfo.url);
+		$.js.unload(this.getModInfo().url);
 		return Handler.superClass._unload.call(this);
 	};
 	
@@ -168,10 +167,9 @@
 			$$.handler.error(new $.Error(modId + '01', 'Invalid article id.'), modName);
 			return;
 		}
-		this._reqInfo = reqInfo;
 		data = data || $.history.ajax.getCache(fullMark);
 		if(data) {
-			$.history.ajax.setMark(fullMark, data.article.title + ' - ' + reqInfo.modInfo.title + $$.config.get('TITLE_POSTFIX'));
+			$.history.ajax.setMark(fullMark, [data.article.title, reqInfo.modInfo.title, $$.config.get('TITLE_POSTFIX')].join(' - '));
 			$('#mainPart').size() || $$.ui.resetContent();
 			$('#mainPart').tween(1000, {
 				origin: {
@@ -225,6 +223,7 @@
 					}, 2000);
 				}
 			});
+			$$.ui.turnOnMenu('a');
 			return;
 		}
 		var url = '/data/' + modKey + '/' + aid;
@@ -245,11 +244,10 @@
 			},
 			noCache: true
 		});
-		$$.ui.turnOnMenu('a');
 	};
 	
 	new Handler({
 		beforeunloadmod: new $.Observer(),
 		loadmod: new $.Observer()
-	}, modName, $$.mod['ROOT']);
+	}, modKey, $$.mod.root);
 })('read', 'READ_ARTICLE', 301);

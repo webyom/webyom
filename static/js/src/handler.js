@@ -4,7 +4,7 @@
 $$.Handler = (function() {
 	var _ID = 204;
 	
-	var Handler = function(observers, modName, parent, opt) {
+	var Handler = function(observers, modKey, parent, opt) {
 		Handler.superClass.constructor.apply(this, $.array.getArray(arguments));
 		opt = opt || {};
 		this._modKeyInfoHash = opt.modKeyInfoHash || {};
@@ -14,17 +14,16 @@ $$.Handler = (function() {
 		this._curMark = '';
 		this._prevModInfo = null;
 		this._curModInfo = null;
-		this._reqInfo = null;
 		this.mod = {};
 		this._unloaded = false;
-		this._name = modName;
+		this._key = modKey;
 		this._parent = parent;
-		this._parent.mod[this._name] = this;
+		this._parent.mod[this._key] = this;
 		this._bound = {
 			beforeunloadmodHook: $bind(this, this._beforeunloadmodHook),
 			loadmodHook: $bind(this, this._loadmodHook)
 		};
-		if(this._name != 'ROOT') {
+		if(this._key != 'root') {
 			this._parent.addEventListener('beforeunloadmod', this._bound.beforeunloadmodHook);
 			this._parent.addEventListener('loadmod', this._bound.loadmodHook);
 		}
@@ -44,7 +43,7 @@ $$.Handler = (function() {
 		},
 		
 		_loadmodHook: function(e) {
-			if(e.originMod && this._reqInfo && e.originMod.name == this._reqInfo.modInfo.name && e.targetMod.name != this._reqInfo.modInfo.name) {
+			if(e.originMod && e.originMod.key == this._key && e.targetMod.key != this._key) {
 				this.dispatchEvent(this.createEvent('loadmod', {
 					originMark: this._curMark,
 					targetMark: '',
@@ -59,7 +58,7 @@ $$.Handler = (function() {
 		},
 		
 		_unload: function() {
-			this._parent.mod[this._name] = null;
+			this._parent.mod[this._key] = null;
 			this._unloaded = true;
 			return this._unloaded;
 		},
@@ -67,7 +66,6 @@ $$.Handler = (function() {
 		_loadMod: function(subReqInfo) {
 			var self = this;
 			var modInfo = subReqInfo.modInfo;
-			var modName = modInfo.name;
 			if(modInfo.url) {
 				$.js.require(modInfo.url, function(ret) {
 					if(ret == $.JsLoader.RET.ABORTED) {
@@ -75,7 +73,7 @@ $$.Handler = (function() {
 					} else if(ret != $.JsLoader.RET.SUCC) {
 						$$alert(
 						      'Code: ' + ret + '\n' +
-						      'Message: Failed to load module ' + modName
+						      'Message: Failed to load module ' + modInfo.name
 						);
 						return;
 					}
@@ -85,7 +83,7 @@ $$.Handler = (function() {
 						originMod: $.object.clone(self._prevModInfo, true),
 						targetMod: $.object.clone(modInfo, true)
 					}));
-					self.mod[modName].handle(subReqInfo.mark, subReqInfo.fullMark, subReqInfo);
+					self.mod[modInfo.key].handle(subReqInfo.mark, subReqInfo.fullMark, subReqInfo);
 				});
 			} else if(modInfo.handler) {
 				modInfo.handler.handle(subReqInfo.mark, subReqInfo.fullMark, subReqInfo);
@@ -112,9 +110,20 @@ $$.Handler = (function() {
 			return this._curModInfo;
 		},
 		
+		getModInfo: function() {
+			return this.key == 'root' ? {} : this._parent._modKeyInfoHash[this._key];
+		},
+		
+		getParentModInfo: function() {
+			return this._parent.getModInfo();
+		},
+		
 		isCurrentHandler: function() {
+			if(this._key == 'root') {
+				return true;
+			}
 			var modInfo = this._parent.getCurrentModInfo();
-			return modInfo && modInfo.name == this._name;
+			return this._parent.isCurrentHandler() && modInfo && modInfo.key == this._key;
 		},
 		
 		error: function(e, modName) {
@@ -139,17 +148,20 @@ $$.Handler = (function() {
 		},
 		
 		handle: function(mark, fullMark, reqInfo) {
+			if(!this.isCurrentHandler()) {
+				return 1;
+			}
 			var self = this;
 			var rawMark = mark;
 			fullMark = fullMark || mark;
 			mark = mark || (this._markPrefix + this._defaultModkey);
 			if(this._markPrefix && mark.indexOf(this._markPrefix) !== 0) {
-				return;
+				return 2;
 			}
 			var subReqInfo = this._getSubReqInfo(mark, fullMark);
 			if(!subReqInfo.modInfo) {
 				$$alert('Sorry, can not find the page you requested.');
-				return 1;
+				return 3;
 			}
 			if(this.dispatchEvent(this.createEvent('beforeunloadmod', {
 				originMark: this._curMark,
@@ -157,7 +169,7 @@ $$.Handler = (function() {
 				originMod: $.object.clone(this._curModInfo, true),
 				targetMod: $.object.clone(subReqInfo.modInfo, true)
 			})) === false) {
-				return 2;
+				return 4;
 			}
 			/*
 			try {
@@ -168,7 +180,6 @@ $$.Handler = (function() {
 			this._curMark = mark;
 			this._prevModInfo = this._curModInfo;
 			this._curModInfo = subReqInfo.modInfo;
-			this._reqInfo = reqInfo;
 			setTimeout(function() {
 				self._loadMod(subReqInfo);
 			}, 300);
@@ -214,7 +225,7 @@ $$.Handler = (function() {
 	var handler = $extend(new $$.Handler({
 		beforeunloadmod: new $.Observer(),
 		loadmod: new $.Observer()
-	}, 'ROOT', $$, {
+	}, 'root', $$, {
 		modKeyInfoHash: $$.config.get('MOD_KEY_INFO_HASH'),
 		defaultModkey: $$.config.get('DEFAULT_MOD_KEY'),
 		markPrefix: _MARK_PREFIX

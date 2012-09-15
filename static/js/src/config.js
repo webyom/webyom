@@ -17,7 +17,7 @@ $$.mod = {};
 $$.config = (function() {
 	var _updater = {};
 	var _config = {
-		TITLE_POSTFIX: ' - Webyom - Gary\'s Blog',
+		TITLE_POSTFIX: 'Webyom - Gary\'s Blog',
 		MARK_PREFIX: 'view/',
 		DEFAULT_MOD_KEY: 'list',
 		LIB_NAME_URL_HASH: {
@@ -36,7 +36,8 @@ $$.config = (function() {
 		MOD_KEY_INFO_HASH: {//p: priority of preload，this bigger p the higher priority。key，id and name must be unique
 			'list': {p: 1, key: 'list', title: 'List', id: 300, name: 'ARTICLE_LIST', url: '/static/js/mod/article-list.js'},
 			'read': {p: 2, key: 'read', title: 'Read', id: 301, name: 'READ_ARTICLE', url: '/static/js/mod/read-article.js'},
-			'write': {p: 3, key: 'write', title: 'Write', id: 302, name: 'WRITE_ARTICLE', url: '/static/js/mod/write-article.js'}
+			'write': {p: 3, key: 'write', title: 'Write', id: 302, name: 'WRITE_ARTICLE', url: '/static/js/mod/write-article.js'},
+			'about': {p: 4, key: 'about', title: 'About', id: 303, name: 'ABOUT', url: '/static/js/mod/about.js'}
 		},
 		SUB_MOD_KEY_INFO_HASH: {}
 	};

@@ -1,5 +1,4 @@
 (function(modKey, modName, modId) {
-	var _MARK_PREFIX = $$.config.get('MARK_PREFIX');
 	var _TMPL = [
 		'<div class="block"><div class="blockInner">',
 			'<div id="articleList">',
@@ -43,7 +42,7 @@
 	
 	Handler.prototype._unload = function() {
 		$.css.unload(_cssList);
-		$.js.unload(this._reqInfo.modInfo.url);
+		$.js.unload(this.getModInfo().url);
 		return Handler.superClass._unload.call(this);
 	};
 	
@@ -56,10 +55,9 @@
 		if(!/^p\d+$/.test(mark)) {
 			mark = 'p1';
 		}
-		this._reqInfo = reqInfo;
 		data = data || $.history.ajax.getCache(fullMark);
 		if(data) {
-			$.history.ajax.setMark(fullMark, reqInfo.modInfo.title + $$.config.get('TITLE_POSTFIX'));
+			$.history.ajax.setMark(fullMark, [reqInfo.modInfo.title, $$.config.get('TITLE_POSTFIX')].join(' - '));
 			$('#mainPart').size() || $$.ui.resetContent();
 			$('#mainPart').tween(1000, {
 				origin: {
@@ -89,6 +87,7 @@
 					}, 2000);
 				}
 			});
+			$$.ui.turnOnMenu('a');
 			return;
 		}
 		var url = '/data/' + mark;
@@ -123,11 +122,10 @@
 			complete: function() {
 			}
 		});
-		$$.ui.turnOnMenu('a');
 	};
 	
 	new Handler({
 		beforeunloadmod: new $.Observer(),
 		loadmod: new $.Observer()
-	}, modName, $$.mod['ROOT']);
+	}, modKey, $$.mod.root);
 })('list', 'ARTICLE_LIST', 300);

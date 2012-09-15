@@ -1,5 +1,4 @@
 (function(modKey, modName, modId) {
-	var _MARK_PREFIX = $$.config.get('MARK_PREFIX');
 	var _TMPL = [
 		'<div id="writeArticle" class="sidePart"><div class="block yui-skin-sam"><div class="blockInner">',
 			'<h2>Write Article</h2>',
@@ -71,7 +70,7 @@
 				load: function(o) {
 					if(o.ret === 0) {
 						$.history.ajax.clearCache();
-						$$.mod['ROOT'].jump(_MARK_PREFIX + 'list');
+						$$.mod['ROOT'].jump($$.config.get('MARK_PREFIX') + 'list');
 					} else {
 						$$alert('Failed to post article.');
 					}
@@ -97,7 +96,7 @@
 	
 	Handler.prototype._unload = function() {
 		$.css.unload(_cssList);
-		$.js.unload(this._reqInfo.modInfo.url);
+		$.js.unload(this.getModInfo().url);
 		return Handler.superClass._unload.call(this);
 	};
 	
@@ -124,7 +123,7 @@
 					gid: self._id,
 					load: function(o) {
 						if(o.ret === 0) {
-							$.history.ajax.setMark(fullMark, reqInfo.modInfo.title + $$.config.get('TITLE_POSTFIX'));
+							$.history.ajax.setMark(fullMark, [reqInfo.modInfo.title, $$.config.get('TITLE_POSTFIX')].join(' - '));
 							_render('/data/update/' + mark, o.data.article, mark);
 						} else {
 							$$alert('Failed to get article1.');
@@ -136,15 +135,14 @@
 					callbackName: '_get_article_info'
 				});
 			} else {
-				$.history.ajax.setMark(fullMark, reqInfo.modInfo.title + $$.config.get('TITLE_POSTFIX'));
+				$.history.ajax.setMark(fullMark, [reqInfo.modInfo.title, $$.config.get('TITLE_POSTFIX')].join(' - '));
 				_render('/data/write', {title: '', content: ''});
 			}
 		});
-		this._reqInfo = reqInfo;
 	};
 	
 	new Handler({
 		beforeunloadmod: new $.Observer(),
 		loadmod: new $.Observer()
-	}, modName, $$.mod['ROOT']);
+	}, modKey, $$.mod.root);
 })('write', 'WRITE_ARTICLE', 302);
