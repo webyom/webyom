@@ -600,7 +600,7 @@ $$.Handler = (function() {
 	var Handler = function(observers, modKey, parent, opt) {
 		Handler.superClass.constructor.apply(this, $.array.getArray(arguments));
 		opt = opt || {};
-		this._activeUnload = opt.activeUnload || this._activeUnload;
+		this._activeUnload = typeof opt.activeUnload == 'undefined' ? this._activeUnload : opt.activeUnload;
 		this._modKeyInfoHash = opt.modKeyInfoHash || {};
 		this._defaultModkey = opt.defaultModkey || '';
 		this._markPrefix = opt.markPrefix || '';

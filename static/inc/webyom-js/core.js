@@ -1077,7 +1077,7 @@ YOM.addModule('Observer', function(YOM) {
 		
 		dispatch: function(e, bind) {
 			var res, tmp, subscriber;
-			for(var i = 0, l = this._subscribers.length; i < l; i++) {
+			for(var i = this._subscribers.length - 1; i >= 0; i--) {
 				subscriber = this._subscribers[i];
 				if(!subscriber) {
 					continue;				
