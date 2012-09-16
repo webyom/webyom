@@ -1,13 +1,5 @@
 (function(modKey, modName, modId) {
 	var _TMPL = [
-		'<div class="block"><div class="blockInner">',
-			'<ul class="tabs">',
-				'<li class="a"><a href="/view/about/profile">Profile</a></li>',
-				'<li class="b"><a href="/view/about/work">Work</a></li>',
-			'</ul>',
-			'<div id="aboutContent">',
-			'</div>',
-		'</div></div>'
 	].join('');
 	
 	var _cssList = [];
@@ -18,10 +10,9 @@
 	
 	$.Class.extend(Handler, $$.Handler);
 	
-	Handler.prototype._unload = function() {
+	Handler.prototype._unload = function(parentUnloaded) {
 		$.css.unload(_cssList);
-		$.js.unload(this.getModInfo().url);
-		return Handler.superClass._unload.call(this);
+		return Handler.superClass._unload.apply(this, $.array.getArray(arguments));
 	};
 	
 	Handler.prototype.handle = function() {
@@ -30,7 +21,6 @@
 			return res;
 		}
 		$('#mainPart').size() || $$.ui.resetContent();
-		$('#mainPart').setHtml($.tmpl.render(_TMPL, {}, {key: 'mod.about'}));
 		$$.ui.turnOnMenu('c');
 		return 0;
 	};
@@ -46,7 +36,8 @@
 					handler.handle.apply(handler, $.array.getArray(arguments));
 				}
 			}},
-			'work': {p: 2, key: 'work', title: 'Work', id: 30301, name: 'WORK', url: '/static/js/mod/about-work.js'}
+			'work': {p: 2, key: 'work', title: 'Work', id: 30301, name: 'WORK', url: '/static/js/mod/about-work.js'},
+			'contact': {p: 3, key: 'contact', title: 'Contact', id: 30302, name: 'CONTACT', url: '/static/js/mod/about-contact.js'}
 		},
 		defaultModkey: 'profile'
 	});

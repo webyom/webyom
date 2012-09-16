@@ -1,6 +1,15 @@
 (function(modKey, modName, modId) {
 	var _TMPL = [
-		'This is Gary\'s profile...'
+		'<div class="block"><div class="blockInner">',
+			'<ul class="tabs a">',
+				'<li class="a"><a href="/view/about/profile">Profile</a></li>',
+				'<li class="b"><a href="/view/about/work">Work</a></li>',
+				'<li class="c"><a href="/view/about/contact">Contact</a></li>',
+			'</ul>',
+			'<div>',
+				'This is Gary\'s profile...',
+			'</div>',
+		'</div></div>'
 	].join('');
 	
 	var _cssList = [];
@@ -11,9 +20,9 @@
 	
 	$.Class.extend(Handler, $$.Handler);
 	
-	Handler.prototype._unload = function() {
+	Handler.prototype._unload = function(parentUnloaded) {
 		$.css.unload(_cssList);
-		return false;
+		return Handler.superClass._unload.apply(this, $.array.getArray(arguments));
 	};
 	
 	Handler.prototype.handle = function(mark, fullMark, reqInfo) {
@@ -33,7 +42,7 @@
 			prior: true,
 			transition: 'easeOut',
 			complete: function() {
-				$('#aboutContent').setHtml($.tmpl.render(_TMPL, {}, {key: 'mod.about.profile'}));
+				$('#mainPart').setHtml($.tmpl.render(_TMPL, {}, {key: 'mod.about.profile'}));
 				$('#mainPart').tween(1000, {
 					origin: {
 						style: 'left: -300px; opacity: 0; position: relative;'
@@ -48,5 +57,5 @@
 		});
 	};
 	
-	new Handler({}, modKey, $$.mod.root.mod.about);
+	new Handler({}, modKey, $$.mod.root.mod.about, {activeUnload: false});
 })('profile', 'PROFILE', 30300);

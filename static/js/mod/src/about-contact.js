@@ -1,13 +1,13 @@
 (function(modKey, modName, modId) {
 	var _TMPL = [
 		'<div class="block"><div class="blockInner">',
-			'<ul class="tabs b">',
+			'<ul class="tabs c">',
 				'<li class="a"><a href="/view/about/profile">Profile</a></li>',
 				'<li class="b"><a href="/view/about/work">Work</a></li>',
 				'<li class="c"><a href="/view/about/contact">Contact</a></li>',
 			'</ul>',
 			'<div>',
-				'This is Gary\'s work...',
+				'This is Gary\'s contact...',
 			'</div>',
 		'</div></div>'
 	].join('');
@@ -42,7 +42,7 @@
 			prior: true,
 			transition: 'easeOut',
 			complete: function() {
-				$('#mainPart').setHtml($.tmpl.render(_TMPL, {}, {key: 'mod.about.work'}));
+				$('#mainPart').setHtml($.tmpl.render(_TMPL, {}, {key: 'mod.about.contact'}));
 				$('#mainPart').tween(1000, {
 					origin: {
 						style: 'left: -300px; opacity: 0; position: relative;'
@@ -58,4 +58,4 @@
 	};
 	
 	new Handler({}, modKey, $$.mod.root.mod.about);
-})('work', 'WORK', 30301);
+})('contact', 'CONTACT', 30302);

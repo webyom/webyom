@@ -25,6 +25,9 @@
         <concat destfile="${build.dir}/about-work.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
             <path path="${src.dir}/about-work.js"/>
         </concat>
+        <concat destfile="${build.dir}/about-contact.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${src.dir}/about-contact.js"/>
+        </concat>
     </target>
 
     <target name="build" depends="concat,common.build">

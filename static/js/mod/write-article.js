@@ -94,10 +94,9 @@
 	
 	$.Class.extend(Handler, $$.Handler);
 	
-	Handler.prototype._unload = function() {
+	Handler.prototype._unload = function(parentUnloaded) {
 		$.css.unload(_cssList);
-		$.js.unload(this.getModInfo().url);
-		return Handler.superClass._unload.call(this);
+		return Handler.superClass._unload.apply(this, $.array.getArray(arguments));
 	};
 	
 	Handler.prototype.handle = function(mark, fullMark, reqInfo) {

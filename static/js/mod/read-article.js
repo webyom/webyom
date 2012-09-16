@@ -104,12 +104,11 @@
 	
 	$.Class.extend(Handler, $$.Handler);
 	
-	Handler.prototype._unload = function() {
+	Handler.prototype._unload = function(parentUnloaded) {
 		_sortable && _sortable.destory();
 		_sortable = null;
 		$.css.unload(_cssList);
-		$.js.unload(this.getModInfo().url);
-		return Handler.superClass._unload.call(this);
+		return Handler.superClass._unload.apply(this, $.array.getArray(arguments));
 	};
 	
 	Handler.prototype._makeSortable = function() {
