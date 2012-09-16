@@ -6,9 +6,9 @@
 				'<li class="b"><a href="/view/about/work">Work</a></li>',
 				'<li class="c"><a href="/view/about/contact">Contact</a></li>',
 			'</ul>',
-			'<div>',
-				'This is Gary\'s work...',
-			'</div>',
+			'<p>',
+				'<a href="https://github.com/webyom/webyom-js" target="_blank">YOM</a> - A JavaScript library which this site built with.',
+			'</p>',
 		'</div></div>'
 	].join('');
 	

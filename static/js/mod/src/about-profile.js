@@ -6,9 +6,15 @@
 				'<li class="b"><a href="/view/about/work">Work</a></li>',
 				'<li class="c"><a href="/view/about/contact">Contact</a></li>',
 			'</ul>',
-			'<div>',
-				'This is Gary\'s profile...',
-			'</div>',
+			'<p>',
+				'Hi, my name is Gary Wang.<br />',
+			'</p>',
+			'<p>',
+				'I\'m living in Shenzhen China, and working as a front-end developer.<br />',
+			'</p>',
+			'<p>',
+				'I love programming in Javascript, CSS, and HTML. Recently I\'m studying Python. I found Python a extramely good programming language, thus I started to build this blog with it.',
+			'</p>',
 		'</div></div>'
 	].join('');
 	

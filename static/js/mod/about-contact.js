@@ -6,9 +6,10 @@
 				'<li class="b"><a href="/view/about/work">Work</a></li>',
 				'<li class="c"><a href="/view/about/contact">Contact</a></li>',
 			'</ul>',
-			'<div>',
-				'This is Gary\'s contact...',
-			'</div>',
+			'<p>',
+				'Email: webyom@gmail.com<br />',
+				'QQ: 251830327',
+			'</p>',
 		'</div></div>'
 	].join('');
 	

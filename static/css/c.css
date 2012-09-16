@@ -204,6 +204,32 @@ h1, h2, h3 {
 	color: #888;
 }
 
+ul.tabs {
+	padding: 0;
+	list-style: none;
+}
+ul.tabs li {
+	display: inline-block;
+	margin-right: 20px;
+}
+ul.tabs li a {
+	font-size: 1.2em;
+}
+ul.tabs li a:hover {
+}
+
+ul.tabs.a li.a a, 
+ul.tabs.b li.b a, 
+ul.tabs.c li.c a {
+	font-size: 1.4em;
+	font-weight: bold;
+	text-decoration: overline;
+}
+ul.tabs.a li.a a:hover, 
+ul.tabs.b li.b a:hover, 
+ul.tabs.c li.c a:hover {
+}
+
 
 
    /* @body - @block
