@@ -1577,6 +1577,10 @@ YOM.addModule('Xhr', function(YOM) {
 		return res;
 	};
 	
+	Xhr.isAnyLoading = function() {
+		return _loading_count > 0;
+	};
+	
 	_onReadyStateChange = function() {
 		if(this._xhr.readyState !== 4 || this._status == _STATUS.ABORTED) {
 			return;
@@ -1727,6 +1731,10 @@ YOM.addModule('CrossDomainPoster', function(YOM) {
 			}
 		});
 		return res;
+	};
+	
+	CrossDomainPoster.isAnyLoading = function() {
+		return _loading_count > 0;
 	};
 	
 	CrossDomainPoster.getInstance = function(id) {
@@ -2971,6 +2979,10 @@ YOM.addModule('JsLoader', function(YOM) {
 		return res;
 	};
 	
+	JsLoader.isAnyLoading = function() {
+		return _loading_count > 0;
+	};
+	
 	JsLoader.prototype._clear = function() {
 		_im.remove(this.getId());
 		if(!this._jsEl) {
@@ -3133,7 +3145,7 @@ YOM.addModule('css', function(YOM) {
 				return id;
 			}
 		}
-		id = id || '_yom_css_' + (_linkCount++);
+		id = $getUniqueId();
 		el = YOM.Element.create('link', {
 			id: id,
 			rel: 'stylesheet',

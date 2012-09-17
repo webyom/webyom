@@ -573,7 +573,9 @@ $$.ui.processing = (function() {
 			start();
 		});
 		$.JsLoader.addEventListener('allcomplete', function(e) {
-			stop();
+			if(!$.Xhr.isAnyLoading()) {
+				stop();
+			}
 		});
 		$.Xhr.addEventListener('start', function(e) {
 			if(e.opt.silent) {
@@ -582,7 +584,9 @@ $$.ui.processing = (function() {
 			start();
 		});
 		$.Xhr.addEventListener('allcomplete', function(e) {
-			stop();
+			if(!$.JsLoader.isAnyLoading()) {
+				stop();
+			}
 		});
 	})();
 	
