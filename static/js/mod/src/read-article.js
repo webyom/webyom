@@ -169,60 +169,31 @@
 		data = data || $.history.ajax.getCache(fullMark);
 		if(data) {
 			$.history.ajax.setMark(fullMark, [data.article.title, reqInfo.modInfo.title, $$.config.get('TITLE_POSTFIX')].join(' - '));
-			$('#mainPart').size() || $$.ui.resetContent();
-			$('#mainPart').tween(1000, {
-				origin: {
-					style: 'left: 0px; opacity: 1; position: relative;'
-				},
-				target: {
-					style: 'left: -300px; opacity: 0; position: relative;'
-				},
-				css: true,
-				prior: true,
-				transition: 'easeOut',
-				complete: function() {
-					$('#mainPart').setHtml($.tmpl.render(_TMPL, data, {key: 'mod.readArticle'}));
-					$.js.require($$_LIB_NAME_URL_HASH.YOM_LOCAL_STORAGE, function(res) {
-						$.localStorage.get('commentModSequence', {proxy: 1, callback: function(res) {
-							if(res) {
-								$.object.each(res.split(' '), function(modId) {
-									$('[data-mod-id="' + modId + '"]', '#mainPart').appendTo($('#mainPart'));
-								});
-							}
-							if(params[1] == 'comment') {
-								_scrollToComments();
-							}
-						}});
-					});
-					$$.util.prettyPrint();
-					$('#mainPart').tween(1000, {
-						origin: {
-							style: 'left: -300px; opacity: 0; position: relative;'
-						},
-						target: {
-							style: 'left: 0px; opacity: 1; position: relative;'
-						},
-						css: true,
-						transition: 'easeOut',
-						complete: $bind(self, self._makeSortable)
-					});
-					_bindEvent(aid);
-					$.js.require($$_LIB_NAME_URL_HASH.YOM_LOCAL_STORAGE, function() {
-						$.localStorage.get('comment_form_data', {proxy: 1, callback: function(commentFormData) {
-							if(commentFormData) {
-								commentFormData = $.object.fromQueryString(commentFormData);
-								$.object.each(commentFormData, function(val, key) {
-									$('#' + key).setVal(val);
-								});
-							}
-						}});
-					});
-					setTimeout(function() {
-						//$.js.preload($$_MOD_KEY_INFO_HASH['list'].url);
-					}, 2000);
-				}
-			});
+			$$.ui.setMainContent($.tmpl.render(_TMPL, data, {key: 'mod.readArticle'}));
 			$$.ui.turnOnMenu('a');
+			$.js.require($$_LIB_NAME_URL_HASH.YOM_LOCAL_STORAGE, function(res) {
+				$.localStorage.get('commentModSequence', {proxy: 1, callback: function(res) {
+					if(res) {
+						$.object.each(res.split(' '), function(modId) {
+							$('[data-mod-id="' + modId + '"]', '#mainPart').appendTo($('#mainPart'));
+						});
+					}
+					if(params[1] == 'comment') {
+						_scrollToComments();
+					}
+				}});
+				$.localStorage.get('comment_form_data', {proxy: 1, callback: function(commentFormData) {
+					if(commentFormData) {
+						commentFormData = $.object.fromQueryString(commentFormData);
+						$.object.each(commentFormData, function(val, key) {
+							$('#' + key).setVal(val);
+						});
+					}
+				}});
+			});
+			_bindEvent(aid);
+			$$.util.prettyPrint();
+			this._makeSortable();
 			return;
 		}
 		var url = '/data/' + modKey + '/' + aid;

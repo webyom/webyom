@@ -57,36 +57,9 @@
 		data = data || $.history.ajax.getCache(fullMark);
 		if(data) {
 			$.history.ajax.setMark(fullMark, [reqInfo.modInfo.title, $$.config.get('TITLE_POSTFIX')].join(' - '));
-			$('#mainPart').size() || $$.ui.resetContent();
-			$('#mainPart').tween(1000, {
-				origin: {
-					style: 'left: 0px; opacity: 1; position: relative;'
-				},
-				target: {
-					style: 'left: -300px; opacity: 0; position: relative;'
-				},
-				css: true,
-				prior: true,
-				transition: 'easeOut',
-				complete: function() {
-					$('#mainPart').setHtml($.tmpl.render(_TMPL, data, {key: 'mod.articleList'}));
-					$$.util.prettyPrint();
-					$('#mainPart').tween(1000, {
-						origin: {
-							style: 'left: -300px; opacity: 0; position: relative;'
-						},
-						target: {
-							style: 'left: 0px; opacity: 1; position: relative;'
-						},
-						css: true,
-						transition: 'easeOut'
-					});
-					setTimeout(function() {
-						//$.js.preload($$_MOD_KEY_INFO_HASH['read'].url);
-					}, 2000);
-				}
-			});
+			$$.ui.setMainContent($.tmpl.render(_TMPL, data, {key: 'mod.articleList'}));
 			$$.ui.turnOnMenu('a');
+			$$.util.prettyPrint();
 			return;
 		}
 		var url = '/data/' + mark;

@@ -51,7 +51,8 @@
 	];
 	
 	function _render(url, data, aid) {
-		$('#content').setHtml($.tmpl.render(_TMPL, data, {key: 'mod.writeArticle'}));
+		$$.ui.setContent($.tmpl.render(_TMPL, data, {key: 'mod.writeArticle'}));
+		$$.ui.turnOnMenu('a');
 		var myEditor = new YAHOO.widget.Editor('msgpost', {   
 			height: '500px',   
 			width: '100%',
@@ -85,7 +86,6 @@
 			myEditor.clearEditorDoc();
 			$('#msgpost').setHtml('');
 		});
-		$$.ui.turnOnMenu('a');
 	};
 	
 	var Handler = function(observers, modName, parent, opt) {

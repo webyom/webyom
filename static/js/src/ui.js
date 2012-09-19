@@ -65,7 +65,7 @@ $$.ui = (function() {
 	};
 	
 	function resetContent() {
-		$('#content').get().innerHTML = _TMPL['CONTENT']['FRAME'];
+		$('#content').setHtml(_TMPL['CONTENT']['FRAME']);
 		$.js.require($$_LIB_NAME_URL_HASH.YOM_LOCAL_STORAGE, function(res) {
 			$.localStorage.get('sideModSequence', {proxy: 1, callback: function(res) {
 				if(res) {
@@ -103,10 +103,23 @@ $$.ui = (function() {
 				});
 			});
 		});
+		return this;
+	};
+	
+	function setContent(content) {
+		$('#content').setHtml(content).fadeIn();
+		return this;
+	};
+	
+	function setMainContent(content) {
+		$('#mainPart').size() || $$.ui.resetContent();
+		$('#mainPart').setHtml(content).fadeIn();
+		return this;
 	};
 	
 	function turnOnMenu(name) {
 		$('#menu').get().className = name;
+		return this;
 	};
 	
 	function init() {
@@ -115,10 +128,13 @@ $$.ui = (function() {
 		_initContent();
 		_initFooter();
 		$$.tooltip.bindAttr('title');
+		return this;
 	};
 	
 	return {
 		resetContent: resetContent,
+		setContent: setContent,
+		setMainContent: setMainContent,
 		turnOnMenu: turnOnMenu,
 		init: init
 	};

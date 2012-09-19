@@ -20,7 +20,6 @@
 		if(res !== 0) {
 			return res;
 		}
-		$('#mainPart').size() || $$.ui.resetContent();
 		$$.ui.turnOnMenu('c');
 		return 0;
 	};
