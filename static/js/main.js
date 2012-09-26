@@ -338,6 +338,9 @@ $$.tooltip = (function() {
 	var _guidePool = [];
 	
 	function _getElTips(el, attr) {
+		if(!el) {
+			return '';
+		}
 		el = $(el);
 		var tips = el.getDatasetVal('tooltip');
 		if(!tips && attr) {

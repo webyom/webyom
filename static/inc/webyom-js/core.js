@@ -1328,8 +1328,8 @@ YOM.Event.addModule('Delegator', function(YOM) {
 			}
 			maxBubble = this._delegatedTypes[type].maxBubble;
 			bubbleTimes = 0;
-			while(target && target.nodeType === 1 && target != this._ele && target.tagName != 'HTML') {
-				if(target.disabled || target.getAttribute('disabled')) {
+			while(target && target != this._ele) {
+				if(target.disabled || YOM(target).getAttr('disabled')) {
 					return;
 				}
 				flag = YOM(target).getDatasetVal('yom-' + type);
@@ -2245,6 +2245,8 @@ YOM.addModule('Element', function(YOM) {
 			var el = this.get();
 			if(name == 'class' || name == 'className') {
 				return el.className;
+			} else if(el.nodeType !== 1 || el.tagName == 'HTML') {
+				return '';
 			} else {
 				return el.getAttribute(name);
 			}
