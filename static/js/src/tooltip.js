@@ -5,6 +5,19 @@ $$.tooltip = (function() {
 	var _guideTooltip;
 	var _guidePool = [];
 	
+	function _getElTips(el, attr) {
+		el = $(el);
+		var tips = el.getDatasetVal('tooltip');
+		if(!tips && attr) {
+			tips = el.getAttr(attr);
+			if(tips) {
+				el.setDatasetVal('tooltip', tips);
+				el.setAttr(attr, '');
+			}
+		}
+		return tips;
+	};
+	
 	function _showGuide(opt) {
 		_guideTooltip = _guideTooltip || new YOM.widget.Tooltip({
 			keepAlive: true,
@@ -38,39 +51,36 @@ $$.tooltip = (function() {
 		return this;
 	};
 	
-	function _bindAttr(attr) {
-		var _toolTip = null;
-		var _toRef = null;
+	function _bindAttr(opt) {
+		var toolTip = null;
+		var toRef = null;
+		var attr = opt.attr;
+		var maxBubble = opt.maxBubble || 0;
 		$(document).addEventListener('mousemove', function(evt) {
-			clearTimeout(_toRef);
+			clearTimeout(toRef);
 			var pos = {x: $.Event.getPageX(evt), y: $.Event.getPageY(evt)};
-			var target = $($.Event.getTarget(evt));
-			var txt = target.getDatasetVal('tooltip');
-			if(!txt) {
-				if(attr) {
-					txt = target.getAttr(attr);
-					if(txt) {
-						target.setDatasetVal('tooltip', txt);
-						target.setAttr(attr, '');
-					} else {
-						_toolTip && _toolTip.close();
-						return;
-					}
-				} else {
-					_toolTip && _toolTip.close();
-					return;
-				}
+			var target = $.Event.getTarget(evt);
+			var txt = _getElTips(target, attr);
+			var times = 0;
+			while(!txt && times < opt.maxBubble) {
+				target = target.parentNode;
+				txt = _getElTips(target, attr);
+				times++;
 			}
-			_toRef = setTimeout(function() {
+			if(!txt) {
+				toolTip && toolTip.close();
+				return;
+			}
+			toRef = setTimeout(function() {
 				$.js.require($$_LIB_NAME_URL_HASH['YOM_WIDGET_TOOLTIP'], function(ret) {
-					_toolTip = _toolTip || new YOM.widget.Tooltip({
+					toolTip = toolTip || new YOM.widget.Tooltip({
 						content: '',
 						zIndex: 999,
 						fx: 'fade',
 						noCloseBtn: true,
 						keepAlive: true
 					});
-					_toolTip.setContent(txt).popup({
+					toolTip.setContent(txt).popup({
 						pos: pos,
 						offset: {L: {x: -10, y: -15}, B: {x: -15, y: 30}, T: {x: -15, y: -15}}
 					});
@@ -80,8 +90,9 @@ $$.tooltip = (function() {
 		_bindAttr = $empty();
 	};
 	
-	function bindAttr(attr) {
-		_bindAttr(attr);
+	function bindAttr(opt) {
+		opt = opt || {};
+		_bindAttr(opt);
 	};
 	
 	return {

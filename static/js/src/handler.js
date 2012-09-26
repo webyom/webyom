@@ -34,7 +34,7 @@ $$.Handler = (function() {
 	$.Class.extend(Handler, $.Event);
 	
 	$extend(Handler.prototype, {
-		_activeUnload: true,
+		_activeUnload: false,
 		
 		_beforeunloadmodHook: function(e) {
 			return this.dispatchEvent(this.createEvent('beforeunloadmod', {

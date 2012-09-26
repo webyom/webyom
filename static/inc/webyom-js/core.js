@@ -150,8 +150,6 @@ YOM.Class
 YOM.JsLoader
 	10201: load fail
 	10202: callback fail
-YOM.require
-	10301: unspported src type
 YOM.Xhr
 	10401: onerror
 */
@@ -746,6 +744,18 @@ YOM.addModule('json', function(YOM) {
 			case 'string':
 				res = _quote(obj);
 				break;
+			case 'boolean':
+				res = obj.toString();
+				break;
+			case 'number':
+				if(isNaN(obj)) {
+					throw new YOM.Error(YOM.Error.getCode(_ID, 1), 'NaN not supported.');
+				} else if(!isFinite(obj)) {
+					throw new YOM.Error(YOM.Error.getCode(_ID, 2), 'Infinite number not supported.');
+				} else {
+					res = obj.toString();
+				}
+				break;
 			case 'object':
 				if(!obj) {
 					res = 'null';
@@ -785,18 +795,8 @@ YOM.addModule('json', function(YOM) {
 				}
 				delete obj.__YOM_JSON_STRINGIFY_MARKED__;
 				break;
-			case 'undefined':
-				res = 'undefined';
-				break;
-			case 'function':
-				res = '';
-				break;
 			default:
-				try {
-					res = obj.toString();
-				} catch(e) {
-					res = YOM.object.toString(obj);
-				}
+				throw new YOM.Error(YOM.Error.getCode(_ID, 3), typeof obj + ' type not supported.');
 			}
 			return res;
 		}
@@ -3191,6 +3191,7 @@ YOM.addModule('css', function(YOM) {
  */
 YOM.addModule('tmpl', function(YOM) {
 	var _cache = {};
+	var _useArrayJoin = YOM.browser.ie;
 	
 	function _getMixinTmplStr(rawStr, mixinTmpl) {
 		if(mixinTmpl) {
@@ -3218,14 +3219,26 @@ YOM.addModule('tmpl', function(YOM) {
 		if(opt.mixinTmpl) {
 			str = _getMixinTmplStr(str, opt.mixinTmpl);
 		}
-		fn = new Function("$data", "var _$out_='',$print=function(str){_$out_+=str;};" + (strict ? "" : "with($data){") + "_$out_+='" + str
+		fn = _useArrayJoin ? 
+		new Function("$data", "var _$out_=[],$print=function(str){_$out_.push(str);};" + (strict ? "" : "with($data){") + "_$out_.push('" + str
 			.replace(/[\r\t\n]/g, " ")
 			.split("<%").join("\t")
 			.replace(/(?:^|%>).*?(?:\t|$)/g, function($0) {
 				return $0.replace(/('|\\)/g, '\\$1');
 			})
-			.replace(/\t==(.*?)%>/g, "';_$out_+=YOM.string.encodeHtml($1);_$out_+='")
-			.replace(/\t=(.*?)%>/g, "';_$out_+=$1;_$out_+='")
+			.replace(/\t==(.*?)%>/g, "',YOM.string.encodeHtml($1),'")
+			.replace(/\t=(.*?)%>/g, "',$1,'")
+			.split("\t").join("');")
+			.split("%>").join("_$out_.push('")
+		+ "');" + (strict ? "" : "}") + "return _$out_.join('');") : 
+		new Function("$data", "var _$out_='',$print=function(str){_$out_+=str;};" + (strict ? "" : "with($data){") + "_$out_+='" + str
+			.replace(/[\r\t\n]/g, " ")
+			.split("<%").join("\t")
+			.replace(/(?:^|%>).*?(?:\t|$)/g, function($0) {
+				return $0.replace(/('|\\)/g, '\\$1');
+			})
+			.replace(/\t==(.*?)%>/g, "'+YOM.string.encodeHtml($1)+'")
+			.replace(/\t=(.*?)%>/g, "'+($1)+'")
 			.split("\t").join("';")
 			.split("%>").join("_$out_+='")
 		+ "';" + (strict ? "" : "}") + "return _$out_;");

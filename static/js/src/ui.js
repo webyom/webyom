@@ -127,7 +127,7 @@ $$.ui = (function() {
 		_initHeader();
 		_initContent();
 		_initFooter();
-		$$.tooltip.bindAttr('title');
+		$$.tooltip.bindAttr({attr: 'title', maxBubble: 2});
 		return this;
 	};
 	
@@ -145,6 +145,10 @@ $$.ui = (function() {
  */
 $$.ui.processing = (function() {
 	var _div;
+	
+	function _isAnyLoading() {
+		return $.JsLoader.isAnyLoading() || $.Xhr.isAnyLoading() || $.CrossDomainPoster.isAnyLoading();
+	};
 	
 	function start(msg) {
 		_div.innerHTML = msg || 'Processing...';
@@ -166,7 +170,7 @@ $$.ui.processing = (function() {
 			start();
 		});
 		$.JsLoader.addEventListener('allcomplete', function(e) {
-			if(!$.Xhr.isAnyLoading()) {
+			if(!_isAnyLoading()) {
 				stop();
 			}
 		});
@@ -177,7 +181,18 @@ $$.ui.processing = (function() {
 			start();
 		});
 		$.Xhr.addEventListener('allcomplete', function(e) {
-			if(!$.JsLoader.isAnyLoading()) {
+			if(!_isAnyLoading()) {
+				stop();
+			}
+		});
+		$.CrossDomainPoster.addEventListener('start', function(e) {
+			if(e.opt.silent) {
+				return;
+			}
+			start();
+		});
+		$.CrossDomainPoster.addEventListener('allcomplete', function(e) {
+			if(!_isAnyLoading()) {
 				stop();
 			}
 		});

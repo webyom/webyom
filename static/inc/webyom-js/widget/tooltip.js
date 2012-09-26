@@ -163,8 +163,8 @@ YOM.widget.addModule('Tooltip', function(YOM) {
 		_locate: function(opt) {
 			opt = opt || {};
 			var wrapper = this._el;
-			var width = opt.width;
-			var height = opt.height;
+			var width;
+			var height;
 			var pos = opt.pos;
 			var offset = opt.offset || {};
 			offset.L = offset.L || {};
@@ -216,26 +216,26 @@ YOM.widget.addModule('Tooltip', function(YOM) {
 					}
 				}
 			}
-			width = wrapperRect.width;
-			height = wrapperRect.height;
-			if(direction == 'L' && !(width > 0)) {
+			if(direction == 'L' && !(opt.width > 0)) {
 				width = Math.min(pos.x + (offset.L.x || 0), wrapperRect.width);
-			} else if(direction == 'TT' && !(height > 0)) {
+			} else if(direction == 'TT' && !(opt.height > 0)) {
 				width = Math.min(docSize.width - pos.x - (offset.T.x || 0), wrapperRect.width);
 				wrapper.setStyle({
 					width: width + 'px'
 				});
 				wrapperRect = wrapper.getRect();
-				if(pos.y < height) {
+				if(pos.y + (offset.T.y || 0) < wrapperRect.height) {
 					direction = 'B';
 					if(targetRect) {
 						pos = {x: targetRect.left, y: targetRect.bottom};
 					}
 				}
 			}
+			width = width || (opt.width > 0 ? opt.width : wrapperRect.width);
+			height = height || (opt.height > 0 ? opt.height : wrapperRect.height);
 			wrapper.setStyle({
-				width: !isNaN(width) ? width + 'px' : 'auto',
-				height: !isNaN(height) ? height + 'px' : 'auto'
+				width: width + 'px',
+				height: height + 'px'
 			});
 			var arrow = wrapper.find('[data-type="yom-tooltip-arrow"]').get();
 			if(direction == 'L') {
