@@ -1,4 +1,8 @@
-(function(modKey, modName, modId) {
+define('mod/write-article', ['require', 'yom/core-pkg', 'yom/history', 'main-pkg', 'YUI#editor/editor-min'], function(require, $, ajaxHistory, $$, Editor) {
+	var modKey = 'write', 
+		modName = 'WRITE_ARTICLE', 
+		modId = 302;
+	
 	var _TMPL = [
 		'<div id="writeArticle" class="sidePart"><div class="block yui-skin-sam"><div class="blockInner">',
 			'<h2>Write Article</h2>',
@@ -53,7 +57,7 @@
 	function _render(url, data, aid) {
 		$$.ui.setContent($.tmpl.render(_TMPL, data, {key: 'mod.writeArticle'}));
 		$$.ui.turnOnMenu('a');
-		var myEditor = new YAHOO.widget.Editor('msgpost', {   
+		var myEditor = new Editor('msgpost', {   
 			height: '500px',   
 			width: '100%',
 			handleSubmit: true
@@ -70,8 +74,8 @@
 				param: $('#writeArticle').toQueryString(),
 				load: function(o) {
 					if(o.ret === 0) {
-						$.history.ajax.clearCache();
-						$$.mod['ROOT'].jump($$.config.get('MARK_PREFIX') + 'list');
+						ajaxHistory.clearCache();
+						$$.Handler.mod.root.jump($$.config.get('MARK_PREFIX') + 'list');
 					} else {
 						$$alert('Failed to post article.');
 					}
@@ -105,43 +109,34 @@
 		}
 		var self = this;
 		$.css.load(_cssList);
-		$.js.require([
-			'http://yui.yahooapis.com/2.7.0/build/yahoo-dom-event/yahoo-dom-event.js',
-			'http://yui.yahooapis.com/2.7.0/build/element/element-min.js',
-			'http://yui.yahooapis.com/2.7.0/build/container/container_core-min.js',
-			'http://yui.yahooapis.com/2.7.0/build/menu/menu-min.js',
-			'http://yui.yahooapis.com/2.7.0/build/button/button-min.js',
-			'http://yui.yahooapis.com/2.7.0/build/editor/editor-min.js'
-		], function() {
-			if(mark) {
-				var url = '/data/update/' + mark;
-				if($.Xhr.isUrlLoading(url)) {
-					return;
-				}
-				$$.util.xhr.get(url, {
-					gid: self._id,
-					load: function(o) {
-						if(o.ret === 0) {
-							$.history.ajax.setMark(fullMark, [reqInfo.modInfo.title, $$.config.get('TITLE_POSTFIX')].join(' - '));
-							_render('/data/update/' + mark, o.data.article, mark);
-						} else {
-							$$alert('Failed to get article1.');
-						}
-					},
-					error: function() {
-						$$alert('Failed to get article2.');
-					},
-					callbackName: '_get_article_info'
-				});
-			} else {
-				$.history.ajax.setMark(fullMark, [reqInfo.modInfo.title, $$.config.get('TITLE_POSTFIX')].join(' - '));
-				_render('/data/write', {title: '', content: ''});
+		if(mark) {
+			var url = '/data/update/' + mark;
+			if($.Xhr.isUrlLoading(url)) {
+				return;
 			}
-		});
+			$$.util.xhr.get(url, {
+				gid: self._id,
+				load: function(o) {
+					if(o.ret === 0) {
+						ajaxHistory.setMark(fullMark, [reqInfo.modInfo.title, $$.config.get('TITLE_POSTFIX')].join(' - '));
+						_render('/data/update/' + mark, o.data.article, mark);
+					} else {
+						$$alert('Failed to get article1.');
+					}
+				},
+				error: function() {
+					$$alert('Failed to get article2.');
+				},
+				callbackName: '_get_article_info'
+			});
+		} else {
+			ajaxHistory.setMark(fullMark, [reqInfo.modInfo.title, $$.config.get('TITLE_POSTFIX')].join(' - '));
+			_render('/data/write', {title: '', content: ''});
+		}
 	};
 	
-	new Handler({
+	return new Handler({
 		beforeunloadmod: new $.Observer(),
 		loadmod: new $.Observer()
-	}, modKey, $$.mod.root);
-})('write', 'WRITE_ARTICLE', 302);
+	}, modKey, $$.Handler.mod.root);
+});

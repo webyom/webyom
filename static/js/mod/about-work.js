@@ -1,4 +1,8 @@
-(function(modKey, modName, modId) {
+define('mod/about-work', ['require', 'yom/core-pkg', 'yom/history', 'main-pkg'], function(require, $, ajaxHistory, $$) {
+	var modKey = 'work', 
+		modName = 'WORK', 
+		modId = 30301;
+	
 	var _TMPL = [
 		'<div class="block"><div class="blockInner">',
 			'<ul class="tabs b">',
@@ -30,9 +34,9 @@
 			return;
 		}
 		$.css.load(_cssList);
-		$.history.ajax.setMark(fullMark, [reqInfo.modInfo.title, $$.config.get('TITLE_POSTFIX')].join(' - '));
+		ajaxHistory.setMark(fullMark, [reqInfo.modInfo.title, $$.config.get('TITLE_POSTFIX')].join(' - '));
 		$$.ui.setMainContent($.tmpl.render(_TMPL, {}, {key: 'mod.about.work'}));
 	};
 	
-	new Handler({}, modKey, $$.mod.root.mod.about);
-})('work', 'WORK', 30301);
+	return new Handler({}, modKey, $$.Handler.mod.root.mod.about);
+});

@@ -1,4 +1,8 @@
-(function(modKey, modName, modId) {
+define('mod/about-contact', ['require', 'yom/core-pkg', 'yom/history', 'main-pkg'], function(require, $, ajaxHistory, $$) {
+	var modKey = 'contact', 
+		modName = 'CONTACT', 
+		modId = 30302;
+	
 	var _TMPL = [
 		'<div class="block"><div class="blockInner">',
 			'<ul class="tabs c">',
@@ -31,9 +35,9 @@
 			return;
 		}
 		$.css.load(_cssList);
-		$.history.ajax.setMark(fullMark, [reqInfo.modInfo.title, $$.config.get('TITLE_POSTFIX')].join(' - '));
+		ajaxHistory.setMark(fullMark, [reqInfo.modInfo.title, $$.config.get('TITLE_POSTFIX')].join(' - '));
 		$$.ui.setMainContent($.tmpl.render(_TMPL, {}, {key: 'mod.about.contact'}));
 	};
 	
-	new Handler({}, modKey, $$.mod.root.mod.about);
-})('contact', 'CONTACT', 30302);
+	return new Handler({}, modKey, $$.Handler.mod.root.mod.about);
+});

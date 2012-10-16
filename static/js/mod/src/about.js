@@ -1,4 +1,8 @@
-(function(modKey, modName, modId) {
+define('mod/about', ['require', 'yom/core-pkg', 'yom/history', 'main-pkg'], function(require, $, ajaxHistory, $$) {
+	var modKey = 'about', 
+		modName = 'ABOUT', 
+		modId = 303;
+	
 	var _TMPL = [
 	].join('');
 	
@@ -24,20 +28,15 @@
 		return 0;
 	};
 	
-	new Handler({
+	return new Handler({
 		beforeunloadmod: new $.Observer(),
 		loadmod: new $.Observer()
-	}, modKey, $$.mod.root, {
+	}, modKey, $$.Handler.mod.root, {
 		modKeyInfoHash: {//p: priority of preload，this bigger p the higher priority。key，id and name must be unique
-			'profile': {p: 1, key: 'profile', title: 'Profile', id: 30300, name: 'PROFILE', handler: {
-				handle: function() {
-					var handler = $$.mod.root.mod.about.mod.profile
-					handler.handle.apply(handler, $.array.getArray(arguments));
-				}
-			}},
-			'work': {p: 2, key: 'work', title: 'Work', id: 30301, name: 'WORK', url: '/static/js/mod/about-work.js'},
-			'contact': {p: 3, key: 'contact', title: 'Contact', id: 30302, name: 'CONTACT', url: '/static/js/mod/about-contact.js'}
+			'profile': {p: 1, key: 'profile', title: 'Profile', id: 30300, name: 'PROFILE', url: 'mod/about-profile'},
+			'work': {p: 2, key: 'work', title: 'Work', id: 30301, name: 'WORK', url: 'mod/about-work'},
+			'contact': {p: 3, key: 'contact', title: 'Contact', id: 30302, name: 'CONTACT', url: 'mod/about-contact'}
 		},
 		defaultModkey: 'profile'
 	});
-})('about', 'ABOUT', 303);
+});

@@ -1,4 +1,8 @@
-(function(modKey, modName, modId) {
+define('mod/article-list', ['require', 'yom/core-pkg', 'yom/history', 'main-pkg'], function(require, $, ajaxHistory, $$) {
+	var modKey = 'list', 
+		modName = 'ARTICLE_LIST', 
+		modId = 300;
+	
 	var _TMPL = [
 		'<div class="block"><div class="blockInner">',
 			'<div id="articleList">',
@@ -54,9 +58,9 @@
 		if(!/^p\d+$/.test(mark)) {
 			mark = 'p1';
 		}
-		data = data || $.history.ajax.getCache(fullMark);
+		data = data || ajaxHistory.getCache(fullMark);
 		if(data) {
-			$.history.ajax.setMark(fullMark, [reqInfo.modInfo.title, $$.config.get('TITLE_POSTFIX')].join(' - '));
+			ajaxHistory.setMark(fullMark, [reqInfo.modInfo.title, $$.config.get('TITLE_POSTFIX')].join(' - '));
 			$$.ui.setMainContent($.tmpl.render(_TMPL, data, {key: 'mod.articleList'}));
 			$$.ui.turnOnMenu('a');
 			$$.util.prettyPrint();
@@ -85,7 +89,7 @@
 			gid: this._id,
 			callbackName: '_get_article_list',
 			load: function(o) {
-				$.history.ajax.setCache(fullMark, o.data);
+				ajaxHistory.setCache(fullMark, o.data);
 				self.handle(mark, fullMark, reqInfo, data)
 			},
 			error: function(code) {
@@ -96,8 +100,8 @@
 		});
 	};
 	
-	new Handler({
+	return new Handler({
 		beforeunloadmod: new $.Observer(),
 		loadmod: new $.Observer()
-	}, modKey, $$.mod.root);
-})('list', 'ARTICLE_LIST', 300);
+	}, modKey, $$.Handler.mod.root);
+});

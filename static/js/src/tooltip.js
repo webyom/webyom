@@ -1,7 +1,7 @@
 /**
- * @namespace
+ * @namespace $$.tooltip
  */
-$$.tooltip = (function() {
+define('main/tooltip', ['require', 'yom/core-pkg'], function(require, $) {
 	var _guideTooltip;
 	var _guidePool = [];
 	
@@ -75,8 +75,8 @@ $$.tooltip = (function() {
 				return;
 			}
 			toRef = setTimeout(function() {
-				$.js.require($$_LIB_NAME_URL_HASH['YOM_WIDGET_TOOLTIP'], function(ret) {
-					toolTip = toolTip || new YOM.widget.Tooltip({
+				require(['yom/widget/tooltip'], function(Tooltip) {
+					toolTip = toolTip || new Tooltip({
 						content: '',
 						zIndex: 999,
 						fx: 'fade',
@@ -102,4 +102,4 @@ $$.tooltip = (function() {
 		bindAttr: bindAttr,
 		guide: guide
 	};
-})();
+});

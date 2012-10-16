@@ -1320,7 +1320,7 @@ YOM.Event.addModule('Delegator', function(YOM) {
 		},
 		
 		_eventListener: function(evt) {
-			var target, type, flag, handler, maxBubble, bubbleTimes;
+			var target, $target, type, flag, handler, maxBubble, bubbleTimes;
 			target = YOM.Event.getTarget(evt);
 			type = evt.type.toLowerCase();
 			if(this._eventHook && this._eventHook(target, evt, type) === false) {
@@ -1329,10 +1329,11 @@ YOM.Event.addModule('Delegator', function(YOM) {
 			maxBubble = this._delegatedTypes[type].maxBubble;
 			bubbleTimes = 0;
 			while(target && target != this._ele) {
-				if(target.disabled || YOM(target).getAttr('disabled')) {
+				$target = YOM(target);
+				if(target.disabled || $target.getAttr('disabled')) {
 					return;
 				}
-				flag = YOM(target).getDatasetVal('yom-' + type);
+				flag = $target.getDatasetVal('yom-' + type);
 				if(flag) {
 					flag = flag.split(' ');
 					handler = this._handlers[type][flag.shift()];
@@ -1526,6 +1527,8 @@ YOM.addModule('Xhr', function(YOM) {
 		this._opt = opt;
 		this._method = (opt.method == 'GET' ? 'GET' : 'POST');
 		this._param = typeof opt.param == 'object' ? YOM.object.toQueryString(opt.param) : opt.param;
+		this._formData = opt.formData;
+		this._charset = opt.charset;
 		this._url = url + (opt.method == 'GET' && this._param ? '?' + this._param : '');
 		this._status = _STATUS.INIT;
 		this._onload = opt.load || $empty;
@@ -1573,6 +1576,7 @@ YOM.addModule('Xhr', function(YOM) {
 				res = true;
 				return false;
 			}
+			return true;
 		});
 		return res;
 	};
@@ -1630,11 +1634,11 @@ YOM.addModule('Xhr', function(YOM) {
 		this._xhr.open(this._method, this._url, this._opt.isAsync === false ? false : true);
 		if(this._method == 'GET') {
 			if(this._opt.noCache) {
-				this._xhr.setRequestHeader('If-Modified-Since', 'Thu, 1 Jan 1970 00:00:00 GMT');
+				this._xhr.setRequestHeader('If-Modified-Since', 'Sun, 27 Mar 1983 00:00:00 GMT');
 				this._xhr.setRequestHeader('Cache-Control', 'no-cache');
 			}
-		} else {
-			this._xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded' + (this._opt.charset ? '; charset=' + this._opt.charset : ''));
+		} else if(!this._formData) {
+			this._xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded' + (this._charset ? '; charset=' + this._charset : ''));
 		}
 		if(this._opt.withCredentials) {
 			this._xhr.withCredentials = true;
@@ -1642,7 +1646,7 @@ YOM.addModule('Xhr', function(YOM) {
 		this._xhr.onreadystatechange = $bind(this, _onReadyStateChange);
 		this._status = _STATUS.LOADING;
 		this._opt.silent || _loading_count++;
-		this._xhr.send(this._method == 'POST' ? this._param : null);
+		this._xhr.send(this._method == 'POST' ? (this._formData || this._param) : null);
 		Xhr.dispatchEvent(Xhr.createEvent('start', {url: this._url, method: this._method, opt: this._opt}));
 		return 0;
 	};
@@ -1729,6 +1733,7 @@ YOM.addModule('CrossDomainPoster', function(YOM) {
 				res = true;
 				return false;
 			}
+			return true;
 		});
 		return res;
 	};
@@ -1757,7 +1762,7 @@ YOM.addModule('CrossDomainPoster', function(YOM) {
 	
 	CrossDomainPoster.prototype._frameOnLoad = function() {
 		if(this._crossSite) {
-			if(this._status =! _STATUS.LOADING) {
+			if(this._status != _STATUS.LOADING) {
 				return;
 			}
 			this._status = _STATUS.LOADED;
@@ -1807,7 +1812,7 @@ YOM.addModule('CrossDomainPoster', function(YOM) {
 		this._frameEl = YOM.Element.create('iframe', {src: this._proxy}, {display: 'none'});
 		this._frameEl.instanceId = this.getId();
 		this._frameEl.callback = $bind(this, function(o) {
-			if(this._status =! _STATUS.LOADING) {
+			if(this._status != _STATUS.LOADING) {
 				return;
 			}
 			this._status = _STATUS.LOADED;
@@ -1820,6 +1825,7 @@ YOM.addModule('CrossDomainPoster', function(YOM) {
 		this._status = _STATUS.LOADING;
 		_loading_count++;
 		CrossDomainPoster.dispatchEvent(CrossDomainPoster.createEvent('start', {url: this._url, opt: this._opt}));
+		return 0;
 	};
 	
 	CrossDomainPoster.prototype.abort = function() {
@@ -2977,6 +2983,7 @@ YOM.addModule('JsLoader', function(YOM) {
 				res = true;
 				return false;
 			}
+			return true;
 		});
 		return res;
 	};
@@ -2989,9 +2996,6 @@ YOM.addModule('JsLoader', function(YOM) {
 		_im.remove(this.getId());
 		if(!this._jsEl) {
 			return;
-		}
-		if(YOM.browser && YOM.browser.v === 9) {
-			this._jsEl.src = '';
 		}
 		this._jsEl.parentNode.removeChild(this._jsEl);
 		this._jsEl = null;
@@ -3047,7 +3051,7 @@ YOM.addModule('JsLoader', function(YOM) {
 			_callbackLoadingHash[this._callbackName] = 1;
 			window[this._callbackName] = $bind(this, function() {
 				this._callbacked = true;
-				if(this._status == _STATUS.LOADED) {
+				if(this._status != _STATUS.LOADING) {
 					return;
 				}
 				this._callback.apply(this._bind || this, YOM.array.getArray(arguments));
@@ -4032,6 +4036,9 @@ YOM.addModule('Tween', function(YOM) {
 			tVal = originStyle[prop];
 			this._el.setStyle(prop, tVal.v + tVal.u);
 		}
+		this._el.each(function(el) {
+			el.clientLeft;//force reflow
+		});
 		this._el.storeStyle(this._css + '-duration');
 		this._el.storeStyle(this._css + '-timing-function');
 		this._el.setStyle(this._css + '-duration', this._duration + 'ms');

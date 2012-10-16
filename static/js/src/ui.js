@@ -1,7 +1,7 @@
 /**
  * @namespace $$.ui
  */
-$$.ui = (function() {
+define('main/ui', ['require', 'yom/core-pkg', 'main/storage', 'main/tooltip'], function(require, $, storage, tooltip) {
 	var _USER_NAME = $$userName;
 	var _TMPL = {
 		HEADER: [
@@ -18,7 +18,7 @@ $$.ui = (function() {
 			FRAME: $$uiContentTmpl,
 			SIDE_WHOAMI: [
 				'<p>', 
-					'<img src="/static/img/myPhoto.jpg" alt="Who am I?" ondblclick="$.console.turnOn();" />', 
+					'<img src="/static/img/myPhoto.jpg" alt="Who am I?" />', 
 					'Hi, my name is Gary Wang.<br /><br />', 
 					'I\'m living in Shenzhen China, and working as a front-end developer.<br /><br />', 
 					'I love programming in Javascript, CSS, and HTML. Recently I\'m studying Python. I found Python a extramely good programming language, thus I started to build this blog with it.', 
@@ -66,41 +66,37 @@ $$.ui = (function() {
 	
 	function resetContent() {
 		$('#content').setHtml(_TMPL['CONTENT']['FRAME']);
-		$.js.require($$_LIB_NAME_URL_HASH.YOM_LOCAL_STORAGE, function(res) {
-			$.localStorage.get('sideModSequence', {proxy: 1, callback: function(res) {
-				if(res) {
-					$.object.each(res.split(' '), function(modId) {
-						$('[data-mod-id="' + modId + '"]', '#sidePart').appendTo($('#sidePart'));
-					});
-				}
-				$('#sideWhoamiContent').get().innerHTML = _TMPL['CONTENT']['SIDE_WHOAMI'];
-				$('#sideReadingsContent').get().innerHTML = _TMPL['CONTENT']['SIDE_READINGS'];
-				$('#sideRecSites').get().innerHTML = _TMPL['CONTENT']['SIDE_REC_SITES'];
-				$('#sidePart').tween(1500, {
-					origin: {
-						style: 'top: -800px; opacity: 0; position: relative;'
-					},
-					target: {
-						style: 'top: 0px; opacity: 1; position: relative;'
-					},
-					css: true,
-					transition: 'easeOut'
+		storage.get('sideModSequence', function(res) {
+			if(res) {
+				$.object.each(res.split(' '), function(modId) {
+					$('[data-mod-id="' + modId + '"]', '#sidePart').appendTo($('#sidePart'));
 				});
-			}});
+			}
+			$('#sideWhoamiContent').get().innerHTML = _TMPL['CONTENT']['SIDE_WHOAMI'];
+			$('#sideReadingsContent').get().innerHTML = _TMPL['CONTENT']['SIDE_READINGS'];
+			$('#sideRecSites').get().innerHTML = _TMPL['CONTENT']['SIDE_REC_SITES'];
+			$('#sidePart').tween(1500, {
+				origin: {
+					style: 'top: -800px; opacity: 0; position: relative;'
+				},
+				target: {
+					style: 'top: 0px; opacity: 1; position: relative;'
+				},
+				css: true,
+				transition: 'easeOut'
+			});
 		});
-		$.js.require($$_LIB_NAME_URL_HASH.YOM_DRAGDROP, function(res) {
+		require(['yom/dragdrop-pkg'], function(dragdrop) {
 			try {
 				_sortable && _sortable.destory();
 			} catch(e) {}
-			_sortable = new $.dragdrop.Sortable('#sidePart .sortable', {cloneContainer: YOM('#sidePart'), handles: '.handle', enterDirection: 'V', boundary: 'PAGE', snap: 0, startOff: {left: 5, top: 5}, clone: 0});
+			_sortable = new dragdrop.Sortable('#sidePart .sortable', {cloneContainer: $('#sidePart'), handles: '.handle', enterDirection: 'V', boundary: 'PAGE', snap: 0, startOff: {left: 5, top: 5}, clone: 0});
 			_sortable.addEventListener('sortrelease', function() {
 				var tmp = [];
 				$('#sidePart .sortable').each(function(el) {
-					tmp.push(YOM(el).getDatasetVal('mod-id'));
+					tmp.push($(el).getDatasetVal('mod-id'));
 				});
-				$.js.require($$_LIB_NAME_URL_HASH.YOM_LOCAL_STORAGE, function(res) {
-					$.localStorage.set('sideModSequence', tmp.join(' '), {proxy: 1});
-				});
+				storage.set('sideModSequence', tmp.join(' '));
 			});
 		});
 		return this;
@@ -112,7 +108,7 @@ $$.ui = (function() {
 	};
 	
 	function setMainContent(content) {
-		$('#mainPart').size() || $$.ui.resetContent();
+		$('#mainPart').size() || resetContent();
 		$('#mainPart').setHtml(content).fadeIn();
 		return this;
 	};
@@ -127,79 +123,78 @@ $$.ui = (function() {
 		_initHeader();
 		_initContent();
 		_initFooter();
-		$$.tooltip.bindAttr({attr: 'title', maxBubble: 2});
+		tooltip.bindAttr({attr: 'title', maxBubble: 2});
 		return this;
 	};
+	
+	var processing = (function() {
+		var _div;
+		
+		function isAnyLoading() {
+			return $.JsLoader.isAnyLoading() || $.Xhr.isAnyLoading() || $.CrossDomainPoster.isAnyLoading();
+		};
+		
+		function start(msg) {
+			_div.innerHTML = msg || 'Processing...';
+			_div.style.display = 'block';
+			document.getElementById('content').className = 'processing';
+		};
+		
+		function stop() {
+			_div.style.display = 'none';
+			document.getElementById('content').className = '';
+		};
+		
+		(function() {
+			_div = document.body.appendChild($.Element.create('div', {id: 'processingDiv'}, {display: 'none'}));
+			$.JsLoader.addEventListener('start', function(e) {
+				if(e.opt.silent) {
+					return;
+				}
+				start();
+			});
+			$.JsLoader.addEventListener('allcomplete', function(e) {
+				if(!isAnyLoading()) {
+					stop();
+				}
+			});
+			$.Xhr.addEventListener('start', function(e) {
+				if(e.opt.silent) {
+					return;
+				}
+				start();
+			});
+			$.Xhr.addEventListener('allcomplete', function(e) {
+				if(!isAnyLoading()) {
+					stop();
+				}
+			});
+			$.CrossDomainPoster.addEventListener('start', function(e) {
+				if(e.opt.silent) {
+					return;
+				}
+				start();
+			});
+			$.CrossDomainPoster.addEventListener('allcomplete', function(e) {
+				if(!isAnyLoading()) {
+					stop();
+				}
+			});
+		})();
+		
+		return {
+			isAnyLoading: isAnyLoading,
+			start: start,
+			stop: stop
+		};
+	})();
 	
 	return {
 		resetContent: resetContent,
 		setContent: setContent,
 		setMainContent: setMainContent,
 		turnOnMenu: turnOnMenu,
-		init: init
+		init: init,
+		processing: processing
 	};
-})();
-
-/**
- * @namespace $$.ui.processing
- */
-$$.ui.processing = (function() {
-	var _div;
-	
-	function _isAnyLoading() {
-		return $.JsLoader.isAnyLoading() || $.Xhr.isAnyLoading() || $.CrossDomainPoster.isAnyLoading();
-	};
-	
-	function start(msg) {
-		_div.innerHTML = msg || 'Processing...';
-		_div.style.display = 'block';
-		document.getElementById('content').className = 'processing';
-	};
-	
-	function stop() {
-		_div.style.display = 'none';
-		document.getElementById('content').className = '';
-	};
-	
-	(function() {
-		_div = document.body.appendChild($.Element.create('div', {id: 'processingDiv'}, {display: 'none'}));
-		$.JsLoader.addEventListener('start', function(e) {
-			if(e.opt.silent) {
-				return;
-			}
-			start();
-		});
-		$.JsLoader.addEventListener('allcomplete', function(e) {
-			if(!_isAnyLoading()) {
-				stop();
-			}
-		});
-		$.Xhr.addEventListener('start', function(e) {
-			if(e.opt.silent) {
-				return;
-			}
-			start();
-		});
-		$.Xhr.addEventListener('allcomplete', function(e) {
-			if(!_isAnyLoading()) {
-				stop();
-			}
-		});
-		$.CrossDomainPoster.addEventListener('start', function(e) {
-			if(e.opt.silent) {
-				return;
-			}
-			start();
-		});
-		$.CrossDomainPoster.addEventListener('allcomplete', function(e) {
-			if(!_isAnyLoading()) {
-				stop();
-			}
-		});
-	})();
-	
-	return {
-		start: start,
-		stop: stop
-	};
-})();
+});

@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>YOM CrossDomainPoster Proxy</title>
+</head>
+<body>
+<form id="sender" method="post" enctype="application/x-www-form-urlencoded"></form>
+<script type="text/javascript">
+(function() {
+	var cdp = parent.require('yom/core-pkg').CrossDomainPoster.getInstance(frameElement.instanceId);
+	if(!cdp) {
+		return;
+	}
+	var data = cdp._data;
+	var df = document.createDocumentFragment();
+	var item;
+	for(var p in data) {
+		if(data.hasOwnProperty(p)) {
+			item = document.createElement('input');
+			item.type = 'hidden';
+			item.name = p;
+			item.value = data[p];
+			df.appendChild(item);
+		}
+	}
+	if(cdp._crossSite) {
+		item = document.createElement('input');
+		item.type = 'hidden';
+		item.name = cdp._proxyParamName;
+		item.value = cdp._crossSiteProxy;
+		df.appendChild(item);
+	}
+	var sender = document.getElementById('sender');
+	sender.appendChild(df);
+	sender.action = cdp._url;
+	sender.acceptCharset = cdp._charset;
+	document.charset = cdp._charset;
+	sender.submit();
+})();
+</script>
+</body>
+</html>

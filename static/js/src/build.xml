@@ -9,13 +9,14 @@
     <property name="copyright.files" value="null"/>
 
     <target name="concat">
-        <concat destfile="${build.dir}/main.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+        <concat destfile="${build.dir}/main-pkg.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
             <path path="${src.dir}/config.js"/>
-			<path path="${src.dir}/storage.js"/>
-            <path path="${src.dir}/util.js"/>
+				<path path="${src.dir}/storage.js"/>
             <path path="${src.dir}/tooltip.js"/>
             <path path="${src.dir}/ui.js"/>
+            <path path="${src.dir}/util.js"/>
             <path path="${src.dir}/handler.js"/>
+            <path path="${src.dir}/main-pkg.js"/>
         </concat>
     </target>
 

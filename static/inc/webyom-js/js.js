@@ -169,9 +169,6 @@ YOM.addModule('js', function(YOM) {
 			if(YOM.browser.ie) {
 				_addEventListener(js, 'readystatechange', function() {
 					if(js && (js.readyState == 'loaded' || js.readyState == 'complete')) {
-						if(YOM.browser.v === 9) {
-							js.src = '';
-						}
 						js.parentNode.removeChild(js);
 						js = null;
 						self._oncomplete.call(this, JsLoader.RET.SUCC);

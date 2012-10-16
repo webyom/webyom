@@ -1,32 +1,32 @@
 /**
  * @namespace $$.storage
  */
-$$.storage = (function() {
+define('main/storage', ['require'], function(require) {
 	function _do(cb) {
-		$.js.require($$.LIB_NAME_URL_HASH['YOM_LOCALSTORAGE'], function(ret) {
-			cb();
+		require(['yom/local-storage'], function(ls) {
+			cb(ls);
 		});
 	};
 	
 	function get(key, cb) {
-		_do(function() {
-			$.localStorage.get(key, {proxy: 1, callback: function(res) {
+		_do(function(ls) {
+			ls.get(key, {proxy: 1, callback: function(res) {
 				cb(res);
 			}});
 		});
 	};
 	
 	function set(key, val, cb) {
-		_do(function() {
-			$.localStorage.set(key, val, {proxy: 1, callback: function(res) {
+		_do(function(ls) {
+			ls.set(key, val, {proxy: 1, callback: function(res) {
 				cb && cb(res);
 			}});
 		});
 	};
 	
 	function remove(key, cb) {
-		_do(function() {
-			$.localStorage.clear(key, {proxy: 1, callback: function(res) {
+		_do(function(ls) {
+			ls.clear(key, {proxy: 1, callback: function(res) {
 				cb && cb(res);
 			}});
 		});
@@ -54,4 +54,4 @@ $$.storage = (function() {
 		remove: remove,
 		doUnlessKey: doUnlessKey
 	};
-})();
+});

@@ -1,7 +1,12 @@
 /**
  * @namespace $$.Handler
  */
-$$.Handler = (function() {
+define('main/handler', ['require', 'yom/core-pkg', 'yom/history', 'main/config', 'main/ui'], function(require, $, ajaxHistory, config, ui) {
+	var $$ = {
+		config: config,
+		ui: ui
+	};
+	
 	var _ID = 204;
 	
 	var Handler = function(observers, modKey, parent, opt) {
@@ -30,6 +35,8 @@ $$.Handler = (function() {
 		}
 		this._id = $getUniqueId();
 	};
+	
+	Handler.mod = {};
 	
 	$.Class.extend(Handler, $.Event);
 	
@@ -74,23 +81,19 @@ $$.Handler = (function() {
 			var self = this;
 			var modInfo = subReqInfo.modInfo;
 			if(modInfo.url) {
-				$.js.require(modInfo.url, function(ret) {
-					if(ret == $.JsLoader.RET.ABORTED) {
-						return;
-					} else if(ret != $.JsLoader.RET.SUCC) {
-						$$alert(
-						      'Code: ' + ret + '\n' +
-						      'Message: Failed to load module ' + modInfo.name
-						);
-						return;
-					}
+				require([modInfo.url], function(mod) {
 					self.dispatchEvent(self.createEvent('loadmod', {
 						originMark: self._prevMark,
 						targetMark: self._curMark,
 						originMod: $.object.clone(self._prevModInfo, true),
 						targetMod: $.object.clone(modInfo, true)
 					}));
-					self.mod[modInfo.key].handle(subReqInfo.mark, subReqInfo.fullMark, subReqInfo);
+					mod.handle(subReqInfo.mark, subReqInfo.fullMark, subReqInfo);
+				}, function(errCode) {
+					$$alert(
+						'Code: ' + errCode + '\n' +
+						'Message: Failed to load module ' + modInfo.name
+					);
 				});
 			} else if(modInfo.handler) {
 				self.dispatchEvent(self.createEvent('loadmod', {
@@ -200,100 +203,100 @@ $$.Handler = (function() {
 		}
 	});
 	
-	return Handler;
-})();
-
-(function() {
-	var _MARK_PREFIX = $$.config.get('MARK_PREFIX');
-	var _OPTION = _getOption();
-	
-	function _getOption() {
-		var m, n, opt;
-		var m = location.hash.match(/\?(.+)/);
-		opt = {};
-		if(m) {
-			m = m[1].split('&');
-			for(var i = 0, l = m.length; i < l; i++) {
-				n = m[i].split('=');
-				opt[n[0]] = n[1];
-			}
-		}
-		$$.config.set('OPTION', opt);
-		return $$.config.get('OPTION');
-	};
-	
-	var _jumpCount = 0;
-	function jump(mark) {
-		if(_jumpCount++ < 10000 || $.history.ajax.needFrame()) {
-			handler.handle(mark);
-		} else {
-			if($.history.isSupportHistoryState) {
-				location.href = '/' + mark;
-			} else {
-				location.href = '/?' + $now() + '#!' + mark;
-			}
-		}
-	};
-	
-	var handler = $extend(new $$.Handler({
-		beforeunloadmod: new $.Observer(),
-		loadmod: new $.Observer()
-	}, 'root', $$, {
-		modKeyInfoHash: $$.config.get('MOD_KEY_INFO_HASH'),
-		defaultModkey: $$.config.get('DEFAULT_MOD_KEY'),
-		markPrefix: _MARK_PREFIX
-	}), {
-		_ID: 205,
-		jump: jump
-	});
-	
 	(function() {
-		if(_OPTION['console'] == 'on') {
-			$.console.turnOn();
-		}
+		var _MARK_PREFIX = $$.config.get('MARK_PREFIX');
+		var _OPTION = _getOption();
 		
-		var pathName = location.pathname.replace(/^\//, '');
-		var hash = location.hash.replace(/^#!\/?/, '');
-		var pathNameReqInfo = handler._getSubReqInfo(pathName);
-		var hashReqInfo = handler._getSubReqInfo(hash);
-		if($.history.isSupportHistoryState) {
-			if(!pathName) {
-				if(hashReqInfo.modInfo) {
-					history.replaceState(null, document.title, '/' + hash);
+		function _getOption() {
+			var m, n, opt;
+			var m = location.hash.match(/\?(.+)/);
+			opt = {};
+			if(m) {
+				m = m[1].split('&');
+				for(var i = 0, l = m.length; i < l; i++) {
+					n = m[i].split('=');
+					opt[n[0]] = n[1];
 				}
-			} else if(!pathNameReqInfo.modInfo && hashReqInfo.modInfo) {
-				history.replaceState(null, document.title, '/' + hash);
 			}
-		} else if(!hashReqInfo.modInfo && pathNameReqInfo.modInfo) {
-			location.hash = '!' + pathName;
-		}
+			$$.config.set('OPTION', opt);
+			return $$.config.get('OPTION');
+		};
 		
-		$$.ui.init();
-		$.Event.addListener(document.body, 'click', function(e) {
-			var el = $.Event.getTarget(e);
-			var pathName, hash;
-			if(el.tagName == 'A') {
-				pathName = el.pathname.replace(/^\//, '');
-				hash = el.hash.replace(/^#/, '');
-				if(el.target) {
-					return;
-				}
-				if(pathName.indexOf(_MARK_PREFIX) !== 0) {
-					return;
-				}
-				if(pathName == handler.getCurrentMark() && hash) {
-					return;
-				}
-				$.Event.preventDefault(e);
-				if(!$.history.isSupportHistoryState && location.pathname.replace(/^\//, '')) {
-					location.href = '/#!' + pathName;
+		var _jumpCount = 0;
+		function jump(mark) {
+			if(_jumpCount++ < 10000 || ajaxHistory.needFrame()) {
+				handler.handle(mark);
+			} else {
+				if(ajaxHistory.isSupportHistoryState()) {
+					location.href = '/' + mark;
 				} else {
-					jump(pathName);
+					location.href = '/?' + $now() + '#!' + mark;
 				}
 			}
+		};
+		
+		var handler = $extend(new Handler({
+			beforeunloadmod: new $.Observer(),
+			loadmod: new $.Observer()
+		}, 'root', Handler, {
+			modKeyInfoHash: $$.config.get('MOD_KEY_INFO_HASH'),
+			defaultModkey: $$.config.get('DEFAULT_MOD_KEY'),
+			markPrefix: _MARK_PREFIX
+		}), {
+			_ID: 205,
+			jump: jump
 		});
 		
-		$.history.ajax.setListener(handler.handle, handler);
-		$.history.ajax.init({cacheSize: 1000});
+		(function() {
+			if(_OPTION['console'] == 'on') {
+				$.console.turnOn();
+			}
+			
+			var pathName = location.pathname.replace(/^\//, '');
+			var hash = location.hash.replace(/^#!\/?/, '');
+			var pathNameReqInfo = handler._getSubReqInfo(pathName);
+			var hashReqInfo = handler._getSubReqInfo(hash);
+			if(ajaxHistory.isSupportHistoryState()) {
+				if(!pathName) {
+					if(hashReqInfo.modInfo) {
+						history.replaceState(null, document.title, '/' + hash);
+					}
+				} else if(!pathNameReqInfo.modInfo && hashReqInfo.modInfo) {
+					history.replaceState(null, document.title, '/' + hash);
+				}
+			} else if(!hashReqInfo.modInfo && pathNameReqInfo.modInfo) {
+				location.hash = '!' + pathName;
+			}
+			
+			$$.ui.init();
+			$.Event.addListener(document.body, 'click', function(e) {
+				var el = $.Event.getTarget(e);
+				var pathName, hash;
+				if(el.tagName == 'A') {
+					pathName = el.pathname.replace(/^\//, '');
+					hash = el.hash.replace(/^#/, '');
+					if(el.target) {
+						return;
+					}
+					if(pathName.indexOf(_MARK_PREFIX) !== 0) {
+						return;
+					}
+					if(pathName == handler.getCurrentMark() && hash) {
+						return;
+					}
+					$.Event.preventDefault(e);
+					if(!ajaxHistory.isSupportHistoryState() && location.pathname.replace(/^\//, '')) {
+						location.href = '/#!' + pathName;
+					} else {
+						jump(pathName);
+					}
+				}
+			});
+			
+			ajaxHistory.setListener(handler.handle, handler);
+			ajaxHistory.init({cacheSize: 1000});
+		})();
 	})();
-})();
+	
+	return Handler;
+});
