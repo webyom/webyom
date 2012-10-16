@@ -112,4 +112,3 @@ define(function(require) {
 	
 	return Mask;
 });
-

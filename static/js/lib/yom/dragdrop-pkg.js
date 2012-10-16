@@ -217,7 +217,6 @@ define('yom/draggable', ['require', 'yom/core-pkg'], function(require, YOM) {
 	
 	return Draggable;
 });
-
 /**
  * @class YOM.dragdrop.Droppable
  */
@@ -443,7 +442,6 @@ define('yom/droppable', ['require', 'yom/core-pkg'], function(require, YOM) {
 	
 	return Droppable;
 });
-
 /**
  * @class YOM.dragdrop.Sortable
  */
@@ -738,7 +736,6 @@ define('yom/sortable', ['require', 'yom/core-pkg'], function(require, YOM) {
 	
 	return Sortable;
 });
-
 /**
  * @class YOM.dragdrop.Resizeable
  */
@@ -1035,7 +1032,6 @@ define('yom/resizeable', ['require', 'yom/core-pkg'], function(require, YOM) {
 	
 	return Resizeable;
 });
-
 /**
  * @namespace YOM.dragdrop
  */
@@ -1047,4 +1043,3 @@ define(function(require) {
 		'Resizeable': require('yom/resizeable')
 	};
 });
-

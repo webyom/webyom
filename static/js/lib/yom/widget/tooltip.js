@@ -349,4 +349,3 @@ define(function(require) {
 	
 	return Tooltip;
 });
-

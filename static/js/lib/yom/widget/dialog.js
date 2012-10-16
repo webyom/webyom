@@ -450,4 +450,3 @@ define(function(require) {
 	
 	return Dialog;
 });
-

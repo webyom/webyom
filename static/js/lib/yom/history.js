@@ -179,4 +179,3 @@ define(function(require) {
 		isSupportHistoryState: isSupportHistoryState
 	};
 });
-

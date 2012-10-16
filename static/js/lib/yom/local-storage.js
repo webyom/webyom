@@ -343,4 +343,3 @@ define(function(require) {
 		clear: clear
 	};
 });
-

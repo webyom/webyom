@@ -49,7 +49,6 @@ define('yom/config', [], function() {
 		domain: t.slice(l - 2, l).join('.')
 	};
 });
-
 /**
  * @class YOM.Error
  */
@@ -122,7 +121,6 @@ define('yom/browser', [], function() {
 		}
 	};
 });
-
 /**
  * @namespace YOM.string
  */
@@ -412,7 +410,6 @@ define('yom/chunker', ['require'], function(require) {
 	
 	return Chunker;
 });
-
 /**
  * @class YOM.Class
  */
@@ -460,7 +457,6 @@ define('yom/class', ['require'], function(require) {
 	
 	return Class;
 });
-
 
 /**
  * @class YOM.HashArray
@@ -653,7 +649,6 @@ define('yom/hash-array', [], function() {
 	
 	return HashArray;
 });
-
 /**
  * @class YOM.InstanceManager
  */
@@ -723,7 +718,6 @@ define('yom/instance-manager', ['require'], function(require) {
 	
 	return InstanceManager;
 });
-
 // This source code is free for use in the public domain.
 // NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
 
@@ -1074,7 +1068,6 @@ define('yom/json', ['require'], function(require) {
 		}
 	};
 });
-
 /**
  * @class YOM.Element
  */
@@ -1924,7 +1917,6 @@ define('yom/element', ['require'], function(require) {
 	
 	return Element;
 });
-
 /**
  * YOM.Element FX extention, inspired by KISSY
  */
@@ -2372,7 +2364,6 @@ define('yom/event-delegator', ['require'], function(require) {
 	
 	return Delegator;
 });
-
 /**
  * @class YOM.Event.VirtualEventHandler
  */
@@ -2442,7 +2433,6 @@ define('yom/event-virtual-handler', ['require'], function(require) {
 	
 	return VirtualEventHandler;
 });
-
 /**
  * @class YOM.Event.MouseenterEventHandler
  */
@@ -2483,7 +2473,6 @@ define('yom/event-mouseenter', ['require'], function(require) {
 	
 	return MouseenterEventHandler;
 });
-
 /**
  * @class YOM.Event.MouseleaveEventHandler
  */
@@ -2524,7 +2513,6 @@ define('yom/event-mouseleave', ['require'], function(require) {
 	
 	return MouseleaveEventHandler;
 });
-
 /**
  * @namespace YOM.cookie
  */
@@ -2720,7 +2708,6 @@ define('yom/xhr', ['require'], function(require) {
 	
 	return Xhr;
 });
-
 /**
  * @class YOM.CrossDomainPoster
  */
@@ -2904,7 +2891,6 @@ define('yom/cross-domain-poster', ['require'], function(require) {
 	
 	return CrossDomainPoster;
 });
-
 /**
  * @namespace YOM.pos
  */
@@ -3032,7 +3018,6 @@ define('yom/util', ['require'], function(require) {
 		}
 	};
 });
-
 /**
  * @class YOM.JsLoader
  */
@@ -3426,7 +3411,6 @@ define('yom/tmpl', ['require'], function(require) {
 		renderId: renderId
 	};
 });
-
 /**
  * @namespace YOM.console
  */
@@ -3870,7 +3854,6 @@ define('yom/transition', [], function() {
 		}
 	};
 });
-
 /**
  * Inspired by KISSY
  * @class YOM.Tween
@@ -4233,14 +4216,12 @@ define('yom/tween', ['require'], function(require) {
 	
 	return Tween;
 });
-
 /**
  * @namespace
  */
 define('yom/widget', [], {
 	_ID: 128
 });
-
 /**
  * @namespace
  */
@@ -4361,4 +4342,3 @@ var $getUniqueId = $getUniqueId || (function() {
 		return 'YOM_UNIQUE_ID_' + _count++;	
 	};
 })();
-
