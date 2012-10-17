@@ -26,7 +26,15 @@ define('main/storage', ['require'], function(require) {
 	
 	function remove(key, cb) {
 		_do(function(ls) {
-			ls.clear(key, {proxy: 1, callback: function(res) {
+			ls.remove(key, {proxy: 1, callback: function(res) {
+				cb && cb(res);
+			}});
+		});
+	};
+	
+	function clear(cb) {
+		_do(function(ls) {
+			ls.clear({proxy: 1, callback: function(res) {
 				cb && cb(res);
 			}});
 		});
@@ -52,6 +60,7 @@ define('main/storage', ['require'], function(require) {
 		get: get,
 		set: set,
 		remove: remove,
+		clear: clear,
 		doUnlessKey: doUnlessKey
 	};
 });
