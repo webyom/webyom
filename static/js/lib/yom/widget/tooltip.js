@@ -29,8 +29,6 @@ define(function(require) {
 	 * opt.zIndex - zIndex of tooltip
 	 * opt.content - content of the tooltip
 	 * opt.tmpl - customized tmpl
-	 * opt.fx - indicate use tween effect to show or hide, "fade" value indicate use fade effect
-	 * opt.fxDuration - duration of tween effect
 	 * opt.noCloseBtn - set "ture" to hide the close btn
 	 * opt.beforeClose - callback function before dialog close, return "false" to cancel the close
 	 * opt.focus - the css query string of focus element
@@ -312,12 +310,16 @@ define(function(require) {
 
 		/**
 		 * @param {Object} opt
+		 * opt.fx - indicate use tween effect to show or hide, "fade" value indicate use fade effect
+		 * opt.fxDuration - duration of tween effect
 		 * opt.closeTimeout - auto close when timeout
 		 */
 		popup: function(opt) {
 			opt = opt || {};
 			var self = this;
 			var thisOpt = this._opt;
+			var fx = this._fx = opt.fx;
+			var fxDuration = this._fxDuration =  opt.fxDuration || _FX_DURATION;
 			if(!this._el) {
 				return this;
 			}
@@ -325,16 +327,16 @@ define(function(require) {
 			this._closed = 0;
 			this._show(opt.width, opt.height);
 			this._locate(opt);
-			if(this._fx == 'fade') {
-				this._el.fadeIn(this._fxDuration, function() {
+			if(fx == 'fade') {
+				this._el.fadeIn(fxDuration, function() {
 					self.focus();
 				});
-			} else if(this._fx == 'slide' && this._height > 0) {
-				this._el.slideDown(this._fxDuration, function() {
+			} else if(fx == 'slide' && this._height > 0) {
+				this._el.slideDown(fxDuration, function() {
 					self.focus();
 				});
-			} else if(this._fx && this._width > 0 && this._height > 0) {
-				this._el.fxShow(this._fxDuration, function() {
+			} else if(fx && this._width > 0 && this._height > 0) {
+				this._el.fxShow(fxDuration, function() {
 					self.focus();
 				});
 			} else {
@@ -345,7 +347,15 @@ define(function(require) {
 			return this;	
 		},
 		
-		close: function() {
+		/**
+		 * @param {Object} opt
+		 * opt.fx - indicate use tween effect to show or hide, "fade" value indicate use fade effect
+		 * opt.fxDuration - duration of tween effect
+		 */
+		close: function(opt) {
+			opt = opt || {};
+			var fx = opt.fx != undefined ? opt.fx : this._fx;
+			var fxDuration = opt.fxDuration || this._fxDuration || _FX_DURATION;
 			if(this.isClosed() || !this._el) {
 				return this;
 			}
@@ -360,16 +370,16 @@ define(function(require) {
 			}
 			clearTimeout(this._closeToRef);
 			var self = this;
-			if(this._fx == 'fade') {
-				this._el.fadeOut(this._fxDuration, function() {
+			if(fx == 'fade') {
+				this._el.fadeOut(fxDuration, function() {
 					self._hide();
 				});
-			} else if(this._fx == 'slide' && this._height > 0) {
-				this._el.slideUp(this._fxDuration, function() {
+			} else if(fx == 'slide' && this._height > 0) {
+				this._el.slideUp(fxDuration, function() {
 					self._hide();
 				});
-			} else if(this._fx && this._width > 0 && this._height > 0) {
-				this._el.fxHide(this._fxDuration, function() {
+			} else if(fx && this._width > 0 && this._height > 0) {
+				this._el.fxHide(fxDuration, function() {
 					self._hide();
 				});
 			} else {

@@ -154,7 +154,6 @@ define('main/tooltip', ['require', 'yom/core-pkg'], function(require, $) {
 			keepAlive: true,
 			content: '',
 			zIndex: opt.zIndex || 99,
-			fx: 'slide',
 			beforeClose: function() {
 				setTimeout(function() {
 					_guidePool.length && _showGuide(_guidePool.shift());
@@ -162,6 +161,7 @@ define('main/tooltip', ['require', 'yom/core-pkg'], function(require, $) {
 			}
 		});
 		_guideTooltip.setContent(opt.content).popup({
+			fx: opt.fx || 'slide',
 			pos: opt.pos,
 			direction: opt.direction,
 			closeTimeout: opt.closeTimeout,
@@ -204,14 +204,30 @@ define('main/tooltip', ['require', 'yom/core-pkg'], function(require, $) {
 			}
 			toRef = setTimeout(function() {
 				require(['yom/widget/tooltip'], function(Tooltip) {
+					var opt = {};
+					txt = txt.replace((/^\[([^\]]+?)\]/), function(m, c) {
+						c = c.split(',');
+						$.array.each(c, function(item) {
+							var key, val;
+							item = item.split(':');
+							key = $.string.trim(item[0]);
+							val = $.string.trim(item[1]);
+							if(!key) {
+								return;
+							}
+							opt[key] = val;
+						});
+						return '';
+					});
 					toolTip = toolTip || new Tooltip({
 						content: '',
 						zIndex: 999,
-						fx: 'fade',
 						noCloseBtn: true,
 						keepAlive: true
 					});
 					toolTip.setContent(txt).popup({
+						direction: opt.direction,
+						fx: opt.fx || 'fade',
 						pos: pos,
 						offset: {L: {x: -10, y: -15}, B: {x: -15, y: 30}, T: {x: -15, y: -15}}
 					});
