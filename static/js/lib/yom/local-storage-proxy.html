@@ -5,25 +5,39 @@
 <title>YOM LocalStorage Proxy Page</title>
 </head>
 <body>
-<script type="text/javascript" src="../../require-config.js"></script>
-<script type="text/javascript" src="require.js"></script>
 <script type="text/javascript">
-var ls = parent.require('yom/local-storage');
-var localStorageProxyPull = function() {
-	var queue = frameElement._queue;
-	if(!queue) {
-		return;
-	}
-	while(queue.length) {
-		(function(p) {
-			setTimeout(function() {
-				ls._do(p[0], null, p[1]);
-			}, 0);
-		})(queue.shift());
+var require = {
+	baseUrl: 'http://www.webyom.org/static/js',
+	path: {
+		'yom': 'lib/yom'
+	},
+	shim: {
+		'yom/inc/sizzle': {
+			exports: 'Sizzle'
+		}
 	}
 };
-localStorageProxyPull();
-frameElement._loaded = 1;
+</script>
+<script type="text/javascript" src="require.js"></script>
+<script type="text/javascript">
+var localStorageProxyPull;
+require(['yom/core-pkg', 'yom/local-storage'], function(YOM, ls) {
+	localStorageProxyPull = function() {
+		var queue = frameElement._queue;
+		if(!queue) {
+			return;
+		}
+		while(queue.length) {
+			(function(p) {
+				setTimeout(function() {
+					ls._do(p[0], null, p[1]);
+				}, 0);
+			})(queue.shift());
+		}
+	};
+	localStorageProxyPull();
+	frameElement._loaded = 1;
+});
 </script>
 </body>
 </html>

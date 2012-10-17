@@ -4335,10 +4335,7 @@ function $now() {
 
 function $empty() {};
 
-var $getUniqueId = $getUniqueId || (function() {
-	var _count = 0;
-	
-	return function getUniqueId() {
-		return 'YOM_UNIQUE_ID_' + _count++;	
-	};
-})();
+var _yom_unique_id_count = 0;
+function $getUniqueId() {
+	return 'YOM_UNIQUE_ID_' + _yom_unique_id_count++;	
+};
