@@ -96,8 +96,8 @@ define(function(require) {
 			}, Math.max(_MIN_CLOSE_TIMEOUT, timeout));
 		},
 		
-		_show: function() {
-			this._el.setStyle({left: '0px', top: '-9999px', width: 'auto', height: 'auto'}).show();	
+		_show: function(w, h) {
+			this._el.setStyle({left: '0px', top: '-9999px', width: w > 0 ? w + 'px' : 'auto', height: h > 0 ? h + 'px' : 'auto'}).show();	
 		},
 		
 		_hide: function() {
@@ -165,29 +165,44 @@ define(function(require) {
 		_locate: function(opt) {
 			opt = opt || {};
 			var wrapper = this._el;
-			var width;
-			var height;
 			var pos = opt.pos;
 			var offset = opt.offset || {};
 			offset.L = offset.L || {};
+			offset.L.x = offset.L.x || 0;
+			offset.L.y = offset.L.y || 0;
 			offset.R = offset.R || {};
+			offset.R.x = offset.R.x || 0;
+			offset.R.y = offset.R.y || 0;
 			offset.T = offset.T || {};
+			offset.T.x = offset.T.x || 0;
+			offset.T.y = offset.T.y || 0;
 			offset.B = offset.B || {};
+			offset.B.x = offset.B.x || 0;
+			offset.B.y = offset.B.y || 0;
 			var direction = _DIRECTION_HASH[opt.direction];
 			var docSize = YOM.Element.getDocSize();
 			var viewRect = YOM.Element.getViewRect();
 			var wrapperRect = wrapper.getRect();
-			var target;
-			var targetRect;
+			var wrapperResized = false;
+			var width, height, target, targetRect, spaceL, spaceR, spaceT, spaceB, arrow;
 			if(pos) {
 				if(!direction) {
-					if(docSize.width - pos.x < wrapperRect.width + Math.max(offset.T.x || 0, offset.B.x || 0) && pos.x > wrapperRect.width - (offset.L.x || 0)) {
-						direction = 'L';
-						
-					} else if(viewRect.bottom - pos.y < pos.y - viewRect.top) {
-						direction = 'TT';
-					} else {
-						direction = 'B';
+					spaceL = pos.x - viewRect.left;
+					spaceR = viewRect.right - pos.x;
+					spaceT = pos.y - viewRect.top;
+					spaceB = viewRect.bottom - pos.y;
+					if(spaceL > spaceR) {//left space is bigger
+						if(spaceT > spaceB && pos.x + wrapperRect.width + offset.T.x <= viewRect.right && pos.y - wrapperRect.height + offset.T.y >= viewRect.top) {
+							direction = 'TT';//fixed
+						} else {
+							direction = 'L';
+						}
+					} else {//right space is bigger
+						if(spaceT > spaceB && pos.x + wrapperRect.width + offset.T.x <= viewRect.right && pos.y - wrapperRect.height + offset.T.y >= viewRect.top) {
+							direction = 'TT';//fixed
+						} else {
+							direction = 'B';
+						}
 					}
 				}
 			} else {
@@ -205,63 +220,89 @@ define(function(require) {
 				} else if(direction == 'B') {
 					pos = {x: targetRect.left, y: targetRect.bottom};
 				} else {
-					if(docSize.width - targetRect.left < wrapperRect.width + Math.max(offset.T.x || 0, offset.B.x || 0) && targetRect.left > wrapperRect.width - (offset.L.x || 0)) {
-						pos = {x: targetRect.left, y: targetRect.top};
-						direction = 'L';
-						
-					} else if(viewRect.bottom - targetRect.bottom < targetRect.top - viewRect.top) {
-						pos = {x: targetRect.left, y: targetRect.top};
-						direction = 'TT';
-					} else {
-						pos = {x: targetRect.left, y: targetRect.bottom};
-						direction = 'B';
+					spaceL = targetRect.left - viewRect.left;
+					spaceR = viewRect.right - targetRect.left;
+					spaceT = targetRect.top - viewRect.top;
+					spaceB = viewRect.bottom - targetRect.bottom;					
+					if(spaceL > spaceR) {//left space is bigger
+						if(spaceT > spaceB && targetRect.left + wrapperRect.width + offset.T.x <= viewRect.right && targetRect.top - wrapperRect.height + offset.T.y >= viewRect.top) {
+							pos = {x: targetRect.left, y: targetRect.top};
+							direction = 'TT';//fixed
+						} else {
+							pos = {x: targetRect.left, y: targetRect.top};
+							direction = 'L';
+						}
+					} else {//right space is bigger
+						if(spaceT > spaceB && targetRect.left + wrapperRect.width + offset.T.x <= viewRect.right && targetRect.top - wrapperRect.height + offset.T.y >= viewRect.top) {
+							pos = {x: targetRect.left, y: targetRect.top};
+							direction = 'TT';//fixed
+						} else {
+							pos = {x: targetRect.left, y: targetRect.bottom};
+							direction = 'B';
+						}
 					}
 				}
 			}
-			if(direction == 'L' && !(opt.width > 0)) {
-				width = Math.min(pos.x + (offset.L.x || 0), wrapperRect.width);
-			} else if(direction == 'TT' && !(opt.height > 0)) {
-				width = Math.min(docSize.width - pos.x - (offset.T.x || 0), wrapperRect.width);
-				wrapper.setStyle({
-					width: width + 'px'
-				});
-				wrapperRect = wrapper.getRect();
-				if(pos.y + (offset.T.y || 0) < wrapperRect.height) {
-					direction = 'B';
-					if(targetRect) {
-						pos = {x: targetRect.left, y: targetRect.bottom};
+			if(!(opt.width > 0) && !(opt.height > 0)) {//adjust wrapper rect if width and height are not specified
+				if(direction == 'L') {
+					if(pos.x < wrapperRect.width - offset.L.x) {
+						wrapper.setStyle({
+							width: (pos.x + offset.L.x) + 'px'
+						});
+						wrapperResized = true;
+					}
+				} else if(direction == 'T') {
+					if(pos.y < wrapperRect.height - offset.T.y) {
+						wrapper.setStyle({
+							height: (pos.y + offset.T.y) + 'px'
+						});
+						wrapperResized = true;
+					}
+				} else if(direction == 'R' || direction == 'B') {
+					if(pos.x + wrapperRect.width + offset[direction].x > docSize.width) {
+						wrapper.setStyle({
+							width: (docSize.width - pos.x - offset[direction].x) + 'px'
+						});
+						wrapperResized = true;
 					}
 				}
+				if(wrapperResized) {
+					wrapperRect = wrapper.getRect();
+				}
 			}
-			width = width || (opt.width > 0 ? opt.width : wrapperRect.width);
-			height = height || (opt.height > 0 ? opt.height : wrapperRect.height);
-			wrapper.setStyle({
-				width: width + 'px',
-				height: height + 'px'
-			});
-			var arrow = wrapper.find('[data-type="yom-tooltip-arrow"]').get();
+			width = opt.width > 0 ? opt.width : wrapperRect.width;
+			height = opt.height > 0 ? opt.height : wrapperRect.height;
+			arrow = wrapper.find('[data-type="yom-tooltip-arrow"]').get();
 			if(direction == 'L') {
 				wrapper.setStyle({
-					left: (pos.x - width) + (offset.L.x || 0) + 'px',
-					top: pos.y + (offset.L.y || 0) + 'px'
+					width: width + 'px',
+					height: height + 'px',
+					left: (pos.x - width) + offset.L.x + 'px',
+					top: pos.y + offset.L.y + 'px'
 				});
 				arrow.className = 'yom-tooltip-arrow-rt';
 			} else if(direction == 'R') {
 				wrapper.setStyle({
-					left: pos.x + (offset.R.x || 0) + 'px',
-					top: pos.y + (offset.R.y || 0) + 'px'
+					width: width + 'px',
+					height: height + 'px',
+					left: pos.x + offset.R.x + 'px',
+					top: pos.y + offset.R.y + 'px'
 				});
 				arrow.className = 'yom-tooltip-arrow-lt';
 			} else if(direction == 'T' || direction == 'TT') {
 				wrapper.setStyle({
-					left: pos.x + (offset.T.x || 0) + 'px',
-					top: (pos.y - height) + (offset.T.y || 0) + 'px'
+					width: width + 'px',
+					height: height + 'px',
+					left: pos.x + offset.T.x + 'px',
+					top: (pos.y - height) + offset.T.y + 'px'
 				});
 				arrow.className = 'yom-tooltip-arrow-bl';
 			} else {
 				wrapper.setStyle({
-					left: pos.x + (offset.B.x || 0) + 'px',
-					top: pos.y + (offset.B.y || 0) + 'px'
+					width: width + 'px',
+					height: height + 'px',
+					left: pos.x + offset.B.x + 'px',
+					top: pos.y + offset.B.y + 'px'
 				});
 				arrow.className = 'yom-tooltip-arrow-tl';
 			}
@@ -282,7 +323,7 @@ define(function(require) {
 			}
 			clearTimeout(this._closeToRef);
 			this._closed = 0;
-			this._show();
+			this._show(opt.width, opt.height);
 			this._locate(opt);
 			if(this._fx == 'fade') {
 				this._el.fadeIn(this._fxDuration, function() {

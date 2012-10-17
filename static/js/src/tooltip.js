@@ -25,7 +25,7 @@ define('main/tooltip', ['require', 'yom/core-pkg'], function(require, $) {
 		_guideTooltip = _guideTooltip || new YOM.widget.Tooltip({
 			keepAlive: true,
 			content: '',
-			zIndex: 999,
+			zIndex: opt.zIndex || 99,
 			fx: 'slide',
 			beforeClose: function() {
 				setTimeout(function() {
