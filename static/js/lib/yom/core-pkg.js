@@ -4038,7 +4038,7 @@ define('yom/tween', ['require'], function(require) {
 		this._originStyle = _getOriginStyle(this._el, this._targetStyle, opt.origin.style);
 		this._targetProp = _getProp(opt.target.prop);
 		this._originProp = _getOriginProp(this._el, this._targetProp, opt.origin.prop);
-		this._transition = YOM.transition[opt.transition] || opt.transition || YOM.transition['linear'];
+		this._transition = YOM.transition[opt.transition] || opt.transition || YOM.transition['easeOut'];
 		this._complete = opt.complete || $empty;
 		this._timer = null;
 		this._status = _STATUS.INIT;
@@ -4116,7 +4116,7 @@ define('yom/tween', ['require'], function(require) {
 		var self = this;
 		var originStyle = this._originStyle;
 		var targetStyle = this._targetStyle;
-		var timingFunction = YOM.transition.css[this._opt.transition] || this._opt.transition || YOM.transition.css['linear'];
+		var timingFunction = YOM.transition.css[this._opt.transition] || YOM.transition.css['easeOut'];
 		var tVal;
 		for(prop in originStyle) {
 			tVal = originStyle[prop];

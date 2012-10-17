@@ -360,18 +360,41 @@ define(function(require) {
 		popup: function() {
 			var self = this;
 			var opt = this._opt;
+			var fx = this._fx;
+			var elTop, elRect, viewRect, docSize, oStyle;
 			if(!this._el) {
 				return this;
 			}
 			clearTimeout(this._closeToRef);
 			this._closed = 0;
 			this._show();
-			if(this._fx == 'fade') {
+			if(fx == 'fade') {
 				this.resize(opt.width, opt.height);
 				this._el.fadeIn(this._fxDuration, function() {
 					self.focus();
 				});
-			} else if(this._fx) {
+			} else if(fx == 'slideDown' || fx == 'slideUp') {
+				this.resize(opt.width, opt.height);
+				elTop = this._el.getStyle('top');
+				elRect = this._el.getRect();
+				viewRect = YOM.Element.getViewRect();
+				docSize = YOM.Element.getDocSize();
+				oStyle = {top: Math.min(docSize.height - elRect.height, parseInt(elTop) + (fx == 'slideUp' ? viewRect.height : -viewRect.height) / 2) + 'px', opacity: '0'};
+				this._el.setStyle(oStyle);
+				this._el.tween(this._fxDuration, {
+					origin: {
+						style: oStyle
+					},
+					target: {
+						style: {top: elTop, opacity: '1'}
+					},
+					complete: function() {
+						self.focus();
+					}
+				});
+			} else if(fx) {
+				self.resize(_INIT_WIDTH, _INIT_HEIGHT);
+				self._el.setStyle('opacity', '0');
 				YOM.Tween.setTimer($empty, this._fxDuration, function(percent) {
 					var w = _INIT_WIDTH + (opt.width - _INIT_WIDTH) * percent;
 					var h = _INIT_HEIGHT + (opt.height - _INIT_HEIGHT) * percent;
@@ -391,6 +414,8 @@ define(function(require) {
 		},
 		
 		close: function() {
+			var fx = this._fx;
+			var elTop, elRect, viewRect, docSize;
 			if(this.isClosed() || !this._el) {
 				return this;
 			}
@@ -405,11 +430,27 @@ define(function(require) {
 			}
 			clearTimeout(this._closeToRef);
 			var self = this;
-			if(this._fx == 'fade') {
+			if(fx == 'fade') {
 				this._el.fadeOut(this._fxDuration, function() {
 					self._hide();
 				});
-			} else if(this._fx) {
+			} else if(fx == 'slideDown' || fx == 'slideUp') {
+				elTop = this._el.getStyle('top');
+				elRect = this._el.getRect();
+				viewRect = YOM.Element.getViewRect();
+				docSize = YOM.Element.getDocSize();
+				this._el.tween(this._fxDuration, {
+					origin: {
+						style: {top: elTop, opacity: '1'}
+					},
+					target: {
+						style: {top: Math.min(docSize.height - elRect.height, parseInt(elTop) + (fx == 'slideUp' ? -viewRect.height : viewRect.height) / 2) + 'px', opacity: '0'}
+					},
+					complete: function() {
+						self._hide();
+					}
+				});
+			} else if(fx) {
 				var wrapper = this._el;
 				var width = this._width;
 				var height = this._height;

@@ -597,7 +597,7 @@ define('main/util', ['require', 'yom/core-pkg'], function(require, $) {
 				contentPadding: 10,
 				dragHandles: '[data-type="yom-dialog-footer"]',
 				focus: '[data-type="yom-dialog-footer"] button',
-				fx: 'fade',
+				fx: 'slideUp',
 				tips: opt.closeTimeout > 0 ? '{{s}} seconds to close. {{c:cancel}}' : '',
 				btns: opt.noBtn ? null : [
 					{text: 'Close', className: 'strong', click: function() {
@@ -616,7 +616,7 @@ define('main/util', ['require', 'yom/core-pkg'], function(require, $) {
 				contentPadding: 10,
 				dragHandles: '[data-type="yom-dialog-footer"]',
 				focus: '[data-type="yom-dialog-footer"] button',
-				fx: 'fade',
+				fx: 'slideUp',
 				btns: [
 					{text: 'Yes', className: 'strong', click: function() {
 						_closeDialog(this);
