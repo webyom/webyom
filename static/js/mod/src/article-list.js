@@ -36,7 +36,7 @@ define('mod/article-list', ['require', 'yom/core-pkg', 'yom/history', 'main-pkg'
 		'</div></div>'
 	].join('');
 	
-	var _cssList = ['/static/inc/prettify/prettify.css'];
+	var _cssList = ['/static/js/lib/prettify/prettify.css'];
 	
 	var Handler = function(observers, modName, parent, opt) {
 		Handler.superClass.constructor.apply(this, $.array.getArray(arguments));

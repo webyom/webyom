@@ -2531,7 +2531,7 @@ define('yom/cookie', [], {
 	
 	get: function(name) {
 		var r = new RegExp('(?:^|;\\s*)' + name + '=([^;]*)'), m = document.cookie.match(r);
-		return m && m[1];
+		return m && m[1] || '';
 	},
 	
 	del: function(name, domain, path) {

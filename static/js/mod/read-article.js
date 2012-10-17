@@ -59,7 +59,7 @@ define('mod/read-article', ['require', 'yom/core-pkg', 'yom/history', 'main-pkg'
 		'<a id="commentsEnd"></a>'
 	].join('');
 	
-	var _cssList = ['/static/inc/prettify/prettify.css', '/static/css/form.css'];
+	var _cssList = ['/static/js/lib/prettify/prettify.css', '/static/css/form.css'];
 	var _sortable = null;
 	
 	function _bindEvent(aid) {
