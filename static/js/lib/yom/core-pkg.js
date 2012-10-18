@@ -4041,6 +4041,7 @@ define('yom/tween', ['require'], function(require) {
 		this._transition = YOM.transition[opt.transition] || opt.transition || YOM.transition['easeOut'];
 		this._complete = opt.complete || $empty;
 		this._timer = null;
+		this._startTime = null;
 		this._status = _STATUS.INIT;
 		this._id = _im.add(this);
 		return this;
@@ -4162,6 +4163,7 @@ define('yom/tween', ['require'], function(require) {
 		var targetProp = this._targetProp;
 		var originProp = this._originProp;
 		var prop, oVal, tVal;
+		this._startTime = $now();
 		if(this._css) {
 			this._cssTween();
 		} else {
@@ -4186,23 +4188,36 @@ define('yom/tween', ['require'], function(require) {
 					self._el.setProp(prop, tVal.f(oVal.v, tVal.v, percent) + tVal.u);
 				}
 				if(percent === 1) {
-					self.stop();
+					self.stop(true);
 				}
 			}, this._transition);
 		}
 		return 0;
 	};
 	
-	Tween.prototype.stop = function() {
+	Tween.prototype.stop = function(_finished) {
 		if(this._status == _STATUS.STOPPED) {
 			return;
 		}
 		var el = this._el;
 		var status = this._status;
+		var tVal, oVal, percent;
 		if(this._css) {
+			clearTimeout(this._timer);
 			this._el.restoreStyle(this._css + '-duration');
 			this._el.restoreStyle(this._css + '-timing-function');
-			clearTimeout(this._timer);
+			if(!_finished) {
+				percent = ($now() - this._startTime) / this._duration;
+				percent = Math.min(this._transition(percent), 1);
+				for(prop in this._targetStyle) {
+					tVal = this._targetStyle[prop];
+					oVal = this._originStyle[prop];
+					if(oVal.u != tVal.u) {
+						oVal.v = 0;
+					}
+					this._el.setStyle(prop, tVal.f(oVal.v, tVal.v, percent) + tVal.u);
+				}
+			}
 		} else {
 			_cancelAnimationFrame(this._timer);
 		}

@@ -583,7 +583,9 @@ define('main/util', ['require', 'yom/core-pkg'], function(require, $) {
 		function popup(opt) {
 			require(['yom/widget/mask', 'yom/widget/dialog'], function(Mask, Dialog) {
 				_init();
-				new Dialog(opt).popup();
+				new Dialog(opt).popup({
+					fx: 'slideDown'
+				});
 			});
 		};
 		

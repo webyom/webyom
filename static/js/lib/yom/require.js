@@ -720,8 +720,8 @@ var define, require;
 			}
 			sourceConf = config.source[_getSourceName(id)];
 			def = _defined[id];
-			if(def) {
-				return {inst: def, loader: def.getLoader()};
+			if(def) {//reserved
+				return {inst: def, load: {loader: def.getLoader(), id: id, nrmId: id, config: config}};
 			}
 			conf = _extendConfig(['charset', 'baseUrl', 'path', 'shim', 'urlArgs'], config, sourceConf);
 			nrmId = _normalizeId(id, context.base, conf.path);
@@ -751,9 +751,9 @@ var define, require;
 			callArgs = new Array(deps.length);
 			_each(deps, function(id, i) {
 				var def = _getDef(id);
-				if(def.inst && def.loader) {
+				if(def.load && def.load.loader) {//reserved module loader
 					callArgs[i] = def.inst.getDef(context);
-					loadList.push(def.loader);
+					loadList.push(def.load);
 				} else if(def.inst) {
 					callArgs[i] = def.inst.getDef(context);
 				} else if(def.load) {
@@ -775,8 +775,8 @@ var define, require;
 				}
 				_each(loadList, function(item, i) {
 					var hold;
-					if(_isFunction(item)) {
-						item(context, onRequire);
+					if(item.loader) {//reserved module loader
+						item.loader(context, onRequire);
 						return;
 					}
 					hold = _getHold(item.nrmId, item.config.baseUrl);
