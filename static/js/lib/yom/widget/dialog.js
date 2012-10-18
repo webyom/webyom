@@ -390,7 +390,9 @@ define(function(require) {
 					},
 					complete: function() {
 						self.focus();
-					}
+					},
+					css: true,
+					prior: true
 				});
 			} else if(fx) {
 				self.resize(_INIT_WIDTH, _INIT_HEIGHT);
@@ -448,7 +450,9 @@ define(function(require) {
 					},
 					complete: function() {
 						self._hide();
-					}
+					},
+					css: true,
+					prior: true
 				});
 			} else if(fx) {
 				var wrapper = this._el;

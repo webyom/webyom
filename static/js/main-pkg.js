@@ -286,7 +286,7 @@ define('main/ui', ['require', 'yom/core-pkg', 'main/storage', 'main/tooltip'], f
 				'</ul>'
 			].join('')
 		},
-		FOOTER : '<span>&copy;2009-2011 Webyom. Designed and Programmed by <a href="mailto:webyom@gmail.com" title="Write a mail to Gary.">Gary</a>. Powered by <a href="http://www.djangoproject.com" target="_blank">Django</a> and <a href="http://github.com/webyom/webyom-js" target="_blank">YOM</a></span><img src="/static/img/django-logo.gif" alt="Powered by Django" /><br class="clearFix" />'
+		FOOTER : '<span>&copy;2009-2011 Webyom. Designed and Programmed by <a href="mailto:webyom@gmail.com" title="Write a mail to Gary.">Gary</a>. Powered by <a href="http://www.djangoproject.com" target="_blank">Django</a> and <a href="http://github.com/webyom/yom" target="_blank">YOM</a></span><img src="/static/img/django-logo.gif" alt="Powered by Django" /><br class="clearFix" />'
 	};
 	
 	var _sortable = null;
