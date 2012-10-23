@@ -238,18 +238,33 @@ define('yom/object', ['require'], function(require) {
 			return $bind(obj, fn);
 		},
 
-		clone: function(obj, deep) {
+		clone: function(obj, deep, _level) {
 			var YOM = {
 				'array': require('yom/array')
 			};
-			if(typeof obj == 'object') {
-				var res = YOM.array.isArray(obj) ? [] : {};
-				for(var i in obj) {
-					res[i] = deep ? this.clone(obj[i], deep) : obj[i];
-				}
+			var res = obj;
+			var i, j, p;
+			deep = deep || 0;
+			_level = _level || 0;
+			if(_level > deep) {
 				return res;
 			}
-			return obj;
+			if(typeof obj == 'object' && obj) {
+				if(YOM.array.isArray(obj)) {
+					res = [];
+					for(i = 0, l = obj.length; i < l; i++) {
+						res.push(obj[i]);
+					}
+				} else {
+					res = {};
+					for(p in obj) {
+						if(this.hasOwnProperty(obj, p)) {
+							res[p] = deep ? this.clone(obj[p], deep, ++_level) : obj[p];
+						}
+					}
+				}
+			}
+			return res;
 		},
 		
 		toQueryString: function(obj) {
@@ -3416,6 +3431,7 @@ define('yom/tmpl', ['require'], function(require) {
  */
 define('yom/console', ['require'], function(require) {
 	var YOM = {
+		'Error': require('yom/error'),
 		'browser': require('yom/browser'),
 		'string': require('yom/string'),
 		'object': require('yom/object'),
@@ -3438,7 +3454,7 @@ define('yom/console', ['require'], function(require) {
 				'<div id="yomConsoleOutputBox" style="line-height: 15px;"></div>',
 				'<div>',
 					'<label for="yomConsoleInputBox" style="font-weight: bold; color: blue;">&gt;&gt;</label>',
-					'<input id="yomConsoleInputBox" type="text" style="width: 458px; border: none; font-family: Courier New, Courier, monospace;" onkeyup="if(event.keyCode === 13) {YOM.console.eval(this.value); return false;}" ondblclick="YOM.console.eval(this.value); return false;" />',
+					'<input id="yomConsoleInputBox" type="text" style="width: 458px; border: none; font-family: Courier New, Courier, monospace;" onkeyup="if(event.keyCode === 13) {require(\'yom/core-pkg\').console.eval(this.value); return false;}" ondblclick="require(\'yom/core-pkg\').console.eval(this.value); return false;" />',
 				'</div>',
 			'</div>',
 			'<div style="height: 0; line-height: 0; clear: both;">&nbsp;</div>',

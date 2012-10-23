@@ -50,9 +50,14 @@ var define, require;
 		return origin;
 	};
 	
-	function _clone(obj, deep) {
+	function _clone(obj, deep, _level) {
+		var res = obj;
+		deep = deep || 0;
+		_level = _level || 0;
+		if(_level > deep) {
+			return res;
+		}
 		if(typeof obj == 'object' && obj) {
-			var res;
 			if(_isArray(obj)) {
 				res = [];
 				_each(obj, function(item) {
@@ -62,13 +67,12 @@ var define, require;
 				res = {};
 				for(var p in obj) {
 					if(_hasOwnProperty(obj, p)) {
-						res[p] = deep ? _clone(obj[p], deep) : obj[p];
+						res[p] = deep ? _clone(obj[p], deep, ++_level) : obj[p];
 					}
 				}
 			}
-			return res;
 		}
-		return obj;
+		return res;
 	};
 	
 	function _getInteractiveScript() {
@@ -469,7 +473,7 @@ var define, require;
 	};
 	
 	function _extendConfig(props, config, ext) {
-		if(!ext) {
+		if(!ext || config == ext) {
 			return config;
 		}
 		ext.baseUrl = _getFullBaseUrl(ext.baseUrl);
@@ -485,7 +489,7 @@ var define, require;
 				waitSeconds: 30
 			};
 		} else {
-			config = _clone(config, true);
+			config = _clone(config, 1);
 		}
 		_each(props, function(p) {
 			config[p] = typeof ext[p] == 'object' ? _extend(config[p], ext[p]) : ext[p];

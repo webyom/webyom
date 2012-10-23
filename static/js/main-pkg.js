@@ -368,7 +368,6 @@ define('main/ui', ['require', 'yom/core-pkg', 'main/storage', 'main/tooltip'], f
 	};
 	
 	function init() {
-		$(document.body).show();
 		_initHeader();
 		_initContent();
 		_initFooter();

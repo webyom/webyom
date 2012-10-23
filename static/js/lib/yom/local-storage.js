@@ -241,7 +241,7 @@ define(function(require) {
 			frame = $id(frameId);
 			if(frame) {
 				frame._queue.push([action, opts]);
-				if(frame._loaded) {
+				if(frame._inited) {
 					frame.contentWindow.localStorageProxyPull();
 				}
 			} else {

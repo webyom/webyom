@@ -35,6 +35,7 @@ require(['yom/core-pkg', 'yom/local-storage'], function(YOM, ls) {
 			})(queue.shift());
 		}
 	};
+	frameElement._inited = 1;
 	localStorageProxyPull();
 });
 frameElement._loaded = 1;
