@@ -249,7 +249,9 @@ define('main/handler', ['require', 'yom/core-pkg', 'yom/history', 'main/config',
 		
 		(function() {
 			if(_OPTION['console'] == 'on') {
-				$.console.turnOn();
+				require(['yom/ext-pkg'], function($) {
+					$.console.turnOn();
+				});
 			}
 			
 			var pathName = location.pathname.replace(/^\//, '');

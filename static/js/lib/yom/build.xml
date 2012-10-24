@@ -20,7 +20,6 @@
             <path path="${src.dir}/src/core/string.js"/>
             <path path="${src.dir}/src/core/object.js"/>
             <path path="${src.dir}/src/core/array.js"/>
-            <path path="${src.dir}/src/core/chunker.js"/>
             <path path="${src.dir}/src/core/class.js"/>
             <path path="${src.dir}/src/core/hash-array.js"/>
             <path path="${src.dir}/src/core/instance-manager.js"/>
@@ -42,11 +41,16 @@
             <path path="${src.dir}/src/core/js-loader.js"/>
             <path path="${src.dir}/src/core/css.js"/>
             <path path="${src.dir}/src/core/tmpl.js"/>
-            <path path="${src.dir}/src/core/console.js"/>
             <path path="${src.dir}/src/core/transition.js"/>
             <path path="${src.dir}/src/core/tween.js"/>
             <path path="${src.dir}/src/core/widget.js"/>
             <path path="${src.dir}/src/core/core-pkg.js"/>
+        </concat>
+        
+        <concat destfile="${build.dir}/ext-pkg.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${src.dir}/src/ext/chunker.js"/>
+            <path path="${src.dir}/src/ext/console.js"/>
+            <path path="${src.dir}/src/ext/ext-pkg.js"/>
         </concat>
         
         <concat destfile="${build.dir}/dragdrop-pkg.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
