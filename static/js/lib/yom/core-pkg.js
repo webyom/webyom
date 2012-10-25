@@ -3795,7 +3795,7 @@ define('yom/tween', ['require'], function(require) {
 			this._el.setStyle(prop, tVal.v + tVal.u);
 		}
 		this._timer = setTimeout(function() {
-			self.stop();
+			self.stop(true);
 		}, this._duration);
 	};
 	

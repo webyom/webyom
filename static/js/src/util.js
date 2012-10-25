@@ -71,7 +71,7 @@ define('main/util', ['require', 'yom/core-pkg'], function(require, $) {
 		
 		function _getTopDialog() {
 			var Dialog = require('yom/widget/dialog');
-			return Dialog.getInstanceById(_dialogIdList[0]);
+			return Dialog && Dialog.getInstanceById(_dialogIdList[0]);
 		};
 		
 		function _onPopup(e) {
@@ -131,13 +131,20 @@ define('main/util', ['require', 'yom/core-pkg'], function(require, $) {
 			_init = $empty;
 		};
 		
-		function popup(opt) {
+		function popup(opt, instGetter) {
+			opt = opt || {};
+			opt.fx = typeof opt.fx == 'undefined' ? 'slideDown' : opt.fx;
 			require(['yom/widget/mask', 'yom/widget/dialog'], function(Mask, Dialog) {
 				_init();
-				new Dialog(opt).popup({
-					fx: 'slideDown'
-				});
+				(instGetter || $empty).call(null, new Dialog(opt).popup());
 			});
+		};
+		
+		function close(opt) {
+			opt = opt || {};
+			opt.fx = typeof opt.fx == 'undefined' ? 'slideDown' : opt.fx;
+			var topDialog = _getTopDialog();
+			topDialog && topDialog.close(opt);
 		};
 		
 		function alert(msg, opt) {
@@ -185,6 +192,7 @@ define('main/util', ['require', 'yom/core-pkg'], function(require, $) {
 		
 		return {
 			popup: popup,
+			close: close,
 			alert: alert,
 			confirm: confirm
 		};
