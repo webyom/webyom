@@ -1,9 +1,3 @@
-.yom-tooltip-wrapper {
-	
-}
-.yom-tooltip-outer {
-	
-}
 .yom-tooltip-inner {
 	position: relative;
 }
@@ -22,9 +16,9 @@
 	-webkit-border-radius: 2px;
 	background: #555;
 	color: #fff;
-	padding: 5px 7px;
+	padding: 7px 7px;
 	font-size: 12px;
-	line-height: 18px;
+	line-height: normal;
 }
 .yom-tooltip-content h4 {
 	color: #fff;
@@ -38,7 +32,7 @@
 .yom-tooltip-content p {
 	margin: 10px 0 0 0;
 }
-.yom-tooltip-arrow-rt, .yom-tooltip-arrow-lt, .yom-tooltip-arrow-bl, .yom-tooltip-arrow-tl {
+.yom-tooltip-arrow-outer, .yom-tooltip-arrow-inner {
 	display: block;
 	position: absolute;
 	border-width: 5px;
@@ -47,23 +41,38 @@
 	width: 0px;
 	line-height: 0px;
 }
-.yom-tooltip-arrow-rt {
+
+.yom-tooltip-L .yom-tooltip-arrow-outer {
 	top: 10px;
-	right: -9px;
+	right: -10px;
 	border-color: transparent transparent transparent #555;
 }
-.yom-tooltip-arrow-lt {
+.yom-tooltip-R .yom-tooltip-arrow-outer {
 	top: 10px;
-	left: -9px;
+	left: -10px;
+	_left: -18px;
 	border-color: transparent #555 transparent transparent;
 }
-.yom-tooltip-arrow-bl {
+.yom-tooltip-T .yom-tooltip-arrow-outer {
 	left: 10px;
-	bottom: -9px;
+	bottom: -10px;
 	border-color: #555 transparent transparent transparent;
 }
-.yom-tooltip-arrow-tl {
+.yom-tooltip-B .yom-tooltip-arrow-outer {
 	left: 10px;
-	top: -9px;
+	top: -10px;
 	border-color: transparent transparent #555 transparent;
+}
+
+.yom-tooltip-L .yom-tooltip-arrow-inner {
+	display: none;
+}
+.yom-tooltip-R .yom-tooltip-arrow-inner {
+	display: none;
+}
+.yom-tooltip-T .yom-tooltip-arrow-inner {
+	display: none;
+}
+.yom-tooltip-B .yom-tooltip-arrow-inner {
+	display: none;
 }

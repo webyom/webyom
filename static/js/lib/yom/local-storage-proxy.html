@@ -6,17 +6,7 @@
 </head>
 <body>
 <script type="text/javascript">
-var require = {
-	baseUrl: 'http://www.webyom.org/static/js',
-	path: {
-		'yom': 'lib/yom'
-	},
-	shim: {
-		'yom/inc/sizzle': {
-			exports: 'Sizzle'
-		}
-	}
-};
+var require = parent.require.getConfig();
 </script>
 <script type="text/javascript" src="require.js"></script>
 <script type="text/javascript">

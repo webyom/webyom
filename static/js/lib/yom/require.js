@@ -103,7 +103,7 @@ var define, require;
 		NO_DEFINE: 4
 	};
 	
-	var _gcfg = _extend({
+	var _gcfg = _extendConfig(['charset', 'baseUrl', 'source', 'path', 'shim', 'urlArgs', 'errCallback', 'onLoadStart', 'onLoadEnd', 'waitSeconds'], {
 		charset: 'utf-8',
 		baseUrl: location.href.split('/').slice(0, -1).join('/'),
 		source: {},
@@ -116,7 +116,7 @@ var define, require;
 		onLoadStart: null,
 		onLoadEnd: null,
 		waitSeconds: 30
-	}, typeof require == 'object' && require);//global config
+	}, require);//global config
 	_gcfg.baseUrl = _getFullBaseUrl(_gcfg.baseUrl);
 	var _interactiveMode = false;
 	var _loadingCount = 0;
@@ -486,13 +486,17 @@ var define, require;
 				urlArgs: {//match by id removed prefix
 					'*': ''//for all
 				},
+				errCallback: null,
+				onLoadStart: null,
+				onLoadEnd: null,
 				waitSeconds: 30
 			};
 		} else {
 			config = _clone(config, 1);
 		}
 		_each(props, function(p) {
-			config[p] = typeof ext[p] == 'object' ? _extend(config[p], ext[p]) : ext[p];
+			config[p] = typeof ext[p] == 'object' ? _extend(config[p], ext[p]) : 
+					typeof ext[p] == 'undefined' ? config[p] : ext[p];
 		});
 		return config;
 	};
@@ -824,6 +828,9 @@ var define, require;
 		};
 		req.config = function(conf) {
 			return _makeRequire({config: conf, parentConfig: config});
+		};
+		req.getConfig = function(conf) {
+			return config;
 		};
 		req.toUrl = function(url, onlyPath) {
 			var moduleFullUrl = context.moduleFullUrl;

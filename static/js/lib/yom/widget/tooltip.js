@@ -9,14 +9,13 @@ define(function(require) {
 	var _MIN_CLOSE_TIMEOUT = 1000;
 	var _DIRECTION_HASH = {L: 'L', R: 'R', T: 'T', B: 'B'};
 	var _TMPL = [
-		'<div data-type="yom-tooltip-outer" class="yom-tooltip-outer">',
-			'<div data-type="yom-tooltip-inner" class="yom-tooltip-inner">',
-				'<span data-type="yom-tooltip-arrow" class="yom-tooltip-arrow-tl">&nbsp;</span>',
-				'<%if(!noCloseBtn) {%>',
-					'<span data-type="yom-tooltip-close-btn" class="yom-tooltip-close-btn">X</span>',
-				'<%}%>',
-				'<div data-type="yom-tooltip-content" class="yom-tooltip-content"><%=content%></div>',
-			'</div>',
+		'<div data-type="yom-tooltip-inner" class="yom-tooltip-inner">',
+			'<div data-type="yom-tooltip-content" class="yom-tooltip-content"><%=content%></div>',
+			'<div data-type="yom-tooltip-arrow-outer" class="yom-tooltip-arrow-outer"></div>',
+			'<div data-type="yom-tooltip-arrow-inner" class="yom-tooltip-arrow-inner"></div>',
+			'<%if(!noCloseBtn) {%>',
+				'<span data-type="yom-tooltip-close-btn" class="yom-tooltip-close-btn">\u00d7</span>',
+			'<%}%>',
 		'</div>'
 	].join('');
 	
@@ -182,7 +181,7 @@ define(function(require) {
 			var viewRect = YOM.Element.getViewRect();
 			var wrapperRect = wrapper.getRect();
 			var wrapperResized = false;
-			var width, height, target, targetRect, spaceL, spaceR, spaceT, spaceB, arrow;
+			var width, height, target, targetRect, spaceL, spaceR, spaceT, spaceB;
 			if(pos) {
 				if(!direction) {
 					spaceL = pos.x - viewRect.left;
@@ -270,7 +269,6 @@ define(function(require) {
 			}
 			width = opt.width > 0 ? opt.width : wrapperRect.width;
 			height = opt.height > 0 ? opt.height : wrapperRect.height;
-			arrow = wrapper.find('[data-type="yom-tooltip-arrow"]').get();
 			if(direction == 'L') {
 				wrapper.setStyle({
 					width: width + 'px',
@@ -278,7 +276,6 @@ define(function(require) {
 					left: (pos.x - width) + offset.L.x + 'px',
 					top: pos.y + offset.L.y + 'px'
 				});
-				arrow.className = 'yom-tooltip-arrow-rt';
 			} else if(direction == 'R') {
 				wrapper.setStyle({
 					width: width + 'px',
@@ -286,24 +283,24 @@ define(function(require) {
 					left: pos.x + offset.R.x + 'px',
 					top: pos.y + offset.R.y + 'px'
 				});
-				arrow.className = 'yom-tooltip-arrow-lt';
 			} else if(direction == 'T' || direction == 'TT') {
+				direction = 'T';
 				wrapper.setStyle({
 					width: width + 'px',
 					height: height + 'px',
 					left: pos.x + offset.T.x + 'px',
 					top: (pos.y - height) + offset.T.y + 'px'
 				});
-				arrow.className = 'yom-tooltip-arrow-bl';
 			} else {
+				direction = 'B';
 				wrapper.setStyle({
 					width: width + 'px',
 					height: height + 'px',
 					left: pos.x + offset.B.x + 'px',
 					top: pos.y + offset.B.y + 'px'
 				});
-				arrow.className = 'yom-tooltip-arrow-tl';
 			}
+			wrapper.get().className = 'yom-tooltip-' + direction;
 			this._width = width;
 			this._height = height;
 		},
