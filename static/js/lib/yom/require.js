@@ -5,7 +5,7 @@
  */
 var define, require;
 
-(function(global) {
+;(function(global) {
 	/**
 	 * utils
 	 */
@@ -182,7 +182,7 @@ var define, require;
 			}
 			_ready = true;
 			while(_queue.length) {
-				(function(args) {
+				;(function(args) {
 					setTimeout(function() {
 						domreadyLoader.apply(null, _getArray(args));
 					}, 0);
@@ -265,7 +265,7 @@ var define, require;
 		
 		dispatch: function(errCode) {
 			while(this._queue.length) {
-				(function(callback) {
+				;(function(callback) {
 					setTimeout(function() {
 						callback && callback(errCode);
 					}, 0);
@@ -406,6 +406,35 @@ var define, require;
 		return nrmId;
 	};
 	
+	function _extendConfig(props, config, ext) {
+		if(!ext || config == ext) {
+			return config;
+		}
+		ext.baseUrl = _getFullBaseUrl(ext.baseUrl);
+		if(ext.baseUrl && config.baseUrl != ext.baseUrl) {
+			config = {
+				charset: 'utf-8',
+				source: {},
+				path: {},//match by id removed prefix
+				shim: {},//match by id removed prefix
+				urlArgs: {//match by id removed prefix
+					'*': ''//for all
+				},
+				errCallback: null,
+				onLoadStart: null,
+				onLoadEnd: null,
+				waitSeconds: 30
+			};
+		} else {
+			config = _clone(config, 1);
+		}
+		_each(props, function(p) {
+			config[p] = typeof config[p] == 'object' && typeof ext[p] == 'object' ? _extend(config[p], ext[p]) : 
+					typeof ext[p] == 'undefined' ? config[p] : ext[p];
+		});
+		return config;
+	};
+	
 	function _getOrigin() {
 		return location.origin || location.protocol + '//' +  location.host;
 	};
@@ -471,38 +500,17 @@ var define, require;
 		var m = id.match(/^([^#]+?)#/);
 		return m && m[1] || '';
 	};
-	
-	function _extendConfig(props, config, ext) {
-		if(!ext || config == ext) {
-			return config;
-		}
-		ext.baseUrl = _getFullBaseUrl(ext.baseUrl);
-		if(ext.baseUrl && config.baseUrl != ext.baseUrl) {
-			config = {
-				charset: 'utf-8',
-				source: {},
-				path: {},//match by id removed prefix
-				shim: {},//match by id removed prefix
-				urlArgs: {//match by id removed prefix
-					'*': ''//for all
-				},
-				errCallback: null,
-				onLoadStart: null,
-				onLoadEnd: null,
-				waitSeconds: 30
-			};
-		} else {
-			config = _clone(config, 1);
-		}
-		_each(props, function(p) {
-			config[p] = typeof ext[p] == 'object' ? _extend(config[p], ext[p]) : 
-					typeof ext[p] == 'undefined' ? config[p] : ext[p];
-		});
-		return config;
-	};
 
 	function _getUrlArg(id, urlArgs) {
 		return urlArgs && (urlArgs[_removeIdPrefix(id)] || urlArgs['*']) || '';
+	};
+
+	function _getCharset(id, charset) {
+		if(typeof charset == 'string') {
+			return charset;
+		} else {
+			return charset && (charset[_removeIdPrefix(id)] || charset['*']) || '';
+		}
 	};
 	
 	function _endLoad(jsNode, onload, onerror) {
@@ -530,6 +538,7 @@ var define, require;
 	
 	function _doLoad(id, nrmId, config, onRequire, hold) {
 		var baseUrl = config.baseUrl;
+		var charset = _getCharset(id, config.charset);
 		var jsNode, urlArg;
 		jsNode = document.createElement('script');
 		if(jsNode.attachEvent && !_isOpera) {
@@ -539,8 +548,8 @@ var define, require;
 			jsNode.addEventListener('load', _onload, false);
 			jsNode.addEventListener('error', _onerror, false);
 		}
-		if(config.charset) {
-			jsNode.charset = config.charset;
+		if(charset) {
+			jsNode.charset = charset;
 		}
 		jsNode.type = 'text/javascript';
 		jsNode.async = 'async';
