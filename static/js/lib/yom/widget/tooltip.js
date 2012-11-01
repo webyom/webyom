@@ -361,7 +361,7 @@ define(function(require) {
 					return this;
 				}
 			} catch(e) {
-				if(YOM.config.debugMode) {
+				if(YOM.config.debug) {
 					throw new YOM.Error(YOM.Error.getCode(_ID, 1));
 				}
 			}

@@ -1,6 +1,8 @@
 /**
- * @fileoverview base of YOM framework
- * @author Gary Wang webyom@gmail.com webyom.org
+ * YOM framework
+ * Copyright (c) 2012 Gary Wang, webyom@gmail.com http://webyom.org
+ * Under the MIT license
+ * https://github.com/webyom/yom
  */
 
 /*
@@ -34,9 +36,12 @@ ID LIST:
 126: json
 127: history
 128: widget
-128001: widget.Mask
-128002: widget.Dialog
-128003: widget.Tooltip
+129: flash
+128001: Mask widget
+128002: Dialog widget
+128003: Tooltip widget
+128004: ModOdl widget
+128005: ImgOdl widget
 */
 
 /**
@@ -45,7 +50,7 @@ ID LIST:
 define('yom/config', [], function() {
 	var t = document.domain.split('.'), l = t.length;
 	return {
-		debugMode: 0,
+		debug: location.href.indexOf('yom-debug=1') > 0,
 		domain: t.slice(l - 2, l).join('.')
 	};
 });
@@ -2646,7 +2651,7 @@ define('yom/xhr', ['require'], function(require) {
 			_loading_count === 0 && Xhr.dispatchEvent(Xhr.createEvent('allcomplete', {url: this._url, method: this._method, opt: this._opt, ret: ret}));
 			Xhr.dispatchEvent(Xhr.createEvent('complete', {url: this._url, method: this._method, opt: this._opt, ret: ret}));
 		} catch(e) {
-			if(YOM.config.debugMode) {
+			if(YOM.config.debug) {
 				throw new YOM.Error(YOM.Error.getCode(_ID, 2));
 			}
 		}
@@ -2803,7 +2808,7 @@ define('yom/cross-domain-poster', ['require'], function(require) {
 			_loading_count === 0 && CrossDomainPoster.dispatchEvent(CrossDomainPoster.createEvent('allcomplete', {url: this._url, opt: this._opt}));
 		CrossDomainPoster.dispatchEvent(CrossDomainPoster.createEvent('complete', {url: this._url, opt: this._opt, ret: ret}));
 		} catch(e) {
-			if(YOM.config.debugMode) {
+			if(YOM.config.debug) {
 				throw new YOM.Error(YOM.Error.getCode(_ID, 1));
 			}
 		}
@@ -2826,7 +2831,7 @@ define('yom/cross-domain-poster', ['require'], function(require) {
 			if(parseError) {
 				this._complete(CrossDomainPoster.RET.ERROR);
 				this._onerror.call(this._bind);
-				if(YOM.config.debugMode) {
+				if(YOM.config.debug) {
 					throw new YOM.Error(YOM.Error.getCode(_ID, 1));
 				}
 			} else {
@@ -3147,7 +3152,7 @@ define('yom/js-loader', ['require'], function(require) {
 			_loading_count === 0 && JsLoader.dispatchEvent(JsLoader.createEvent('allcomplete', {src: this._src, opt: this._opt, ret: ret}));
 			JsLoader.dispatchEvent(JsLoader.createEvent('complete', {src: this._src, opt: this._opt, ret: ret}));
 		} catch(e) {
-			if(YOM.config.debugMode) {
+			if(YOM.config.debug) {
 				throw new YOM.Error(YOM.Error.getCode(JsLoader._ID, 2));
 			}
 		}
@@ -3957,6 +3962,8 @@ define('yom/flash', ['require'], function(require) {
 		'object': require('yom/object')
 	};
 	
+	var _ID = 129;
+	
 	var _flashVersion = null;
 	
 	/**
@@ -4031,7 +4038,7 @@ define('yom/flash', ['require'], function(require) {
 		if(flashObj && !flashObj[methodName]) {
 			eval('flashObj["' + methodName + '"] = function(){return eval(this.CallFunction("<invoke name=\\"' + methodName + '\\" returntype=\\"javascript\\">" + __flash__argumentsToXML(arguments,0) + "</invoke>"));}');
 		}
-		return flashObj[methodName].apply(flashObj, args);
+		return flashObj[methodName].apply(flashObj, args || []);
 	};
 	
 	return {
@@ -4058,6 +4065,7 @@ define(['require', document.querySelectorAll ? '' : 'yom/inc/sizzle'], function(
 	YOM.debugMode = 0;
 	
 	YOM = $extend(YOM, {
+		'config': require('yom/config'),
 		'Error': require('yom/error'),
 		'browser': require('yom/browser'),
 		'string': require('yom/string'),

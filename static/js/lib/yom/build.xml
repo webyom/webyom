@@ -89,6 +89,10 @@
         <concat destfile="${build.dir}/widget/img-odl.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
             <path path="${src.dir}/widget/src/img-odl/img-odl.js"/>
         </concat>
+        
+        <concat destfile="${build.dir}/require-plugin/jsonp.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${src.dir}/require-plugin/src/jsonp/jsonp.js"/>
+        </concat>
     </target>
 
     <target name="build" depends="concat,common.build">

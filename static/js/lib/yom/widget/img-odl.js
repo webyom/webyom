@@ -4,6 +4,7 @@
 define(function(require) {
 	var YOM = require('yom/core-pkg');
 	
+	var _ID = 128005;
 	var _SRC_ATTR_NAME = 'data-init-src';
 	var _MARK_ATTR_NAME = 'data-odl-marked';
 	

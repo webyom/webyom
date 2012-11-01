@@ -298,6 +298,12 @@ define(function(require) {
 			return this;
 		},
 		
+		/**
+		 * @param {Object} opt
+		 * opt.noCentralize - no force centralize
+		 * opt.leftFix - horizontal position fix
+		 * opt.topFix - vertical position fix
+		 */
 		resize: function(w, h, opt) {
 			if(!this._el) {
 				return this;
@@ -336,7 +342,7 @@ define(function(require) {
 				}
 				
 			}
-			this._dragging || opt.noCentralize || this.centralize(opt.leftFix || 0, opt.topFix || 0);
+			this._dragging || opt.noCentralize || this.centralize(opt.leftFix, opt.topFix);
 			this._width = w;
 			this._height = h;
 			return this;
@@ -361,6 +367,8 @@ define(function(require) {
 		 * @param {Object} opt
 		 * opt.fx - indicate use tween effect to show or hide, "fade" value indicate use fade effect
 		 * opt.fxDuration - duration of tween effect
+		 * opt.leftFix - horizontal position fix
+		 * opt.topFix - vertical position fix
 		 */
 		popup: function(opt) {
 			opt = opt || {};
@@ -376,12 +384,12 @@ define(function(require) {
 			this._closed = 0;
 			this._show();
 			if(fx == 'fade') {
-				this.resize(thisOpt.width, thisOpt.height);
+				this.resize(thisOpt.width, thisOpt.height, {leftFix: opt.leftFix, topFix: opt.topFix});
 				this._el.fadeIn(this._fxDuration, function() {
 					self.focus();
 				});
 			} else if(fx == 'slideDown' || fx == 'slideUp') {
-				this.resize(thisOpt.width, thisOpt.height);
+				this.resize(thisOpt.width, thisOpt.height, {leftFix: opt.leftFix, topFix: opt.topFix});
 				elTop = this._el.getStyle('top');
 				elRect = this._el.getRect();
 				viewRect = YOM.Element.getViewRect();
@@ -402,19 +410,19 @@ define(function(require) {
 					prior: true
 				});
 			} else if(fx) {
-				self.resize(_INIT_WIDTH, _INIT_HEIGHT);
+				self.resize(_INIT_WIDTH, _INIT_HEIGHT, {leftFix: opt.leftFix, topFix: opt.topFix});
 				self._el.setStyle('opacity', '0');
 				YOM.Tween.setTimer($empty, fxDuration, function(percent) {
 					var w = _INIT_WIDTH + (thisOpt.width - _INIT_WIDTH) * percent;
 					var h = _INIT_HEIGHT + (thisOpt.height - _INIT_HEIGHT) * percent;
-					self.resize(w, h);
+					self.resize(w, h, {leftFix: opt.leftFix, topFix: opt.topFix});
 					self._el.setStyle('opacity', percent);
 					if(percent === 1) {
 						self.focus();
 					}
 				});
 			} else {
-				this.resize(thisOpt.width, thisOpt.height);
+				this.resize(thisOpt.width, thisOpt.height, {leftFix: opt.leftFix, topFix: opt.topFix});
 				this.focus();
 			}
 			this._closeTimeout(thisOpt.closeTimeout, thisOpt.tips);
@@ -426,6 +434,8 @@ define(function(require) {
 		 * @param {Object} opt
 		 * opt.fx - indicate use tween effect to show or hide, "fade" value indicate use fade effect
 		 * opt.fxDuration - duration of tween effect
+		 * opt.leftFix - horizontal position fix
+		 * opt.topFix - vertical position fix
 		 */
 		close: function(opt) {
 			opt = opt || {};
@@ -440,7 +450,7 @@ define(function(require) {
 					return this;
 				}
 			} catch(e) {
-				if(YOM.config.debugMode) {
+				if(YOM.config.debug) {
 					throw new YOM.Error(YOM.Error.getCode(_ID, 1));
 				}
 			}
@@ -474,8 +484,8 @@ define(function(require) {
 				var height = this._height;
 				var viewRect = YOM.Element.getViewRect();
 				var wrapperRect = wrapper.getRect();
-				var leftFix = wrapperRect.left - (viewRect.left + (viewRect.width - wrapperRect.width) / 2)
-				var topFix = wrapperRect.top - (viewRect.top + (viewRect.height - wrapperRect.height) / 2)
+				var leftFix = wrapperRect.left - (viewRect.left + (viewRect.width - wrapperRect.width) / 2) + (opt.leftFix || 0);
+				var topFix = wrapperRect.top - (viewRect.top + (viewRect.height - wrapperRect.height) / 2) + (opt.topFix || 0);
 				YOM.Tween.setTimer($empty, fxDuration, function(percent) {
 					var w = width - (width - _INIT_WIDTH) * percent;
 					var h = height - (height - _INIT_HEIGHT) * percent;
