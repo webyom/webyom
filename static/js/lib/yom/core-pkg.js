@@ -3030,6 +3030,7 @@ define('yom/js-loader', ['require'], function(require) {
 		'config': require('yom/config'),
 		'Error': require('yom/error'),
 		'browser': require('yom/browser'),
+		'object': require('yom/object'),
 		'Class': require('yom/class'),
 		'array': require('yom/array'),
 		'InstanceManager': require('yom/instance-manager'),
@@ -3071,6 +3072,11 @@ define('yom/js-loader', ['require'], function(require) {
 		this._status = _STATUS.INIT;
 		this._callbacked = false;
 		this._gid = opt.gid;//group id
+		this._bound = {
+			onloadHandler: YOM.object.bind(this, this._onloadHandler),
+			onerrorHandler: YOM.object.bind(this, this._onerrorHandler),
+			ieOnloadHandler: YOM.object.bind(this, this._ieOnloadHandler)
+		};
 		this._id = _im.add(this);
 	};
 	
@@ -3127,6 +3133,12 @@ define('yom/js-loader', ['require'], function(require) {
 		if(!this._jsEl) {
 			return;
 		}
+		if(this._jsEl.addEventListener) {
+			this._jsEl.removeEventListener('load', this._bound.onloadHandler, false);
+			this._jsEl.removeEventListener('error', this._bound.onerrorHandler, false);
+		} else {
+			this._jsEl.detachEvent('onreadystatechange', this._bound.ieOnloadHandler);
+		}
 		this._jsEl.parentNode.removeChild(this._jsEl);
 		this._jsEl = null;
 		if(this._callback) {
@@ -3167,6 +3179,33 @@ define('yom/js-loader', ['require'], function(require) {
 		return this._gid;
 	};
 	
+	JsLoader.prototype._onloadHandler = function() {
+		if(this._status != _STATUS.LOADING) {
+			return;
+		}
+		this._status = _STATUS.LOADED;
+		this._complete(JsLoader.RET.SUCC);
+		if(this._callback && !this._callbacked) {
+			this._dealError(YOM.Error.getCode(JsLoader._ID, 1));
+		}
+		this._onload.call(this._bind);
+	};
+	
+	JsLoader.prototype._onerrorHandler = function() {
+		if(this._status != _STATUS.LOADING) {
+			return;
+		}
+		this._status = _STATUS.LOADED;
+		this._complete(JsLoader.RET.ERROR);
+		this._dealError(YOM.Error.getCode(JsLoader._ID, 0));
+	};
+	
+	JsLoader.prototype._ieOnloadHandler = function() {
+		if(this._jsEl && (this._jsEl.readyState == 'loaded' || this._jsEl.readyState == 'complete')) {
+			this._onloadHandler();
+		}
+	};
+	
 	JsLoader.prototype.load = function() {
 		if(this._status != _STATUS.INIT) {
 			return 1;
@@ -3188,40 +3227,12 @@ define('yom/js-loader', ['require'], function(require) {
 				window[this._callbackName] = null;
 			});
 		}
-		function onload() {
-			if(this._status != _STATUS.LOADING) {
-				return;
-			}
-			this._status = _STATUS.LOADED;
-			this._complete(JsLoader.RET.SUCC);
-			if(this._callback && !this._callbacked) {
-				this._dealError(YOM.Error.getCode(JsLoader._ID, 1));
-			}
-			this._onload.call(this._bind);
-		};
-		function onerror() {
-			if(this._status != _STATUS.LOADING) {
-				return;
-			}
-			this._status = _STATUS.LOADED;
-			this._complete(JsLoader.RET.ERROR);
-			this._dealError(YOM.Error.getCode(JsLoader._ID, 0));
-		};
 		this._jsEl = document.createElement('script');
-		if(YOM.browser.ie) {
-			YOM.Event.addListener(this._jsEl, 'readystatechange', function() {
-				if(this._jsEl && (this._jsEl.readyState == 'loaded' || this._jsEl.readyState == 'complete')) {
-					onload.call(this);
-					return;
-				}
-			}, this);
+		if(this._jsEl.addEventListener) {
+			this._jsEl.addEventListener('load', this._bound.onloadHandler, false);
+			this._jsEl.addEventListener('error', this._bound.onerrorHandler, false);
 		} else {
-			YOM.Event.addListener(this._jsEl, 'load', function() {
-				onload.call(this);
-			}, this);
-			YOM.Event.addListener(this._jsEl, 'error', function() {
-				onerror.call(this);
-			}, this);
+			this._jsEl.attachEvent('onreadystatechange', this._bound.ieOnloadHandler);
 		}
 		if(this._charset) {
 			this._jsEl.charset = this._charset;

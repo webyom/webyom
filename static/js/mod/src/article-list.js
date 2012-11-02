@@ -67,30 +67,30 @@ define('mod/article-list', ['require', 'yom/core-pkg', 'yom/history', 'main-pkg'
 			return;
 		}
 		var url = '/data/' + mark;
-		if($.Xhr.isUrlLoading(url)) {
+		if($.JsLoader.isUrlLoading(url)) {
 			return;
 		}
-		/*
+		///*
 		new $.JsLoader(url, {
 			callbackName: '_get_article_list',
 			callback: function(o) {
-				$('#mainPart').setHtml($.tmpl.render(_TMPL, data, {key: 'mod.articleList'}));
-				$$.util.prettyPrint();
-				$$.handler.setCache(mark, o.data);
+				ajaxHistory.setCache(fullMark, o.data);
+				self.handle(mark, fullMark, reqInfo)
 			},
 			error: function(code) {
-				$$.handler.error(new $.Error(code, 'Failed to load article list ' + mark), modName);
+				self.error(new $.Error(code, 'Failed to load article list ' + mark), modName);
 			}, 
 			complete: function() {
 			}
 		}).load();
-		*/
+		//*/
+		/*
 		$$.util.xhr.get(url, {
 			gid: this._id,
 			callbackName: '_get_article_list',
 			load: function(o) {
 				ajaxHistory.setCache(fullMark, o.data);
-				self.handle(mark, fullMark, reqInfo, data)
+				self.handle(mark, fullMark, reqInfo)
 			},
 			error: function(code) {
 				self.error(new $.Error(code, 'Failed to load article list ' + mark), modName);
@@ -98,6 +98,7 @@ define('mod/article-list', ['require', 'yom/core-pkg', 'yom/history', 'main-pkg'
 			complete: function() {
 			}
 		});
+		*/
 	};
 	
 	return new Handler({

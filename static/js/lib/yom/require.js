@@ -96,6 +96,7 @@ var define, require;
 		require: 1,
 		exports: 1,
 		module: 1,
+		global: 1,
 		domReady: 1
 	};
 	var _ERR_CODE = {
@@ -173,6 +174,7 @@ var define, require;
 	new Def('module', _gcfg, {}, {}, function(context) {
 		return {};
 	});
+	new Def('global', _gcfg, global, {});
 	new Def('domReady', _gcfg, {}, {}, function(context) {
 		return {};
 	}, (function() {
@@ -764,7 +766,7 @@ var define, require;
 			}
 			if(!deps.length && _isFunction(factory) && factory.length) {
 				factoryStr = factory.toString();
-				reqFnName = factoryStr.match(/function[^\(]*\(([^\)]*)\)/);
+				reqFnName = factoryStr.match(/^function[^\(]*\(([^\)]+)\)/) || ['', 'require'];
 				reqFnName = (reqFnName[1].split(',')[0]).replace(/\s/g, '');
 				factoryStr.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/mg, '')//remove comments
 					.replace(new RegExp('[(=;:{}&|]\\s*' + reqFnName + '\\(\\s*["\']([^"\'\\s]+)["\']\\s*\\)', 'g'), function(m, dep) {//extract dependencies
@@ -851,7 +853,7 @@ var define, require;
 				if(arguments.length === 1) {
 					def = _getDef(deps)
 					if(def.plugin) {
-						return plugin.require(deps, config);
+						return def.plugin.require(deps, config);
 					} else {
 						return def.inst && def.inst.getDef(context);
 					}

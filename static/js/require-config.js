@@ -2,6 +2,7 @@ var require = {
 	baseUrl: 'http://www.webyom.org/static/js',
 	path: {
 		'yom': 'lib/yom',
+		'require-plugin': 'lib/yom/require-plugin',
 		'prettify': 'lib/prettify/prettify'
 	},
 	shim: {
