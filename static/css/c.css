@@ -69,7 +69,6 @@ h1, h2, h3 {
 	height: 80px;
 	overflow: hidden;
 	position: relative;
-	left: -800px;
 }
 #header h1 {
 	width: 183px;
@@ -147,10 +146,6 @@ h1, h2, h3 {
 }
 #content h1 {
 	font-size: 1.3em;
-}
-#content #sidePart {
-	position: relative;
-	top: -800px;
 }
 
 #content .mainPart {

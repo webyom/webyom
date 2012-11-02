@@ -293,16 +293,6 @@ define('main/ui', ['require', 'yom/core-pkg', 'main/storage', 'main/tooltip'], f
 	
 	function _initHeader() {
 		$('#header').get().innerHTML = _TMPL['HEADER'];
-		$('#header').tween(1500, {
-			origin: {
-				style: 'opacity: 0;'
-			},
-			target: {
-				style: 'left: 0px; opacity: 1;'
-			},
-			css: true,
-			transition: 'easeOut'
-		});
 	};
 	
 	function _initContent() {
@@ -324,16 +314,6 @@ define('main/ui', ['require', 'yom/core-pkg', 'main/storage', 'main/tooltip'], f
 			$('#sideWhoamiContent').get().innerHTML = _TMPL['CONTENT']['SIDE_WHOAMI'];
 			$('#sideReadingsContent').get().innerHTML = _TMPL['CONTENT']['SIDE_READINGS'];
 			$('#sideRecSites').get().innerHTML = _TMPL['CONTENT']['SIDE_REC_SITES'];
-			$('#sidePart').tween(1500, {
-				origin: {
-					style: 'top: -800px; opacity: 0; position: relative;'
-				},
-				target: {
-					style: 'top: 0px; opacity: 1; position: relative;'
-				},
-				css: true,
-				transition: 'easeOut'
-			});
 		});
 		require(['yom/dragdrop-pkg'], function(dragdrop) {
 			try {

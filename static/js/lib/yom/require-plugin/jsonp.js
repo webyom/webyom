@@ -1,7 +1,7 @@
 /**
  * YOM require jsonp plugin
  */
-define('yom/require-plugin/jsonp', [], function() {
+define('require-plugin/jsonp', [], function() {
 	var _head = document.head || document.getElementsByTagName('head')[0] || document.documentElement;
 	var _callbackQueueHash = {};
 	var _callbackLoadingHash = {};
@@ -62,17 +62,16 @@ define('yom/require-plugin/jsonp', [], function() {
 	};
 	
 	function req(id, config, callback, errCallback) {
-		var url = this._removePluginPrefix(id);
-		var callbackName, charset;
+		var url = this._getResource(id);
+		var params, callbackName, charset;
 		if(callback) {
 			if(url) {
-				callbackName = url.match(/(?:#|&)callbackName=(.*?)(?:&|$)/);
-				callbackName = callbackName && callbackName[1] || '_Callback';
-				charset = url.match(/(?:#|&)charset=(.*?)(?:&|$)/);
-				charset = charset && charset[1] || 'utf-8';
+				params = this._getParams(id);
+				callbackName = params['callbackName'] || '_Callback';
+				charset = params['charset'] || 'utf-8';
 				_load(url, function(data, err) {
 					if(err) {
-						errCallback && errCallback(require.ERR_CODE.LOAD_ERROR);
+						errCallback && errCallback(require.ERR_CODE.LOAD_ERROR, {url: url});
 					} else {
 						_cache[url] = data;
 						callback(data);
