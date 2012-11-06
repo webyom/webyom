@@ -2,7 +2,7 @@
  * @namespace YOM.widget.Mask
  */
 define(function(require) {
-	var YOM = require('yom/core-pkg');
+	var YOM = require('../core-pkg');
 	
 	var _ID = 128001;
 	
@@ -15,7 +15,7 @@ define(function(require) {
 	
 	function Mask(opt) {
 		opt = opt || {};
-		var style = $extend(_defaultStyle, opt.style);
+		var style = YOM.object.extend(_defaultStyle, opt.style);
 		this._opacity = style.opacity || '1';
 		this._target = YOM(opt.target || document.body);
 		this._el = YOM(document.body).append(YOM.Element.create('div', {}, style));
@@ -25,7 +25,7 @@ define(function(require) {
 		_defaultStyle = style;
 	};
 	
-	$extend(Mask.prototype, {
+	YOM.object.extend(Mask.prototype, {
 		addEventListener: function(type, listener, bind) {
 			return this._el.addEventListener(type, listener, bind);
 		},

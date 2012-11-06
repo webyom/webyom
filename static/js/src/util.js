@@ -1,7 +1,7 @@
 /**
  * @namespace $$.util
  */
-define('main/util', ['require', 'yom/core-pkg'], function(require, $) {
+define('./util', ['require', 'yom/core-pkg'], function(require, $) {
 	var util = {
 		_ID: 202
 	};
@@ -137,6 +137,8 @@ define('main/util', ['require', 'yom/core-pkg'], function(require, $) {
 			require(['yom/widget/mask', 'yom/widget/dialog'], function(Mask, Dialog) {
 				_init();
 				(instGetter || $empty).call(null, new Dialog(opt).popup());
+			}, function(code) {
+				alert('Require error code: ' + code);
 			});
 		};
 		

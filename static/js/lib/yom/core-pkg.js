@@ -45,9 +45,9 @@ ID LIST:
 */
 
 /**
- * @namespace
+ * @namespace YOM.config
  */
-define('yom/config', [], function() {
+define('./config', [], function() {
 	var t = document.domain.split('.'), l = t.length;
 	return {
 		debug: location.href.indexOf('yom-debug=1') > 0,
@@ -67,7 +67,7 @@ YOM.JsLoader
 YOM.Xhr
 	10401: onerror
 */
-define('yom/error', [], function() {
+define('./error', [], function() {
 	var YomError = function(code, opt) {
 		if(typeof opt == 'string') {
 			opt = {message: opt};
@@ -106,7 +106,7 @@ define('yom/error', [], function() {
 /**
  * @namespace YOM.browser
  */
-define('yom/browser', [], function() {
+define('./browser', [], function() {
 	var _ua = navigator.userAgent.toLowerCase();
 	
 	return {
@@ -129,7 +129,7 @@ define('yom/browser', [], function() {
 /**
  * @namespace YOM.string
  */
-define('yom/string', [], {
+define('./string', [], {
 	_ID: 117,
 	
 	getByteLength: function(str) {
@@ -181,7 +181,7 @@ define('yom/string', [], {
 /**
  * @namespace YOM.object
  */
-define('yom/object', ['require'], function(require) {
+define('./object', ['require'], function(require) {
 	return {
 		_ID: 110,
 		
@@ -192,10 +192,8 @@ define('yom/object', ['require'], function(require) {
 		},
 		
 		isArray: function(obj) {
-			var YOM = {
-				'array': require('yom/array')
-			};
-			return YOM.array.isArray(obj);
+			var array = require('./array');
+			return array.isArray(obj);
 		},
 		
 		isFunction: function(obj) {
@@ -207,12 +205,10 @@ define('yom/object', ['require'], function(require) {
 		},
 		
 		each: function(obj, fn, bind) {
-			var YOM = {
-				'array': require('yom/array')
-			};
+			var array = require('./array');
 			var val;
-			if(YOM.array.isArray(obj)) {
-				YOM.array.each(obj, fn, bind);
+			if(array.isArray(obj)) {
+				array.each(obj, fn, bind);
 			} else {
 				for(var p in obj) {
 					if(this.hasOwnProperty(obj, p)) {
@@ -240,13 +236,18 @@ define('yom/object', ['require'], function(require) {
 		},
 		
 		bind: function(obj, fn) {
-			return $bind(obj, fn);
+			var array = require('./array');
+			if(fn.bind) {
+				return fn.bind(obj);
+			} else {
+				return function() {
+					return fn.apply(obj, array.getArray(arguments));
+				};
+			}
 		},
 
 		clone: function(obj, deep, _level) {
-			var YOM = {
-				'array': require('yom/array')
-			};
+			var array = require('./array');
 			var res = obj;
 			var i, j, p;
 			deep = deep || 0;
@@ -255,7 +256,7 @@ define('yom/object', ['require'], function(require) {
 				return res;
 			}
 			if(typeof obj == 'object' && obj) {
-				if(YOM.array.isArray(obj)) {
+				if(array.isArray(obj)) {
 					res = [];
 					for(i = 0, l = obj.length; i < l; i++) {
 						res.push(obj[i]);
@@ -270,6 +271,23 @@ define('yom/object', ['require'], function(require) {
 				}
 			}
 			return res;
+		},
+		
+		getClean: function(obj) {
+			var cleaned;
+			if(obj && obj.getClean) {
+				cleaned = obj.getClean();
+			} else if(typeof obj == 'object') {
+				cleaned = {};
+				for(var p in obj) {
+					if(this.hasOwnProperty(obj, p)) {
+						cleaned[p] = obj[p];
+					}
+				}
+			} else {
+				cleaned = obj;
+			}
+			return cleaned;
 		},
 		
 		toQueryString: function(obj) {
@@ -298,9 +316,9 @@ define('yom/object', ['require'], function(require) {
 /**
  * @namespace YOM.array
  */
-define('yom/array', ['require'], function(require) {
+define('./array', ['./object'], function(object) {
 	var YOM = {
-		'object': require('yom/object')
+		'object': object
 	};
 	
 	return {
@@ -355,21 +373,20 @@ define('yom/array', ['require'], function(require) {
 /**
  * @class YOM.Class
  */
-define('yom/class', ['require'], function(require) {
+define('./class', ['./error', './object', './array'], function(Err, object, array) {
 	var YOM = {
-		'Error': require('yom/error'),
-		'browser': require('yom/browser'),
-		'object': require('yom/object'),
-		'array': require('yom/array')
+		'Error': Err,
+		'object': object,
+		'array': array
 	};
 	
 	var Class = function() {};
 
-	Class._ID = 102;
+	var _ID = 102;
 	
 	Class.extend = function(subClass, superClass) {
 		if(arguments.length < 2) {
-			throw new YOM.Error(YOM.Error.getCode(YOM.Class._ID, 1));
+			throw new YOM.Error(YOM.Error.getCode(_ID, 1));
 		}
 		var F = function() {};
 		F.prototype = superClass.prototype;
@@ -403,7 +420,7 @@ define('yom/class', ['require'], function(require) {
 /**
  * @class YOM.HashArray
  */
-define('yom/hash-array', [], function() {
+define('./hash-array', [], function() {
 	var HashArray = function() {
 		this._items = [];
 		this._k2i = {};
@@ -594,10 +611,10 @@ define('yom/hash-array', [], function() {
 /**
  * @class YOM.InstanceManager
  */
-define('yom/instance-manager', ['require'], function(require) {
+define('./instance-manager', ['./object', './array'], function(object, array) {
 	var YOM = {
-		'object': require('yom/object'),
-		'array': require('yom/array')
+		'object': object,
+		'array': array
 	};
 		
 	var InstanceManager = function() {
@@ -717,7 +734,7 @@ define('yom/instance-manager', ['require'], function(require) {
  * @return {Object|Array}
  * @author Mike Samuel <mikesamuel@gmail.com>
  */
-define('yom/json-sans-eval', [], function() {
+define('./json-sans-eval', [], function() {
 var jsonParse = (function () {
   var number
       = '(?:-?\\b(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\\b)';
@@ -905,12 +922,12 @@ return jsonParse;
 /**
  * @namespace YOM.json
  */
-define('yom/json', ['require'], function(require) {
+define('./json', ['./error', './object', './array', './json-sans-eval'], function(Err, object, array, jsonParse) {
 	var YOM = {
-		'Error': require('yom/error'),
-		'object': require('yom/object'),
-		'array': require('yom/array'),
-		'jsonParse': require('yom/json-sans-eval')
+		'Error': Err,
+		'object': object,
+		'array': array,
+		'jsonParse': jsonParse
 	};
 	
 	var _ID = 126;
@@ -1011,15 +1028,246 @@ define('yom/json', ['require'], function(require) {
 	};
 });
 /**
+ * @class YOM.Observer
+ */
+define('./observer', ['./object'], function(object) {
+	var Observer = function () {
+		this._subscribers = [];
+	};
+	
+	Observer.prototype = {
+		subscribe: function(subscriber, bind) {
+			subscriber = bind ? object.bind(bind, subscriber) : subscriber;
+			for(var i = 0, l = this._subscribers.length; i < l; i++) {
+				if(subscriber == this._subscribers[i]) {
+					return null;
+				}
+			}
+			this._subscribers.push(subscriber);
+			return subscriber;
+		},
+		
+		remove: function(subscriber) {
+			var res = [];
+			if(subscriber) {
+				for(var i = this._subscribers.length - 1; i >= 0; i--) {
+					if(subscriber == this._subscribers[i]) {
+						res = res.concat(this._subscribers.splice(i, 1));
+					}
+				}
+			} else {
+				res = this._subscribers;
+				this._subscribers = [];
+			}
+			return res;
+		},
+		
+		dispatch: function(e, bind) {
+			var res, tmp, subscriber;
+			for(var i = this._subscribers.length - 1; i >= 0; i--) {
+				subscriber = this._subscribers[i];
+				if(!subscriber) {
+					continue;				
+				}
+				tmp = subscriber.call(bind, e);
+				res = tmp === false || res === false ? false : tmp;
+			}
+			return res;
+		},
+		
+		constructor: Observer
+	};
+	
+	Observer._ID = 111;
+	
+	return Observer;
+});
+/**
+ * @class YOM.Event
+ */
+define('./event', ['./error', './object', './observer'], function(Err, object, Observer) {
+	var YOM = {
+		'Error': Err,
+		'object': object,
+		'Observer': Observer
+	};
+	
+	var _ID = 108;
+	
+	var _elRefCount = 0;
+	_customizedEventHash = {
+		
+	};
+	
+	function _getObserver(instance, type) {
+		if(!instance instanceof Evt) {
+			throw new YOM.Error(YOM.Error.getCode(_ID, 1));
+		}
+		instance._observers = instance._observers || {};
+		instance._observers[type] = instance._observers[type] || new YOM.Observer();
+		return instance._observers[type];
+	};
+	
+	function _getObservers(instance) {
+		if(!instance instanceof Evt) {
+			throw new YOM.Error(YOM.Error.getCode(_ID, 1));
+		}
+		instance._observers = instance._observers || {};
+		return instance._observers;
+	};
+	
+	function Evt(observers) {
+		this._observers = YOM.object.getClean(observers) || {};
+	};
+	
+	Evt.prototype = {
+		addObservers: function(newObservers) {
+			var observers = _getObservers(this);
+			newObservers = YOM.object.getClean(newObservers);
+			for(var type in newObservers) {
+				if(newObservers[type] instanceof YOM.Observer) {
+					observers[type] = newObservers[type];
+				}
+			}
+		},
+		
+		addEventListener: function(type, listener, bind) {
+			var observer = _getObserver(this, type);
+			if(!observer) {
+				throw new YOM.Error(YOM.Error.getCode(_ID, 1));
+			}
+			return observer.subscribe(listener, bind);
+		},
+		
+		removeEventListener: function(type, listener) {
+			var observer = _getObserver(this, type);
+			if(!observer) {
+				throw new YOM.Error(YOM.Error.getCode(_ID, 2));
+			}
+			return observer.remove(listener);
+		},
+		
+		dispatchEvent: function(e, asyn) {
+			if(typeof e == 'string') {
+				e = {type: e};
+			}
+			var self = this;
+			var observer = _getObserver(this, e.type);
+			if(!observer) {
+				throw new YOM.Error(YOM.Error.getCode(_ID, 3));
+			}
+			if(asyn) {
+				setTimeout(function() {
+					observer.dispatch.call(observer, e, self);
+				}, 0);
+				return undefined;
+			} else {
+				return observer.dispatch.call(observer, e, self);
+			}
+		},
+		
+		createEvent: function(type, opt) {
+			var e = YOM.object.clone(opt) || {};
+			e.type = type;
+			return e;
+		},
+		
+		constructor: Evt
+	};
+	
+	Evt.addListener = function(el, eType, listener, bind) {
+		var cEvent, cEventHandler;
+		eType = eType.toLowerCase();
+		listener = bind ? YOM.object.bind(bind, listener) : listener;
+		cEvent = _customizedEventHash[eType];
+		if(cEvent) {
+			el.elEventRef = el.elEventRef || ++_elRefCount;
+			cEventHandler = cEvent.elEventRefHandlerHash[el.elEventRef];
+			if(!cEventHandler) {
+				cEventHandler = cEvent.elEventRefHandlerHash[el.elEventRef] = new cEvent.Handler(el);
+			}
+			cEventHandler.addListener(listener);
+		} else if(el.addEventListener) {
+			el.addEventListener(eType, listener, false);
+		} else {
+			el.attachEvent('on' + eType, listener);
+		}
+		return listener;
+	};
+	
+	Evt.removeListener = function(el, eType, listener) {
+		var cEvent, cEventHandler;
+		eType = eType.toLowerCase();
+		cEvent = _customizedEventHash[eType];
+		if(cEvent) {
+			cEventHandler = cEvent.elEventRefHandlerHash[el.elEventRef];
+			if(cEventHandler) {
+				cEventHandler.removeListener(listener);
+			}
+		} else if(el.removeEventListener) {
+			el.removeEventListener(eType, listener, false);
+		} else {
+			el.detachEvent('on' + eType, listener);
+		}
+	};
+	
+	Evt.addCustomizedEvent = function(type, Handler) {
+		_customizedEventHash[type] = {
+			Handler: Handler,
+			elEventRefHandlerHash: {}
+		};
+	};
+	
+	Evt.removeCustomizedEventHandler = function(type, ref) {
+		var cEvent = _customizedEventHash[type];
+		if(cEvent) {
+			cEvent.elEventRefHandlerHash[ref] = null;
+		}
+	};
+	
+	Evt.cancelBubble = function(e) {
+		if(e.stopPropagation) {
+			e.stopPropagation();
+		} else {
+			e.cancelBubble = true;
+		}
+	};
+	
+	Evt.preventDefault = function(e) {
+		if(e.preventDefault) {
+			e.preventDefault();
+		} else {
+			e.returnValue = false;
+		}
+	};
+	
+	Evt.getTarget = function(e) {
+		return e.target || e.srcElement;
+	};
+	
+	Evt.getPageX = function(e) {
+		return e.pageX != undefined ? e.pageX : e.clientX + Math.max(document.documentElement.scrollLeft, document.body.scrollLeft);
+	};
+	
+	Evt.getPageY = function(e) {
+		return e.pageY != undefined ? e.pageY : e.clientY + Math.max(document.documentElement.scrollTop, document.body.scrollTop);
+	};
+	
+	return Evt;
+});
+/**
  * @class YOM.Element
  */
-define('yom/element', ['require'], function(require) {
+define('./element', ['./browser', './string', './object', './array', './event'], function(browser, string, object, array, Evt) {
 	var YOM = {
-		'browser': require('yom/browser'),
-		'string': require('yom/string'),
-		'object': require('yom/object'),
-		'array': require('yom/array')
+		'browser': browser,
+		'string': string,
+		'object': object,
+		'array': array,
+		'Event': Evt
 	};
+	
+	var _ID = 107;
 	
 	function _isElementNode(el) {
 		return el && (el.nodeType === 1 || el.nodeType === 9);
@@ -1034,7 +1282,7 @@ define('yom/element', ['require'], function(require) {
 		this._styleStorage = {};
 	};
 	
-	$extend(Item.prototype, {
+	YOM.object.extend(Item.prototype, {
 		get: function() {
 			return this._el;
 		},
@@ -1134,9 +1382,9 @@ define('yom/element', ['require'], function(require) {
 		}
 	});
 	
-	function Element(el) {
+	function Elem(el) {
 		this._items = [];
-		if(el instanceof Element) {
+		if(el instanceof Elem) {
 			return el;
 		} else if(YOM.array.isArray(el)) {
 			YOM.object.each(el, function(item) {
@@ -1159,7 +1407,7 @@ define('yom/element', ['require'], function(require) {
 		return this;
 	};
 
-	$extend(Element.prototype, {
+	YOM.object.extend(Elem.prototype, {
 		_getItem: function(i) {
 			if(typeof i == 'undefined') {
 				return this._items[0];
@@ -1199,7 +1447,7 @@ define('yom/element', ['require'], function(require) {
 					}
 				}
 			});
-			return new Element(res);
+			return new Elem(res);
 		},
 		
 		toQueryString: function() {
@@ -1282,7 +1530,7 @@ define('yom/element', ['require'], function(require) {
 			this.each(function(el) {
 				if(typeof name == 'object') {
 					YOM.object.each(name, function(val, key) {
-						new Element(el).setAttr(key, val);
+						new Elem(el).setAttr(key, val);
 					});
 				} else {
 					if(!name) {
@@ -1291,7 +1539,7 @@ define('yom/element', ['require'], function(require) {
 					if(name.indexOf('data-') === 0 && el.dataset) {
 						name = name.split('-');
 						name.shift();
-						new Element(el).setDatasetVal(name.join('-'), value);
+						new Elem(el).setDatasetVal(name.join('-'), value);
 					} else if(name == 'class' || name == 'className') {
 						el.className = value;
 					} else {
@@ -1324,7 +1572,7 @@ define('yom/element', ['require'], function(require) {
 			this.each(function(el) {
 				if(typeof name == 'object') {
 					YOM.object.each(name, function(val, key) {
-						new Element(el).setProp(key, val);
+						new Elem(el).setProp(key, val);
 					});
 				} else {
 					if(!name) {
@@ -1354,7 +1602,7 @@ define('yom/element', ['require'], function(require) {
 			this.each(function(el) {
 				if(typeof name == 'object') {
 					YOM.object.each(name, function(val, key) {
-						new Element(el).setDatasetVal(key, val);
+						new Elem(el).setDatasetVal(key, val);
 					});
 				} else {
 					if(el.dataset) {
@@ -1407,7 +1655,7 @@ define('yom/element', ['require'], function(require) {
 			var el = this.get();
 			var parent = el.parentNode;
 			var res = {left: 0, top: 0};
-			while(parent && !Element.isBody(parent)) {
+			while(parent && !Elem.isBody(parent)) {
 				res.left = parent.scrollLeft;
 				res.top = parent.scrollTop;
 				parent = parent.parentNode;
@@ -1420,7 +1668,7 @@ define('yom/element', ['require'], function(require) {
 			if(!el) {
 				return 0;
 			}
-			if(Element.isBody(el)) {
+			if(Elem.isBody(el)) {
 				return Math.max(document.documentElement.scrollLeft, document.body.scrollLeft);
 			} else {
 				return el.scrollLeft;
@@ -1432,7 +1680,7 @@ define('yom/element', ['require'], function(require) {
 			if(!el) {
 				return 0;
 			}
-			if(Element.isBody(el)) {
+			if(Elem.isBody(el)) {
 				return Math.max(document.documentElement.scrollTop, document.body.scrollTop);
 			} else {
 				return el.scrollTop;
@@ -1462,14 +1710,14 @@ define('yom/element', ['require'], function(require) {
 			if(!el || el.scrollLeft == x) {
 				return this;
 			}
-			if(x instanceof Element) {
+			if(x instanceof Elem) {
 				this.scrollLeftTo(x.getRect(this).left, interval, transition);
 				return this;
 			}
 			var rect = this.getRect();
-			var viewRect = Element.getViewRect();
+			var viewRect = Elem.getViewRect();
 			var scrollWidth, clientWidth;
-			var isBody = Element.isBody(el);
+			var isBody = Elem.isBody(el);
 			if(isBody) {
 				scrollWidth = rect.width;
 				clientWidth = viewRect.width;
@@ -1481,7 +1729,7 @@ define('yom/element', ['require'], function(require) {
 				return this;
 			}
 			x = x < 0 ? 0 : (x > scrollWidth - clientWidth ? scrollWidth - clientWidth : x);
-			var tweenObj = isBody ? new Element(YOM.browser.chrome ? document.body : document.documentElement) : new Element(el);
+			var tweenObj = isBody ? new Elem(YOM.browser.chrome ? document.body : document.documentElement) : new Elem(el);
 			if(interval === 0) {
 				tweenObj.setProp('scrollLeft', x);
 				return this;
@@ -1507,14 +1755,14 @@ define('yom/element', ['require'], function(require) {
 			if(!el || el.scrollTop == y) {
 				return this;
 			}
-			if(y instanceof Element) {
+			if(y instanceof Elem) {
 				this.scrollTopTo(y.getRect(this).top, interval, transition);
 				return this;
 			}
 			var rect = this.getRect();
-			var viewRect = Element.getViewRect();
+			var viewRect = Elem.getViewRect();
 			var scrollHeight, clientHeight;
-			var isBody = Element.isBody(el);
+			var isBody = Elem.isBody(el);
 			if(isBody) {
 				scrollHeight = rect.height;
 				clientHeight = viewRect.height;
@@ -1526,7 +1774,7 @@ define('yom/element', ['require'], function(require) {
 				return this;
 			}
 			y = y < 0 ? 0 : (y > scrollHeight - clientHeight ? scrollHeight - clientHeight : y);
-			var tweenObj = isBody ? new Element(YOM.browser.chrome ? document.body : document.documentElement) : new Element(el);
+			var tweenObj = isBody ? new Elem(YOM.browser.chrome ? document.body : document.documentElement) : new Elem(el);
 			if(interval === 0) {
 				tweenObj.setProp('scrollTop', y);
 				return this;
@@ -1549,17 +1797,17 @@ define('yom/element', ['require'], function(require) {
 		
 		getOffsetParent: function() {
 			var el = this.get();
-			if(!el || Element.isBody(el)) {
+			if(!el || Elem.isBody(el)) {
 				return null;
 			}
-			return el.offsetParent && new Element(el.offsetParent);
+			return el.offsetParent && new Elem(el.offsetParent);
 		},
 		
 		getRect: function(relative) {
 			var el, rect, docScrolls, elScrolls, res;
 			el = this.get();
-			if(Element.isBody(el)) {
-				var bodySize = Element.getDocSize(el.ownerDocument);
+			if(Elem.isBody(el)) {
+				var bodySize = Elem.getDocSize(el.ownerDocument);
 				res = {
 					top: 0, left: 0,
 					width: bodySize.width,
@@ -1570,8 +1818,8 @@ define('yom/element', ['require'], function(require) {
 				return res;
 			}
 			rect = el.getBoundingClientRect && el.getBoundingClientRect();
-			relative = relative ? $query(relative).getRect() : {top: 0, left: 0};
-			docScrolls = Element.getViewRect(el.ownerDocument);
+			relative = relative ? Elem.query(relative).getRect() : {top: 0, left: 0};
+			docScrolls = Elem.getViewRect(el.ownerDocument);
 			elScrolls = this.getScrolls();
 			if(rect) {
 				if(YOM.browser.ie && !YOM.browser.isQuirksMode() && (YOM.browser.v <= 7 || document.documentMode <= 7)) {
@@ -1599,8 +1847,8 @@ define('yom/element', ['require'], function(require) {
 				};
 				while(el.offsetParent) {
 					el = el.offsetParent;
-					res.top += el.offsetTop + (parseInt(new Element(el).getStyle('borderTopWidth')) || 0);
-					res.left += el.offsetLeft + (parseInt(new Element(el).getStyle('borderLeftWidth')) || 0);
+					res.top += el.offsetTop + (parseInt(new Elem(el).getStyle('borderTopWidth')) || 0);
+					res.left += el.offsetLeft + (parseInt(new Elem(el).getStyle('borderLeftWidth')) || 0);
 				}
 				res.bottom = res.top + res.height - relative.top;
 				res.right = res.left + res.width - relative.left;
@@ -1614,7 +1862,7 @@ define('yom/element', ['require'], function(require) {
 		},
 		
 		removeChild: function(el) {
-			if(!(el instanceof Element)) {
+			if(!(el instanceof Elem)) {
 				el = this.find(el);
 			}
 			el.each(function(child) {
@@ -1630,10 +1878,10 @@ define('yom/element', ['require'], function(require) {
 		
 		remove: function() {
 			var el = this.get();
-			if(!el || Element.isBody(el)) {
+			if(!el || Elem.isBody(el)) {
 				return null;
 			}
-			return new Element(el.parentNode.removeChild(el));
+			return new Elem(el.parentNode.removeChild(el));
 		},
 		
 		first: function() {
@@ -1642,7 +1890,7 @@ define('yom/element', ['require'], function(require) {
 			if(!el) {
 				return res;
 			}
-			new Element(el.childNode || el.children).each(function(item) {
+			new Elem(el.childNode || el.children).each(function(item) {
 				if(_isElementNode(item)) {
 					res = item;
 					return false;
@@ -1657,7 +1905,7 @@ define('yom/element', ['require'], function(require) {
 			if(!el) {
 				return null;
 			}
-			return el.nextElementSibling || Element.searchChain(el, 'nextSibling', function(el) {
+			return el.nextElementSibling || Elem.searchChain(el, 'nextSibling', function(el) {
 				return _isElementNode(el);
 			});
 		},
@@ -1667,7 +1915,7 @@ define('yom/element', ['require'], function(require) {
 			if(!el) {
 				return null;
 			}
-			return el.previousElementSibling || Element.searchChain(el, 'previousSibling', function(el) {
+			return el.previousElementSibling || Elem.searchChain(el, 'previousSibling', function(el) {
 				return _isElementNode(el);
 			});
 		},
@@ -1675,17 +1923,17 @@ define('yom/element', ['require'], function(require) {
 		head: function(tar) {
 			var firstChild = this.first();
 			if(firstChild) {
-				return new Element(this.get().insertBefore(tar, firstChild));
+				return new Elem(this.get().insertBefore(tar, firstChild));
 			} else {
 				return this.append(tar);
 			}
 		},
 		
 		headTo: function(tar) {
-			tar = $query(tar);
+			tar = Elem.query(tar);
 			var firstChild = tar.first();
 			if(firstChild) {
-				return new Element(tar.get().insertBefore(this.get(), firstChild));
+				return new Elem(tar.get().insertBefore(this.get(), firstChild));
 			} else {
 				return tar.append(this.get());
 			}
@@ -1693,9 +1941,9 @@ define('yom/element', ['require'], function(require) {
 		
 		append: function(el) {
 			if(_isElementNode(el)) {
-				return new Element(this.get().appendChild(el));
-			} else if(el instanceof Element) {
-				return new Element(this.get().appendChild(el.get()));
+				return new Elem(this.get().appendChild(el));
+			} else if(el instanceof Elem) {
+				return new Elem(this.get().appendChild(el.get()));
 			}
 			return null;
 		},
@@ -1706,17 +1954,17 @@ define('yom/element', ['require'], function(require) {
 				return null;
 			}
 			if(_isElementNode(parent)) {
-				return new Element(parent.appendChild(child));
-			} else if(parent instanceof Element) {
-				return new Element(parent.append(child));
+				return new Elem(parent.appendChild(child));
+			} else if(parent instanceof Elem) {
+				return new Elem(parent.append(child));
 			}
 			return null;
 		},
 		
 		before: function(target) {
 			var el = this.get();
-			target = $query(target).get();
-			if(!el || !target || Element.isBody(target)) {
+			target = Elem.query(target).get();
+			if(!el || !target || Elem.isBody(target)) {
 				return this;
 			}
 			target.parentNode.insertBefore(el, target);
@@ -1725,8 +1973,8 @@ define('yom/element', ['require'], function(require) {
 		
 		after: function(target) {
 			var el = this.get();
-			target = $query(target).get();
-			if(!el || !target || Element.isBody(target)) {
+			target = Elem.query(target).get();
+			if(!el || !target || Elem.isBody(target)) {
 				return this;
 			}
 			if(target.nextSibling) {
@@ -1740,7 +1988,7 @@ define('yom/element', ['require'], function(require) {
 		clone: function(bool) {
 			var el = this.get();
 			if(el) {
-				return new Element(el.cloneNode(bool));
+				return new Elem(el.cloneNode(bool));
 			}
 			return null;
 		},
@@ -1768,7 +2016,7 @@ define('yom/element', ['require'], function(require) {
 		
 		toggle: function(callback) {
 			this.each(function(el) {
-				el = new Element(el);
+				el = new Elem(el);
 				if(el.getStyle('display') == 'none') {
 					el.show();
 					callback && callback.call(el, 'SHOW');
@@ -1781,23 +2029,21 @@ define('yom/element', ['require'], function(require) {
 		},
 		
 		addEventListener: function(eType, listener, bind) {
-			var Event = require('yom/event');
 			this.each(function(el) {
-				Event.addListener(el, eType, listener, bind || el);
+				YOM.Event.addListener(el, eType, listener, bind || el);
 			});
 			return this;
 		},
 		
 		removeEventListener: function(eType, listener) {
-			var Event = require('yom/event');
 			this.each(function(el) {
-				Event.removeListener(el, eType, listener);
+				YOM.Event.removeListener(el, eType, listener);
 			});
 			return this;
 		},
 		
 		concat: function(els) {
-			return new Element(this.getAll().concat(new Element(els).getAll()));
+			return new Elem(this.getAll().concat(new Elem(els).getAll()));
 		},
 		
 		removeItem: function(el) {
@@ -1818,30 +2064,45 @@ define('yom/element', ['require'], function(require) {
 		}
 	});
 	
-	Element._ID = 107;
+	Elem.head = document.head || document.getElementsByTagName('head')[0] || document.documentElement;
 	
-	Element.head = document.head || document.getElementsByTagName('head')[0] || document.documentElement;
+	Elem.query = function(sel, context) {
+		var res;
+		if(sel instanceof Elem) {
+			return sel;
+		} else if(typeof sel == 'string') {
+			if(context) {
+				context = new Elem(typeof context == 'string' ? (document.querySelectorAll ? document.querySelectorAll(context) : Sizzle(context)) : context);
+				res = context.find(sel);
+			} else {
+				res = new Elem(document.querySelectorAll ? document.querySelectorAll(sel) : Sizzle(sel));
+			}
+		} else {
+			res = new Elem(sel);
+		}
+		return res;
+	};
 	
-	Element.isBody = function(el) {
-		el = $query(el).get();
+	Elem.isBody = function(el) {
+		el = Elem.query(el).get();
 		if(!el) {
 			return false;
 		}
 		return el.tagName == 'BODY' || el.tagName == 'HTML';
 	};
 
-	Element.create = function(name, attrs, style) {
-		var el = new Element(document.createElement(name));
+	Elem.create = function(name, attrs, style) {
+		var el = new Elem(document.createElement(name));
 		attrs && el.setAttr(attrs);
 		style && el.setStyle(style);
 		return el.get();
 	};
 	
-	Element.contains = function(a, b) {
+	Elem.contains = function(a, b) {
 		return (a.contains) ? (a != b && a.contains(b)) : !!(a.compareDocumentPosition(b) & 16);
 	};
 	
-	Element.searchChain = function(el, prop, validator) {
+	Elem.searchChain = function(el, prop, validator) {
 		var res;
 		while(el && el.nodeType) {
 			res = el[prop];
@@ -1853,7 +2114,7 @@ define('yom/element', ['require'], function(require) {
 		return null;
 	};
 	
-	Element.getViewRect = function(doc) {
+	Elem.getViewRect = function(doc) {
 		var res;
 		doc = doc || document;
 		res = {
@@ -1869,19 +2130,19 @@ define('yom/element', ['require'], function(require) {
 		return res;
 	};
 
-	Element.getFrameRect = function(maxBubble) {
+	Elem.getFrameRect = function(maxBubble) {
 		var res, rect;
 		var win = window;
 		var frame = win.frameElement;
 		var bubbleLeft = maxBubble;
 		if(!frame) {
-			return new Element(document.body).getRect();
+			return new Elem(document.body).getRect();
 		}
-		res = new Element(frame).getRect();
+		res = new Elem(frame).getRect();
 		win = win.parent;
 		frame = win.frameElement;
 		while(frame && (!maxBubble || --bubbleLeft > 0)) {
-			rect = new Element(frame).getRect();
+			rect = new Elem(frame).getRect();
 			res.left += rect.left;
 			res.right += rect.left;
 			res.top += rect.top;
@@ -1892,7 +2153,7 @@ define('yom/element', ['require'], function(require) {
 		return res;
 	};
 	
-	Element.getDocSize = function(doc) {
+	Elem.getDocSize = function(doc) {
 		var w, h;
 		doc = doc || document;
 		if(YOM.browser.isQuirksMode()) {
@@ -1913,19 +2174,558 @@ define('yom/element', ['require'], function(require) {
 		};
 	};
 	
-	return Element;
+	return Elem;
+});
+/**
+ * Inspired by KISSY
+ * @namespace YOM.transition
+ */
+define('./transition', [], function() {
+	var _BACK_CONST = 1.70158;
+	return {
+		css: {
+			linear: 'linear',
+			ease: 'ease',
+			easeIn: 'ease-in',
+			easeOut: 'ease-out',
+			easeInOut: 'ease-in-out'
+		},
+		
+		linear: function(t) {
+			return t;
+		},
+		
+		/**
+		 * Begins slowly and accelerates towards end. (quadratic)
+		 */
+		easeIn: function (t) {
+			return t * t;
+		},
+	
+		/**
+		 * Begins quickly and decelerates towards end.  (quadratic)
+		 */
+		easeOut: function (t) {
+			return ( 2 - t) * t;
+		},
+		
+		/**
+		 * Begins slowly and decelerates towards end. (quadratic)
+		 */
+		easeInOut: function (t) {
+			return (t *= 2) < 1 ?
+				0.5 * t * t :
+				0.5 * (1 - (--t) * (t - 2));
+		},
+		
+		/**
+		 * Begins slowly and accelerates towards end. (quartic)
+		 */
+		easeInStrong: function (t) {
+			return t * t * t * t;
+		},
+		
+		/**
+		 * Begins quickly and decelerates towards end.  (quartic)
+		 */
+		easeOutStrong: function (t) {
+			return 1 - (--t) * t * t * t;
+		},
+		
+		/**
+		 * Begins slowly and decelerates towards end. (quartic)
+		 */
+		easeInOutStrong: function (t) {
+			return (t *= 2) < 1 ?
+				0.5 * t * t * t * t :
+				0.5 * (2 - (t -= 2) * t * t * t);
+		},
+		
+		/**
+		 * Snap in elastic effect.
+		 */
+		elasticIn: function (t) {
+			var p = 0.3, s = p / 4;
+			if (t === 0 || t === 1) return t;
+			return -(Math.pow(2, 10 * (t -= 1)) * Math.sin((t - s) * (2 * Math.PI) / p));
+		},
+		
+		/**
+		 * Snap out elastic effect.
+		 */
+		elasticOut: function (t) {
+			var p = 0.3, s = p / 4;
+			if (t === 0 || t === 1) return t;
+			return Math.pow(2, -10 * t) * Math.sin((t - s) * (2 * Math.PI) / p) + 1;
+		},
+		
+		/**
+		 * Snap both elastic effect.
+		 */
+		elasticInOut: function (t) {
+			var p = 0.45, s = p / 4;
+			if (t === 0 || (t *= 2) === 2) return t / 2;
+			if (t < 1) {
+				return -0.5 * (Math.pow(2, 10 * (t -= 1)) *
+				Math.sin((t - s) * (2 * Math.PI) / p));
+			}
+			return Math.pow(2, -10 * (t -= 1)) *
+			Math.sin((t - s) * (2 * Math.PI) / p) * 0.5 + 1;
+		},
+	
+		/**
+		 * Backtracks slightly, then reverses direction and moves to end.
+		 */
+		backIn: function (t) {
+			if (t === 1) t -= 0.001;
+			return t * t * ((_BACK_CONST + 1) * t - _BACK_CONST);
+		},
+		
+		/**
+		 * Overshoots end, then reverses and comes back to end.
+		 */
+		backOut: function (t) {
+			return (t -= 1) * t * ((_BACK_CONST + 1) * t + _BACK_CONST) + 1;
+		},
+		
+		/**
+		 * Backtracks slightly, then reverses direction, overshoots end,
+		 * then reverses and comes back to end.
+		 */
+		backInOut: function (t) {
+			if ((t *= 2 ) < 1) {
+				return 0.5 * (t * t * (((_BACK_CONST *= (1.525)) + 1) * t - _BACK_CONST));
+			}
+			return 0.5 * ((t -= 2) * t * (((_BACK_CONST *= (1.525)) + 1) * t + _BACK_CONST) + 2);
+		},
+		
+		/**
+		 * Bounce off of start.
+		 */
+		bounceIn: function (t) {
+			return 1 - Easing.bounceOut(1 - t);
+		},
+		
+		/**
+		 * Bounces off end.
+		 */
+		bounceOut: function (t) {
+			var s = 7.5625, r;
+			if (t < (1 / 2.75)) {
+				r = s * t * t;
+			}
+			else if (t < (2 / 2.75)) {
+				r =  s * (t -= (1.5 / 2.75)) * t + 0.75;
+			}
+			else if (t < (2.5 / 2.75)) {
+				r =  s * (t -= (2.25 / 2.75)) * t + 0.9375;
+			}
+			else {
+				r =  s * (t -= (2.625 / 2.75)) * t + 0.984375;
+			}
+			return r;
+		},
+		
+		/**
+		 * Bounces off start and end.
+		 */
+		bounceInOut: function (t) {
+			if (t < 0.5) {
+				return Easing.bounceIn(t * 2) * 0.5;
+			}
+			return Easing.bounceOut(t * 2 - 1) * 0.5 + 0.5;
+		}
+	};
+});
+/**
+ * Inspired by KISSY
+ * @class YOM.Tween
+ */
+define('./tween', ['./browser', './object', './instance-manager', './element', './transition'], function(browser, object, InstanceManager, Elem, transition) {
+	var YOM = {
+		'browser': browser,
+		'object': object,
+		'InstanceManager': InstanceManager,
+		'Element': Elem,
+		'transition': transition
+	};
+	
+	var _ID = 120;
+	var _STATUS = {
+		INIT: 0,
+		TWEENING: 1,
+		STOPPED: 2
+	};
+	var _STYLE_PROPS = [
+		'backgroundColor', 'borderBottomColor', 'borderBottomWidth', 'borderBottomStyle', 'borderLeftColor', 'borderLeftWidth', 'borderLeftStyle', 'borderRightColor', 'borderRightWidth', 'borderRightStyle', 'borderSpacing', 'borderTopColor', 'borderTopWidth', 'borderTopStyle', 'bottom', 'color', 'font', 'fontFamily', 'fontSize', 'fontWeight', 'height', 'left', 'letterSpacing', 'lineHeight', 'marginBottom', 'marginLeft', 'marginRight', 'marginTop', 'maxHeight', 'maxWidth', 'minHeight', 'minWidth', 'opacity', 'outlineColor', 'outlineOffset', 'outlineWidth', 'paddingBottom', 'paddingLeft', 'paddingRight', 'paddingTop', 'right', 'textIndent', 'top', 'width', 'wordSpacing', 'zIndex', 'position'
+	];
+	var _FPS = 60;
+	
+	var _im = new YOM.InstanceManager();
+	var _parserEl = null;
+	
+	var _requestAnimationFrame = window.requestAnimationFrame
+	|| window.webkitRequestAnimationFrame
+	|| window.mozRequestAnimationFrame
+	|| window.oRequestAnimationFrame
+	|| window.msRequestAnimationFrame
+	|| function(callback) {
+		return setTimeout(callback, 1000 / _FPS);
+	}
+	
+	var _cancelAnimationFrame = window.cancelAnimationFrame
+	|| window.webkitCancelAnimationFrame
+	|| window.mozCancelAnimationFrame
+	|| window.oCancelAnimationFrame
+	|| window.msCancelAnimationFrame
+	|| function(timer) {
+		clearTimeout(timer);
+	};
+	
+	function _getParserEl() {
+		if(!_parserEl) {
+			_parserEl = YOM.Element.create('div');
+		}
+		return _parserEl;
+	};
+	
+	function _getRgbVal(str) {
+		var res;
+		str += '';
+		if(str.indexOf('rgb') === 0) {
+			res = str.match(/\d+/g);
+		} else if(str.indexOf('#') === 0) {
+			if(str.length === 4) {
+				str = '#' + str.slice(1, 2) + str.slice(1, 2) + str.slice(2, 3) + str.slice(2, 3) + str.slice(3, 4) + str.slice(3, 4);
+			}
+			res = [parseInt(str.slice(1, 3), 16) || 0, parseInt(str.slice(3, 5), 16) || 0, parseInt(str.slice(5, 7), 16) || 0];
+		}
+		return res || [];
+	};
+	
+	function _calColorVal(source, target, percent) {
+		var srcTmp = _getRgbVal(source);
+		var tarTmp = _getRgbVal(target);
+		if(!tarTmp.length) {
+			return target;
+		}
+		var tmp = [];
+		for(var i = 0; i < 4; i++) {
+			srcTmp[i] = parseInt(srcTmp[i]) || 0;
+			tarTmp[i] = parseInt(tarTmp[i]) || 0;
+			tmp[i] = parseInt(srcTmp[i] + (tarTmp[i] - srcTmp[i]) * percent);
+			tmp[i] = tmp[i] < 0 ? 0 : tmp[i] > 255 ? 255 : tmp[i];
+		}
+		if(target.indexOf('rgba') === 0) {
+			return 'rgba(' + tmp.join(',') + ')';
+		} else {
+			tmp.pop();
+			return 'rgb(' + tmp.join(',') + ')';
+		}
+	};
+	
+	function _calNumVal(origin, target, percent) {
+		return origin + (target - origin) * percent;
+	};
+	
+	function _calStrVal(origin, target, percent) {
+		return percent === 1 ? target : origin;
+	};
+	
+	function _parsePropVal(val) {
+		var v, u;
+		val = val + '';
+		v = parseFloat(val);
+		u = val.replace(/^[-\d\.]+/, '');
+		return isNaN(v) ? {v: val, u: '', f: (/^#|rgb/).test(val) ? _calColorVal : _calStrVal} : {v: v, u: u, f: _calNumVal};
+	};
+	
+	function _getStyle(style) {
+		var res = {};
+		var parserEl;
+		if(!style) {
+			return res;
+		}
+		if(typeof style == 'string') {
+			parserEl = _getParserEl();
+			parserEl.innerHTML = '<div style="' + style + '"></div>';
+			style = parserEl.firstChild.style;
+		}
+		YOM.object.each(_STYLE_PROPS, function(prop) {
+			var val = style[prop];
+			if(val || val === 0) {
+				res[prop] = _parsePropVal(val);
+			}
+		});
+		return res;
+	};
+	
+	function _getOriginStyle(el, target, origin) {
+		var res = {};
+		origin = _getStyle(origin);
+		YOM.object.each(target, function(propVal, propName) {
+			var val;
+			if(origin[propName]) {
+				res[propName] = origin[propName];
+			} else {
+				val = el.getStyle(propName);
+				if(val || val === 0) {
+					res[propName] = _parsePropVal(val);
+				} else {
+					res[propName] = propVal;
+				}
+			}
+		});
+		return res;
+	};
+	
+	function _getProp(prop) {
+		var res = {};
+		YOM.object.each(prop, function(propVal, propName) {
+			res[propName] = _parsePropVal(propVal);
+		});
+		return res;
+	};
+	
+	function _getOriginProp(el, target, origin) {
+		var res = {};
+		origin = _getProp(origin);
+		YOM.object.each(target, function(propVal, propName) {
+			var val;
+			if(origin[propName]) {
+				res[propName] = origin[propName];
+			} else {
+				val = el.getProp(propName);
+				if(val != undefined) {
+					res[propName] = _parsePropVal(val);
+				} else {
+					res[propName] = propVal;
+				}
+			}
+		});
+		return res;
+	};
+	
+	function Tween(el, duration, opt) {
+		if(!(this instanceof Tween)) {
+			return new Tween(el, duration, opt);
+		}
+		opt = opt || {};
+		opt.origin = opt.origin || {};
+		opt.target = opt.target || {};
+		this._opt = opt;
+		this._el = YOM.Element.query(el);
+		this._duration = duration;
+		this._css = opt.css && !opt.target.prop && Tween.getCssTransitionName();
+		this._targetStyle = _getStyle(opt.target.style);
+		this._originStyle = _getOriginStyle(this._el, this._targetStyle, opt.origin.style);
+		this._targetProp = _getProp(opt.target.prop);
+		this._originProp = _getOriginProp(this._el, this._targetProp, opt.origin.prop);
+		this._transition = YOM.transition[opt.transition] || opt.transition || YOM.transition['easeOut'];
+		this._complete = opt.complete || $empty;
+		this._timer = null;
+		this._startTime = null;
+		this._status = _STATUS.INIT;
+		this._id = _im.add(this);
+		return this;
+	};
+	
+	Tween._im = _im;
+	
+	Tween.getCssTransitionName = function() {
+		var el = new YOM.Element(_getParserEl());
+		var name = 'transition';
+		var isSupport = el.getStyle(name) != undefined;
+		if(!isSupport) {
+			if(YOM.browser.chrome || YOM.browser.safari || YOM.browser.ipad || YOM.browser.iphone || YOM.browser.android) {
+				name = '-webkit-transition';
+			} else if(YOM.browser.firefox) {
+				name = '-moz-transition';
+			} else if(YOM.browser.opera) {
+				name = '-o-transition';
+			} else if(YOM.browser.ie) {
+				name = '-ms-transition';
+			} else {
+				name = '';
+			}
+			if(name) {
+				isSupport = el.getStyle(name) != undefined;
+				if(!isSupport) {
+					name = '';
+				}
+			}
+		}
+		Tween.getCssTransitionName = function() {
+			return name;
+		};
+		return name;
+	};
+	
+	Tween.setTimer = function(setter, duration, callback, transition) {
+		transition = YOM.transition[transition] || transition || YOM.transition['linear'];
+		var start = $now();
+		var end = start + duration;
+		setter(_requestAnimationFrame(function() {
+			var now = $now();
+			var percent = now >= end ? 1 : (now - start) / duration;
+			percent = Math.min(transition(percent), 1);
+			callback(percent);
+			if(percent < 1) {
+				setter(_requestAnimationFrame(arguments.callee));
+			}
+		}));
+	};
+
+	Tween.stopAllTween = function(el) {
+		YOM.Element.query(el).each(function(el) {
+			var tweenObj = _im.get(new YOM.Element(el).getDatasetVal('yom-tween-oid'));
+			tweenObj && tweenObj.stop();
+		});
+	};
+	
+	Tween.cancelTimer = _cancelAnimationFrame;
+	
+	Tween.prototype._stopAllTween = function() {
+		Tween.stopAllTween(this._el);
+	};
+	
+	Tween.prototype._removeTweeningEl = function() {
+		this._el.removeItem(function(el) {
+			var tweenObj = _im.get(new YOM.Element(el).getDatasetVal('yom-tween-oid'));
+			return tweenObj && tweenObj.isTweening();
+		});
+	};
+	
+	Tween.prototype._cssTween = function() {
+		var self = this;
+		var originStyle = this._originStyle;
+		var targetStyle = this._targetStyle;
+		var timingFunction = YOM.transition.css[this._opt.transition] || YOM.transition.css['easeOut'];
+		var tVal;
+		for(prop in originStyle) {
+			tVal = originStyle[prop];
+			this._el.setStyle(prop, tVal.v + tVal.u);
+		}
+		this._el.each(function(el) {
+			el.clientLeft;//force reflow
+		});
+		this._el.storeStyle(this._css + '-duration');
+		this._el.storeStyle(this._css + '-timing-function');
+		this._el.setStyle(this._css + '-duration', this._duration + 'ms');
+		this._el.setStyle(this._css + '-timing-function', timingFunction);
+		for(prop in targetStyle) {
+			tVal = targetStyle[prop];
+			this._el.setStyle(prop, tVal.v + tVal.u);
+		}
+		this._timer = setTimeout(function() {
+			self.stop(true);
+		}, this._duration);
+	};
+	
+	Tween.prototype.isTweening = function() {
+		return this._status == _STATUS.TWEENING;
+	};
+	
+	Tween.prototype.play = function() {
+		if(this._status != _STATUS.INIT) {
+			return 1;
+		}
+		if(this._opt.prior) {
+			this._stopAllTween();
+		} else {
+			this._removeTweeningEl();
+		}
+		if(!this._el.size()) {
+			return 2;
+		}
+		this._status = _STATUS.TWEENING;
+		this._el.setDatasetVal('yom-tween-oid', this._id);
+		var self = this;
+		var targetStyle = this._targetStyle;
+		var originStyle = this._originStyle;
+		var targetProp = this._targetProp;
+		var originProp = this._originProp;
+		var prop, oVal, tVal;
+		this._startTime = $now();
+		if(this._css) {
+			this._cssTween();
+		} else {
+			Tween.setTimer(function(timer) {self._timer = timer;}, this._duration, function(percent) {
+				if(self._status == _STATUS.STOPPED) {
+					return;
+				}
+				for(prop in targetStyle) {
+					tVal = targetStyle[prop];
+					oVal = originStyle[prop];
+					if(oVal.u != tVal.u) {
+						oVal.v = 0;
+					}
+					self._el.setStyle(prop, tVal.f(oVal.v, tVal.v, percent) + tVal.u);
+				}
+				for(prop in targetProp) {
+					tVal = targetProp[prop];
+					oVal = originProp[prop];
+					if(oVal.u != tVal.u) {
+						oVal.v = 0;
+					}
+					self._el.setProp(prop, tVal.f(oVal.v, tVal.v, percent) + tVal.u);
+				}
+				if(percent === 1) {
+					self.stop(true);
+				}
+			}, this._transition);
+		}
+		return 0;
+	};
+	
+	Tween.prototype.stop = function(_finished) {
+		if(this._status == _STATUS.STOPPED) {
+			return;
+		}
+		var el = this._el;
+		var status = this._status;
+		var tVal, oVal, percent;
+		if(this._css) {
+			clearTimeout(this._timer);
+			this._el.restoreStyle(this._css + '-duration');
+			this._el.restoreStyle(this._css + '-timing-function');
+			if(!_finished) {
+				percent = ($now() - this._startTime) / this._duration;
+				percent = Math.min(this._transition(percent), 1);
+				for(prop in this._targetStyle) {
+					tVal = this._targetStyle[prop];
+					oVal = this._originStyle[prop];
+					if(oVal.u != tVal.u) {
+						oVal.v = 0;
+					}
+					this._el.setStyle(prop, tVal.f(oVal.v, tVal.v, percent) + tVal.u);
+				}
+			}
+		} else {
+			_cancelAnimationFrame(this._timer);
+		}
+		this._el = null;
+		this._status = _STATUS.STOPPED;
+		_im.remove(this._id);
+		if(status != _STATUS.INIT && this._complete) {
+			this._complete(el);
+		}
+	};
+	
+	return Tween;
 });
 /**
  * YOM.Element FX extention, inspired by KISSY
  */
-define('yom/element-fx', ['require'], function(require) {
+define('./element-fx', ['./object', './array', './element', './tween'], function(object, array, Elem, Tween) {
 	var YOM = {
-		'object': require('yom/object'),
-		'array': require('yom/array'),
-		'Element': require('yom/element')
+		'object': object,
+		'array': array,
+		'Element': Elem,
+		'Tween': Tween
 	};
 	
-	$extend(YOM.Element.prototype, (function() {
+	YOM.object.extend(YOM.Element.prototype, (function() {
 		var _DURATION = 300;
 		var _CONF = {
 			fxShow: {style: ['overflow', 'opacity', 'width', 'height'], isShow: 1},
@@ -1938,9 +2738,8 @@ define('yom/element-fx', ['require'], function(require) {
 		};
 		
 		function _doFx(type, el, duration, complete) {
-			var Tween = require('yom/tween');
 			var conf, iStyle, oStyle, tStyle, isShow, width, height;
-			Tween.stopAllTween(el);
+			YOM.Tween.stopAllTween(el);
 			if(type == 'fxToggle') {
 				type = el.getStyle('display') == 'none' ? 'fxShow' : 'fxHide';
 			}
@@ -1993,7 +2792,7 @@ define('yom/element-fx', ['require'], function(require) {
 				}
 			});
 			el.setStyle(oStyle);
-			new Tween(el, duration, {
+			new YOM.Tween(el, duration, {
 				target: {
 					style: tStyle
 				},
@@ -2009,10 +2808,9 @@ define('yom/element-fx', ['require'], function(require) {
 		
 		var fx = {
 			tween: function() {
-				var Tween = require('yom/tween');
 				var args = YOM.array.getArray(arguments);
 				this.each(function(el) {
-					Tween.apply(this, [el].concat(args)).play();
+					YOM.Tween.apply(this, [el].concat(args)).play();
 				});
 				return this;
 			}
@@ -2038,240 +2836,13 @@ define('yom/element-fx', ['require'], function(require) {
 	return {};
 });
 /**
- * @class YOM.Observer
- */
-define('yom/observer', [], function() {
-	var Observer = function () {
-		this._subscribers = [];
-	};
-	
-	Observer.prototype = {
-		subscribe: function(subscriber, bind) {
-			subscriber = bind ? $bind(bind, subscriber) : subscriber;
-			for(var i = 0, l = this._subscribers.length; i < l; i++) {
-				if(subscriber == this._subscribers[i]) {
-					return null;
-				}
-			}
-			this._subscribers.push(subscriber);
-			return subscriber;
-		},
-		
-		remove: function(subscriber) {
-			var res = [];
-			if(subscriber) {
-				for(var i = this._subscribers.length - 1; i >= 0; i--) {
-					if(subscriber == this._subscribers[i]) {
-						res = res.concat(this._subscribers.splice(i, 1));
-					}
-				}
-			} else {
-				res = this._subscribers;
-				this._subscribers = [];
-			}
-			return res;
-		},
-		
-		dispatch: function(e, bind) {
-			var res, tmp, subscriber;
-			for(var i = this._subscribers.length - 1; i >= 0; i--) {
-				subscriber = this._subscribers[i];
-				if(!subscriber) {
-					continue;				
-				}
-				tmp = subscriber.call(bind, e);
-				res = tmp === false || res === false ? false : tmp;
-			}
-			return res;
-		},
-		
-		constructor: Observer
-	};
-	
-	Observer._ID = 111;
-	
-	return Observer;
-});
-/**
- * @class YOM.Event
- */
-define('yom/event', ['require'], function(require) {
-	var YOM = {
-		'Error': require('yom/error'),
-		'object': require('yom/object'),
-		'Observer': require('yom/observer')
-	};
-	
-	var _elRefCount = 0;
-	_customizedEventHash = {
-		
-	};
-	
-	function _getObserver(instance, type) {
-		if(!instance instanceof Event) {
-			throw new YOM.Error(YOM.Error.getCode(Event._ID, 1));
-		}
-		instance._observers = instance._observers || {};
-		instance._observers[type] = instance._observers[type] || new YOM.Observer();
-		return instance._observers[type];
-	};
-	
-	function _getObservers(instance) {
-		if(!instance instanceof Event) {
-			throw new YOM.Error(YOM.Error.getCode(Event._ID, 1));
-		}
-		instance._observers = instance._observers || {};
-		return instance._observers;
-	};
-	
-	function Event(observers) {
-		this._observers = $getClean(observers) || {};
-	};
-	
-	Event.prototype = {
-		addObservers: function(newObservers) {
-			var observers = _getObservers(this);
-			newObservers = $getClean(newObservers);
-			for(var type in newObservers) {
-				if(newObservers[type] instanceof YOM.Observer) {
-					observers[type] = newObservers[type];
-				}
-			}
-		},
-		
-		addEventListener: function(type, listener, bind) {
-			var observer = _getObserver(this, type);
-			if(!observer) {
-				throw new YOM.Error(YOM.Error.getCode(Event._ID, 1));
-			}
-			return observer.subscribe(listener, bind);
-		},
-		
-		removeEventListener: function(type, listener) {
-			var observer = _getObserver(this, type);
-			if(!observer) {
-				throw new YOM.Error(YOM.Error.getCode(Event._ID, 2));
-			}
-			return observer.remove(listener);
-		},
-		
-		dispatchEvent: function(e, asyn) {
-			if(typeof e == 'string') {
-				e = {type: e};
-			}
-			var self = this;
-			var observer = _getObserver(this, e.type);
-			if(!observer) {
-				throw new YOM.Error(YOM.Error.getCode(Event._ID, 3));
-			}
-			if(asyn) {
-				setTimeout(function() {
-					observer.dispatch.call(observer, e, self);
-				}, 0);
-				return undefined;
-			} else {
-				return observer.dispatch.call(observer, e, self);
-			}
-		},
-		
-		createEvent: function(type, opt) {
-			var e = YOM.object.clone(opt) || {};
-			e.type = type;
-			return e;
-		},
-		
-		constructor: Event
-	};
-	
-	Event._ID = 108;
-	
-	Event.addListener = function(el, eType, listener, bind) {
-		var cEvent, cEventHandler;
-		eType = eType.toLowerCase();
-		listener = bind ? $bind(bind, listener) : listener;
-		cEvent = _customizedEventHash[eType];
-		if(cEvent) {
-			el.elEventRef = el.elEventRef || ++_elRefCount;
-			cEventHandler = cEvent.elEventRefHandlerHash[el.elEventRef];
-			if(!cEventHandler) {
-				cEventHandler = cEvent.elEventRefHandlerHash[el.elEventRef] = new cEvent.Handler(el);
-			}
-			cEventHandler.addListener(listener);
-		} else if(el.addEventListener) {
-			el.addEventListener(eType, listener, false);
-		} else {
-			el.attachEvent('on' + eType, listener);
-		}
-		return listener;
-	};
-	
-	Event.removeListener = function(el, eType, listener) {
-		var cEvent, cEventHandler;
-		eType = eType.toLowerCase();
-		cEvent = _customizedEventHash[eType];
-		if(cEvent) {
-			cEventHandler = cEvent.elEventRefHandlerHash[el.elEventRef];
-			if(cEventHandler) {
-				cEventHandler.removeListener(listener);
-			}
-		} else if(el.removeEventListener) {
-			el.removeEventListener(eType, listener, false);
-		} else {
-			el.detachEvent('on' + eType, listener);
-		}
-	};
-	
-	Event.addCustomizedEvent = function(type, Handler) {
-		_customizedEventHash[type] = {
-			Handler: Handler,
-			elEventRefHandlerHash: {}
-		};
-	};
-	
-	Event.removeCustomizedEventHandler = function(type, ref) {
-		var cEvent = _customizedEventHash[type];
-		if(cEvent) {
-			cEvent.elEventRefHandlerHash[ref] = null;
-		}
-	};
-	
-	Event.cancelBubble = function(e) {
-		if(e.stopPropagation) {
-			e.stopPropagation();
-		} else {
-			e.cancelBubble = true;
-		}
-	};
-	
-	Event.preventDefault = function(e) {
-		if(e.preventDefault) {
-			e.preventDefault();
-		} else {
-			e.returnValue = false;
-		}
-	};
-	
-	Event.getTarget = function(e) {
-		return e.target || e.srcElement;
-	};
-	
-	Event.getPageX = function(e) {
-		return e.pageX != undefined ? e.pageX : e.clientX + Math.max(document.documentElement.scrollLeft, document.body.scrollLeft);
-	};
-	
-	Event.getPageY = function(e) {
-		return e.pageY != undefined ? e.pageY : e.clientY + Math.max(document.documentElement.scrollTop, document.body.scrollTop);
-	};
-	
-	return Event;
-});
-/**
  * @class YOM.Event.Delegator
  */
-define('yom/event-delegator', ['require'], function(require) {
+define('./event-delegator', ['./object', './event', './element'], function(object, Evt, Elem) {
 	var YOM = {
-		'Event': require('yom/event'),
-		'Element': require('yom/element')
+		'object': object,
+		'Event': Evt,
+		'Element': Elem
 	};
 	
 	var _pageDelegator;
@@ -2281,7 +2852,7 @@ define('yom/event-delegator', ['require'], function(require) {
 	 */
 	function Delegator(ele, opt) {
 		opt = opt || {};
-		this._ele = $query(ele);
+		this._ele = YOM.Element.query(ele);
 		this._delegatedTypes = {};
 		this._handlers = {};
 		this._eventHook = opt.eventHook;
@@ -2320,7 +2891,7 @@ define('yom/event-delegator', ['require'], function(require) {
 				flag.maxBubble = Math.max(flag.maxBubble, maxBubble);
 				return;
 			} else {
-				var listener = $bind(this, this._eventListener);
+				var listener = YOM.object.bind(this, this._eventListener);
 				this._ele.addEventListener(type, listener);
 				this._handlers[type] = {};
 				this._delegatedTypes[type] = {maxBubble: maxBubble, listener: listener};
@@ -2366,10 +2937,10 @@ define('yom/event-delegator', ['require'], function(require) {
 /**
  * @class YOM.Event.VirtualEventHandler
  */
-define('yom/event-virtual-handler', ['require'], function(require) {
+define('./event-virtual-handler', ['./object', './event'], function(object, Evt) {
 	var YOM = {
-		'object': require('yom/object'),
-		'Event': require('yom/event')
+		'object': object,
+		'Event': Evt
 	};
 	
 	var VirtualEventHandler = function(el) {
@@ -2435,21 +3006,22 @@ define('yom/event-virtual-handler', ['require'], function(require) {
 /**
  * @class YOM.Event.MouseenterEventHandler
  */
-define('yom/event-mouseenter', ['require'], function(require) {
+define('./event-mouseenter', ['./browser', './object', './array', './class', './event', './element', './event-virtual-handler'], function(browser, object, array, Class, Evt, Elem, VirtualEventHandler) {
 	var YOM = {
-		'browser': require('yom/browser'),
-		'Class': require('yom/class'),
-		'array': require('yom/array'),
-		'Event': require('yom/event'),
-		'Element': require('yom/element')
+		'browser': browser,
+		'object': object,
+		'array': array,
+		'Class': Class,
+		'Event': Evt,
+		'Element': Elem
 	};
-	YOM.Event.VirtualEventHandler = require('yom/event-virtual-handler');
+	YOM.Event.VirtualEventHandler = VirtualEventHandler;
 	
 	var MouseenterEventHandler = function(el) {
 		this.name = 'mouseenter';
 		MouseenterEventHandler.superClass.constructor.apply(this, YOM.array.getArray(arguments));
 		this._bound = {
-			mouseover: $bind(this, this._mouseover)
+			mouseover: YOM.object.bind(this, this._mouseover)
 		};
 		YOM.Event.addListener(this._delegateEl, 'mouseover', this._bound.mouseover);
 	};
@@ -2475,21 +3047,22 @@ define('yom/event-mouseenter', ['require'], function(require) {
 /**
  * @class YOM.Event.MouseleaveEventHandler
  */
-define('yom/event-mouseleave', ['require'], function(require) {
+define('./event-mouseleave', ['./browser', './object', './array', './class', './event', './element', './event-virtual-handler'], function(browser, object, array, Class, Evt, Elem, VirtualEventHandler) {
 	var YOM = {
-		'browser': require('yom/browser'),
-		'Class': require('yom/class'),
-		'array': require('yom/array'),
-		'Event': require('yom/event'),
-		'Element': require('yom/element')
+		'browser': browser,
+		'object': object,
+		'array': array,
+		'Class': Class,
+		'Event': Evt,
+		'Element': Elem
 	};
-	YOM.Event.VirtualEventHandler = require('yom/event-virtual-handler');
+	YOM.Event.VirtualEventHandler = VirtualEventHandler;
 	
 	var MouseleaveEventHandler = function(el) {
 		this.name = 'mouseleave';
 		MouseleaveEventHandler.superClass.constructor.apply(this, YOM.array.getArray(arguments));
 		this._bound = {
-			mouseout: $bind(this, this._mouseout)
+			mouseout: YOM.object.bind(this, this._mouseout)
 		};
 		YOM.Event.addListener(this._delegateEl, 'mouseout', this._bound.mouseout);
 	};
@@ -2515,9 +3088,9 @@ define('yom/event-mouseleave', ['require'], function(require) {
 /**
  * @namespace YOM.cookie
  */
-define('yom/cookie', ['require'], function(require) {
+define('./cookie', ['./config'], function(config) {
 	var YOM = {
-		'config': require('yom/config')
+		'config': config
 	};
 	
 	return {
@@ -2545,15 +3118,15 @@ define('yom/cookie', ['require'], function(require) {
 /**
  * @namespace YOM.Xhr
  */
-define('yom/xhr', ['require'], function(require) {
+define('./xhr', ['./config', './error', './class', './object', './instance-manager', './observer', './event'], function(config, Err, Class, object, InstanceManager, Observer, Evt) {
 	var YOM = {
-		'config': require('yom/config'),
-		'Error': require('yom/error'),
-		'Class': require('yom/class'),
-		'object': require('yom/object'),
-		'InstanceManager': require('yom/instance-manager'),
-		'Observer': require('yom/observer'),
-		'Event': require('yom/event')
+		'config': config,
+		'Error': Err,
+		'Class': Class,
+		'object': object,
+		'InstanceManager': InstanceManager,
+		'Observer': Observer,
+		'Event': Evt
 	};
 	
 	var _ID = 116;
@@ -2687,7 +3260,7 @@ define('yom/xhr', ['require'], function(require) {
 		if(this._opt.withCredentials) {
 			this._xhr.withCredentials = true;
 		}
-		this._xhr.onreadystatechange = $bind(this, _onReadyStateChange);
+		this._xhr.onreadystatechange = YOM.object.bind(this, _onReadyStateChange);
 		this._status = _STATUS.LOADING;
 		this._opt.silent || _loading_count++;
 		this._xhr.send(this._method == 'POST' ? (this._formData || this._param) : null);
@@ -2715,16 +3288,17 @@ define('yom/xhr', ['require'], function(require) {
 /**
  * @class YOM.CrossDomainPoster
  */
-define('yom/cross-domain-poster', ['require'], function(require) {
+define('./cross-domain-poster', ['require', './config', './error', './object', './class', './instance-manager', './json', './observer', './event', './element'], function(require, config, Err, object, Class, InstanceManager, json, Observer, Evt, Elem) {
 	var YOM = {
-		'config': require('yom/config'),
-		'Error': require('yom/error'),
-		'Class': require('yom/class'),
-		'InstanceManager': require('yom/instance-manager'),
-		'json': require('yom/json'),
-		'Observer': require('yom/observer'),
-		'Event': require('yom/event'),
-		'Element': require('yom/element')
+		'config': config,
+		'Error': Err,
+		'object': object,
+		'Class': Class,
+		'InstanceManager': InstanceManager,
+		'json': json,
+		'Observer': Observer,
+		'Event': Evt,
+		'Element': Elem
 	};
 	
 	var _ID = 125;
@@ -2850,9 +3424,14 @@ define('yom/cross-domain-poster', ['require'], function(require) {
 		if(!this._frameEl) {
 			return;
 		}
-		YOM.Event.removeListener(this._frameEl, 'load', this._frameOnLoadListener);
-		document.body.removeChild(this._frameEl);
+		var frameEl = this._frameEl;
 		this._frameEl = null;
+		YOM.Event.removeListener(frameEl, 'load', this._frameOnLoadListener);
+		//Chrome will not tirgger the exception throwed in callback after frame element removed
+		//so delay to remove it
+		setTimeout(function() {
+			document.body.removeChild(frameEl);
+		}, 0);
 		_im.remove(this.getId());
 	};
 		
@@ -2866,7 +3445,7 @@ define('yom/cross-domain-poster', ['require'], function(require) {
 		}
 		this._frameEl = YOM.Element.create('iframe', {src: this._proxy}, {display: 'none'});
 		this._frameEl.instanceId = this.getId();
-		this._frameEl.callback = $bind(this, function(o) {
+		this._frameEl.callback = YOM.object.bind(this, function(o) {
 			if(this._status != _STATUS.LOADING) {
 				return;
 			}
@@ -2874,7 +3453,7 @@ define('yom/cross-domain-poster', ['require'], function(require) {
 			this._complete(CrossDomainPoster.RET.SUCC);
 			this._onload.call(this._bind, o);
 		});
-		this._frameOnLoadListener = $bind(this, this._frameOnLoad);
+		this._frameOnLoadListener = YOM.object.bind(this, this._frameOnLoad);
 		YOM.Event.addListener(this._frameEl, 'load', this._frameOnLoadListener);
 		this._frameEl = document.body.appendChild(this._frameEl);
 		this._status = _STATUS.LOADING;
@@ -2898,9 +3477,9 @@ define('yom/cross-domain-poster', ['require'], function(require) {
 /**
  * @namespace YOM.pos
  */
-define('yom/pos', ['require'], function(require) {
+define('./pos', ['./object'], function(object) {
 	var YOM = {
-		'object': require('yom/object')
+		'object': object
 	};
 	
 	return {
@@ -2947,9 +3526,9 @@ define('yom/pos', ['require'], function(require) {
 /**
  * @namespace YOM.util
  */
-define('yom/util', ['require'], function(require) {
+define('./util', ['./object'], function(object) {
 	var YOM = {
-		'object': require('yom/object')
+		'object': object
 	};
 	
 	return {
@@ -3025,19 +3604,19 @@ define('yom/util', ['require'], function(require) {
 /**
  * @class YOM.JsLoader
  */
-define('yom/js-loader', ['require'], function(require) {
+define('./js-loader', ['./config', './error', './browser', './object', './class', './array', './instance-manager', './observer', './event', './element', './util'], function(config, Err, browser, object, Class, array, InstanceManager, Observer, Evt, Elem, util) {
 	var YOM = {
-		'config': require('yom/config'),
-		'Error': require('yom/error'),
-		'browser': require('yom/browser'),
-		'object': require('yom/object'),
-		'Class': require('yom/class'),
-		'array': require('yom/array'),
-		'InstanceManager': require('yom/instance-manager'),
-		'Observer': require('yom/observer'),
-		'Event': require('yom/event'),
-		'Element': require('yom/element'),
-		'util': require('yom/util')
+		'config': config,
+		'Error': Err,
+		'browser': browser,
+		'object': object,
+		'Class': Class,
+		'array': array,
+		'InstanceManager': InstanceManager,
+		'Observer': Observer,
+		'Event': Evt,
+		'Element': Elem,
+		'util': util
 	};
 	
 	var _TIMEOUT = 60000;
@@ -3218,7 +3797,7 @@ define('yom/js-loader', ['require'], function(require) {
 				return -1;
 			}
 			_callbackLoadingHash[this._callbackName] = 1;
-			window[this._callbackName] = $bind(this, function() {
+			window[this._callbackName] = YOM.object.bind(this, function() {
 				this._callbacked = true;
 				if(this._status != _STATUS.LOADING) {
 					return;
@@ -3270,13 +3849,13 @@ define('yom/js-loader', ['require'], function(require) {
 /**
  * @namespace YOM.css
  */
-define('yom/css', ['require'], function(require) {
+define('./css', ['./object', './array', './class', './event', './element'], function(object, array, Class, Evt, Elem) {
 	var YOM = {
-		'object': require('yom/object'),
-		'array': require('yom/array'),
-		'Class': require('yom/class'),
-		'Event': require('yom/event'),
-		'Element': require('yom/element')
+		'object': object,
+		'array': array,
+		'Class': Class,
+		'Event': Evt,
+		'Element': Elem
 	};
 	
 	var _linkCount = 0;
@@ -3334,7 +3913,7 @@ define('yom/css', ['require'], function(require) {
 	};
 	YOM.Class.extend(Css, YOM.Event);
 	
-	return $extend(new Css({
+	return YOM.object.extend(new Css({
 	}), {
 		_ID: 106,
 		load: load,
@@ -3344,11 +3923,11 @@ define('yom/css', ['require'], function(require) {
 /**
  * @namespace YOM.tmpl
  */
-define('yom/tmpl', ['require'], function(require) {
+define('./tmpl', ['./browser', './string', './object'], function(browser, string, object) {
 	var YOM = {
-		'browser': require('yom/browser'),
-		'string': require('yom/string'),
-		'object': require('yom/object')
+		'browser': browser,
+		'string': string,
+		'object': object
 	};
 	
 	var _cache = {};
@@ -3427,550 +4006,12 @@ define('yom/tmpl', ['require'], function(require) {
 	};
 });
 /**
- * Inspired by KISSY
- * @namespace YOM.transition
- */
-define('yom/transition', [], function() {
-	var _BACK_CONST = 1.70158;
-	return {
-		css: {
-			linear: 'linear',
-			ease: 'ease',
-			easeIn: 'ease-in',
-			easeOut: 'ease-out',
-			easeInOut: 'ease-in-out'
-		},
-		
-		linear: function(t) {
-			return t;
-		},
-		
-		/**
-		 * Begins slowly and accelerates towards end. (quadratic)
-		 */
-		easeIn: function (t) {
-			return t * t;
-		},
-	
-		/**
-		 * Begins quickly and decelerates towards end.  (quadratic)
-		 */
-		easeOut: function (t) {
-			return ( 2 - t) * t;
-		},
-		
-		/**
-		 * Begins slowly and decelerates towards end. (quadratic)
-		 */
-		easeInOut: function (t) {
-			return (t *= 2) < 1 ?
-				0.5 * t * t :
-				0.5 * (1 - (--t) * (t - 2));
-		},
-		
-		/**
-		 * Begins slowly and accelerates towards end. (quartic)
-		 */
-		easeInStrong: function (t) {
-			return t * t * t * t;
-		},
-		
-		/**
-		 * Begins quickly and decelerates towards end.  (quartic)
-		 */
-		easeOutStrong: function (t) {
-			return 1 - (--t) * t * t * t;
-		},
-		
-		/**
-		 * Begins slowly and decelerates towards end. (quartic)
-		 */
-		easeInOutStrong: function (t) {
-			return (t *= 2) < 1 ?
-				0.5 * t * t * t * t :
-				0.5 * (2 - (t -= 2) * t * t * t);
-		},
-		
-		/**
-		 * Snap in elastic effect.
-		 */
-		elasticIn: function (t) {
-			var p = 0.3, s = p / 4;
-			if (t === 0 || t === 1) return t;
-			return -(Math.pow(2, 10 * (t -= 1)) * Math.sin((t - s) * (2 * Math.PI) / p));
-		},
-		
-		/**
-		 * Snap out elastic effect.
-		 */
-		elasticOut: function (t) {
-			var p = 0.3, s = p / 4;
-			if (t === 0 || t === 1) return t;
-			return Math.pow(2, -10 * t) * Math.sin((t - s) * (2 * Math.PI) / p) + 1;
-		},
-		
-		/**
-		 * Snap both elastic effect.
-		 */
-		elasticInOut: function (t) {
-			var p = 0.45, s = p / 4;
-			if (t === 0 || (t *= 2) === 2) return t / 2;
-			if (t < 1) {
-				return -0.5 * (Math.pow(2, 10 * (t -= 1)) *
-				Math.sin((t - s) * (2 * Math.PI) / p));
-			}
-			return Math.pow(2, -10 * (t -= 1)) *
-			Math.sin((t - s) * (2 * Math.PI) / p) * 0.5 + 1;
-		},
-	
-		/**
-		 * Backtracks slightly, then reverses direction and moves to end.
-		 */
-		backIn: function (t) {
-			if (t === 1) t -= 0.001;
-			return t * t * ((_BACK_CONST + 1) * t - _BACK_CONST);
-		},
-		
-		/**
-		 * Overshoots end, then reverses and comes back to end.
-		 */
-		backOut: function (t) {
-			return (t -= 1) * t * ((_BACK_CONST + 1) * t + _BACK_CONST) + 1;
-		},
-		
-		/**
-		 * Backtracks slightly, then reverses direction, overshoots end,
-		 * then reverses and comes back to end.
-		 */
-		backInOut: function (t) {
-			if ((t *= 2 ) < 1) {
-				return 0.5 * (t * t * (((_BACK_CONST *= (1.525)) + 1) * t - _BACK_CONST));
-			}
-			return 0.5 * ((t -= 2) * t * (((_BACK_CONST *= (1.525)) + 1) * t + _BACK_CONST) + 2);
-		},
-		
-		/**
-		 * Bounce off of start.
-		 */
-		bounceIn: function (t) {
-			return 1 - Easing.bounceOut(1 - t);
-		},
-		
-		/**
-		 * Bounces off end.
-		 */
-		bounceOut: function (t) {
-			var s = 7.5625, r;
-			if (t < (1 / 2.75)) {
-				r = s * t * t;
-			}
-			else if (t < (2 / 2.75)) {
-				r =  s * (t -= (1.5 / 2.75)) * t + 0.75;
-			}
-			else if (t < (2.5 / 2.75)) {
-				r =  s * (t -= (2.25 / 2.75)) * t + 0.9375;
-			}
-			else {
-				r =  s * (t -= (2.625 / 2.75)) * t + 0.984375;
-			}
-			return r;
-		},
-		
-		/**
-		 * Bounces off start and end.
-		 */
-		bounceInOut: function (t) {
-			if (t < 0.5) {
-				return Easing.bounceIn(t * 2) * 0.5;
-			}
-			return Easing.bounceOut(t * 2 - 1) * 0.5 + 0.5;
-		}
-	};
-});
-/**
- * Inspired by KISSY
- * @class YOM.Tween
- */
-define('yom/tween', ['require'], function(require) {
-	var YOM = {
-		'browser': require('yom/browser'),
-		'object': require('yom/object'),
-		'InstanceManager': require('yom/instance-manager'),
-		'Element': require('yom/element'),
-		'transition': require('yom/transition')
-	};
-	
-	var _ID = 120;
-	var _STATUS = {
-		INIT: 0,
-		TWEENING: 1,
-		STOPPED: 2
-	};
-	var _STYLE_PROPS = [
-		'backgroundColor', 'borderBottomColor', 'borderBottomWidth', 'borderBottomStyle', 'borderLeftColor', 'borderLeftWidth', 'borderLeftStyle', 'borderRightColor', 'borderRightWidth', 'borderRightStyle', 'borderSpacing', 'borderTopColor', 'borderTopWidth', 'borderTopStyle', 'bottom', 'color', 'font', 'fontFamily', 'fontSize', 'fontWeight', 'height', 'left', 'letterSpacing', 'lineHeight', 'marginBottom', 'marginLeft', 'marginRight', 'marginTop', 'maxHeight', 'maxWidth', 'minHeight', 'minWidth', 'opacity', 'outlineColor', 'outlineOffset', 'outlineWidth', 'paddingBottom', 'paddingLeft', 'paddingRight', 'paddingTop', 'right', 'textIndent', 'top', 'width', 'wordSpacing', 'zIndex', 'position'
-	];
-	var _FPS = 60;
-	
-	var _im = new YOM.InstanceManager();
-	var _parserEl = null;
-	
-	var _requestAnimationFrame = window.requestAnimationFrame
-	|| window.webkitRequestAnimationFrame
-	|| window.mozRequestAnimationFrame
-	|| window.oRequestAnimationFrame
-	|| window.msRequestAnimationFrame
-	|| function(callback) {
-		return setTimeout(callback, 1000 / _FPS);
-	}
-	
-	var _cancelAnimationFrame = window.cancelAnimationFrame
-	|| window.webkitCancelAnimationFrame
-	|| window.mozCancelAnimationFrame
-	|| window.oCancelAnimationFrame
-	|| window.msCancelAnimationFrame
-	|| function(timer) {
-		clearTimeout(timer);
-	};
-	
-	function _getParserEl() {
-		if(!_parserEl) {
-			_parserEl = YOM.Element.create('div');
-		}
-		return _parserEl;
-	};
-	
-	function _getRgbVal(str) {
-		var res;
-		str += '';
-		if(str.indexOf('rgb') === 0) {
-			res = str.match(/\d+/g);
-		} else if(str.indexOf('#') === 0) {
-			if(str.length === 4) {
-				str = '#' + str.slice(1, 2) + str.slice(1, 2) + str.slice(2, 3) + str.slice(2, 3) + str.slice(3, 4) + str.slice(3, 4);
-			}
-			res = [parseInt(str.slice(1, 3), 16) || 0, parseInt(str.slice(3, 5), 16) || 0, parseInt(str.slice(5, 7), 16) || 0];
-		}
-		return res || [];
-	};
-	
-	function _calColorVal(source, target, percent) {
-		var srcTmp = _getRgbVal(source);
-		var tarTmp = _getRgbVal(target);
-		if(!tarTmp.length) {
-			return target;
-		}
-		var tmp = [];
-		for(var i = 0; i < 4; i++) {
-			srcTmp[i] = parseInt(srcTmp[i]) || 0;
-			tarTmp[i] = parseInt(tarTmp[i]) || 0;
-			tmp[i] = parseInt(srcTmp[i] + (tarTmp[i] - srcTmp[i]) * percent);
-			tmp[i] = tmp[i] < 0 ? 0 : tmp[i] > 255 ? 255 : tmp[i];
-		}
-		if(target.indexOf('rgba') === 0) {
-			return 'rgba(' + tmp.join(',') + ')';
-		} else {
-			tmp.pop();
-			return 'rgb(' + tmp.join(',') + ')';
-		}
-	};
-	
-	function _calNumVal(origin, target, percent) {
-		return origin + (target - origin) * percent;
-	};
-	
-	function _calStrVal(origin, target, percent) {
-		return percent === 1 ? target : origin;
-	};
-	
-	function _parsePropVal(val) {
-		var v, u;
-		val = val + '';
-		v = parseFloat(val);
-		u = val.replace(/^[-\d\.]+/, '');
-		return isNaN(v) ? {v: val, u: '', f: (/^#|rgb/).test(val) ? _calColorVal : _calStrVal} : {v: v, u: u, f: _calNumVal};
-	};
-	
-	function _getStyle(style) {
-		var res = {};
-		var parserEl;
-		if(!style) {
-			return res;
-		}
-		if(typeof style == 'string') {
-			parserEl = _getParserEl();
-			parserEl.innerHTML = '<div style="' + style + '"></div>';
-			style = parserEl.firstChild.style;
-		}
-		YOM.object.each(_STYLE_PROPS, function(prop) {
-			var val = style[prop];
-			if(val || val === 0) {
-				res[prop] = _parsePropVal(val);
-			}
-		});
-		return res;
-	};
-	
-	function _getOriginStyle(el, target, origin) {
-		var res = {};
-		origin = _getStyle(origin);
-		YOM.object.each(target, function(propVal, propName) {
-			var val;
-			if(origin[propName]) {
-				res[propName] = origin[propName];
-			} else {
-				val = el.getStyle(propName);
-				if(val || val === 0) {
-					res[propName] = _parsePropVal(val);
-				} else {
-					res[propName] = propVal;
-				}
-			}
-		});
-		return res;
-	};
-	
-	function _getProp(prop) {
-		var res = {};
-		YOM.object.each(prop, function(propVal, propName) {
-			res[propName] = _parsePropVal(propVal);
-		});
-		return res;
-	};
-	
-	function _getOriginProp(el, target, origin) {
-		var res = {};
-		origin = _getProp(origin);
-		YOM.object.each(target, function(propVal, propName) {
-			var val;
-			if(origin[propName]) {
-				res[propName] = origin[propName];
-			} else {
-				val = el.getProp(propName);
-				if(val != undefined) {
-					res[propName] = _parsePropVal(val);
-				} else {
-					res[propName] = propVal;
-				}
-			}
-		});
-		return res;
-	};
-	
-	function Tween(el, duration, opt) {
-		if(!(this instanceof Tween)) {
-			return new Tween(el, duration, opt);
-		}
-		opt = opt || {};
-		opt.origin = opt.origin || {};
-		opt.target = opt.target || {};
-		this._opt = opt;
-		this._el = $query(el);
-		this._duration = duration;
-		this._css = opt.css && !opt.target.prop && Tween.getCssTransitionName();
-		this._targetStyle = _getStyle(opt.target.style);
-		this._originStyle = _getOriginStyle(this._el, this._targetStyle, opt.origin.style);
-		this._targetProp = _getProp(opt.target.prop);
-		this._originProp = _getOriginProp(this._el, this._targetProp, opt.origin.prop);
-		this._transition = YOM.transition[opt.transition] || opt.transition || YOM.transition['easeOut'];
-		this._complete = opt.complete || $empty;
-		this._timer = null;
-		this._startTime = null;
-		this._status = _STATUS.INIT;
-		this._id = _im.add(this);
-		return this;
-	};
-	
-	Tween._im = _im;
-	
-	Tween.getCssTransitionName = function() {
-		var el = new YOM.Element(_getParserEl());
-		var name = 'transition';
-		var isSupport = el.getStyle(name) != undefined;
-		if(!isSupport) {
-			if(YOM.browser.chrome || YOM.browser.safari || YOM.browser.ipad || YOM.browser.iphone || YOM.browser.android) {
-				name = '-webkit-transition';
-			} else if(YOM.browser.firefox) {
-				name = '-moz-transition';
-			} else if(YOM.browser.opera) {
-				name = '-o-transition';
-			} else if(YOM.browser.ie) {
-				name = '-ms-transition';
-			} else {
-				name = '';
-			}
-			if(name) {
-				isSupport = el.getStyle(name) != undefined;
-				if(!isSupport) {
-					name = '';
-				}
-			}
-		}
-		Tween.getCssTransitionName = function() {
-			return name;
-		};
-		return name;
-	};
-	
-	Tween.setTimer = function(setter, duration, callback, transition) {
-		transition = YOM.transition[transition] || transition || YOM.transition['linear'];
-		var start = $now();
-		var end = start + duration;
-		setter(_requestAnimationFrame(function() {
-			var now = $now();
-			var percent = now >= end ? 1 : (now - start) / duration;
-			percent = Math.min(transition(percent), 1);
-			callback(percent);
-			if(percent < 1) {
-				setter(_requestAnimationFrame(arguments.callee));
-			}
-		}));
-	};
-
-	Tween.stopAllTween = function(el) {
-		$query(el).each(function(el) {
-			var tweenObj = _im.get(new YOM.Element(el).getDatasetVal('yom-tween-oid'));
-			tweenObj && tweenObj.stop();
-		});
-	};
-	
-	Tween.cancelTimer = _cancelAnimationFrame;
-	
-	Tween.prototype._stopAllTween = function() {
-		Tween.stopAllTween(this._el);
-	};
-	
-	Tween.prototype._removeTweeningEl = function() {
-		this._el.removeItem(function(el) {
-			var tweenObj = _im.get(new YOM.Element(el).getDatasetVal('yom-tween-oid'));
-			return tweenObj && tweenObj.isTweening();
-		});
-	};
-	
-	Tween.prototype._cssTween = function() {
-		var self = this;
-		var originStyle = this._originStyle;
-		var targetStyle = this._targetStyle;
-		var timingFunction = YOM.transition.css[this._opt.transition] || YOM.transition.css['easeOut'];
-		var tVal;
-		for(prop in originStyle) {
-			tVal = originStyle[prop];
-			this._el.setStyle(prop, tVal.v + tVal.u);
-		}
-		this._el.each(function(el) {
-			el.clientLeft;//force reflow
-		});
-		this._el.storeStyle(this._css + '-duration');
-		this._el.storeStyle(this._css + '-timing-function');
-		this._el.setStyle(this._css + '-duration', this._duration + 'ms');
-		this._el.setStyle(this._css + '-timing-function', timingFunction);
-		for(prop in targetStyle) {
-			tVal = targetStyle[prop];
-			this._el.setStyle(prop, tVal.v + tVal.u);
-		}
-		this._timer = setTimeout(function() {
-			self.stop(true);
-		}, this._duration);
-	};
-	
-	Tween.prototype.isTweening = function() {
-		return this._status == _STATUS.TWEENING;
-	};
-	
-	Tween.prototype.play = function() {
-		if(this._status != _STATUS.INIT) {
-			return 1;
-		}
-		if(this._opt.prior) {
-			this._stopAllTween();
-		} else {
-			this._removeTweeningEl();
-		}
-		if(!this._el.size()) {
-			return 2;
-		}
-		this._status = _STATUS.TWEENING;
-		this._el.setDatasetVal('yom-tween-oid', this._id);
-		var self = this;
-		var targetStyle = this._targetStyle;
-		var originStyle = this._originStyle;
-		var targetProp = this._targetProp;
-		var originProp = this._originProp;
-		var prop, oVal, tVal;
-		this._startTime = $now();
-		if(this._css) {
-			this._cssTween();
-		} else {
-			Tween.setTimer(function(timer) {self._timer = timer;}, this._duration, function(percent) {
-				if(self._status == _STATUS.STOPPED) {
-					return;
-				}
-				for(prop in targetStyle) {
-					tVal = targetStyle[prop];
-					oVal = originStyle[prop];
-					if(oVal.u != tVal.u) {
-						oVal.v = 0;
-					}
-					self._el.setStyle(prop, tVal.f(oVal.v, tVal.v, percent) + tVal.u);
-				}
-				for(prop in targetProp) {
-					tVal = targetProp[prop];
-					oVal = originProp[prop];
-					if(oVal.u != tVal.u) {
-						oVal.v = 0;
-					}
-					self._el.setProp(prop, tVal.f(oVal.v, tVal.v, percent) + tVal.u);
-				}
-				if(percent === 1) {
-					self.stop(true);
-				}
-			}, this._transition);
-		}
-		return 0;
-	};
-	
-	Tween.prototype.stop = function(_finished) {
-		if(this._status == _STATUS.STOPPED) {
-			return;
-		}
-		var el = this._el;
-		var status = this._status;
-		var tVal, oVal, percent;
-		if(this._css) {
-			clearTimeout(this._timer);
-			this._el.restoreStyle(this._css + '-duration');
-			this._el.restoreStyle(this._css + '-timing-function');
-			if(!_finished) {
-				percent = ($now() - this._startTime) / this._duration;
-				percent = Math.min(this._transition(percent), 1);
-				for(prop in this._targetStyle) {
-					tVal = this._targetStyle[prop];
-					oVal = this._originStyle[prop];
-					if(oVal.u != tVal.u) {
-						oVal.v = 0;
-					}
-					this._el.setStyle(prop, tVal.f(oVal.v, tVal.v, percent) + tVal.u);
-				}
-			}
-		} else {
-			_cancelAnimationFrame(this._timer);
-		}
-		this._el = null;
-		this._status = _STATUS.STOPPED;
-		_im.remove(this._id);
-		if(status != _STATUS.INIT && this._complete) {
-			this._complete(el);
-		}
-	};
-	
-	return Tween;
-});
-/**
  * @namespace YOM.flash
  */
-define('yom/flash', ['require'], function(require) {
+define('./flash', ['./browser', './object'], function(browser, object) {
 	var YOM = {
-		'browser': require('yom/browser'),
-		'object': require('yom/object')
+		'browser': browser,
+		'object': object
 	};
 	
 	var _ID = 129;
@@ -4061,58 +4102,61 @@ define('yom/flash', ['require'], function(require) {
 /**
  * @namespace
  */
-define('yom/widget', [], {
+define('./widget', [], {
 	_ID: 128
 });
 /**
  * @namespace
  */
-define(['require', document.querySelectorAll ? '' : 'yom/inc/sizzle'], function(require, Sizzle) {
+define(['require', document.querySelectorAll ? '' : './inc/sizzle'], function(require, Sizzle) {
 	var YOM = function(sel, context) {
-		return $query(sel, context);
+		return Elem.query(sel, context);
 	};
+	
+	var object = require('./object');
+	var Elem = require('./element');
 	
 	YOM._ID = 100;
 	YOM.debugMode = 0;
 	
-	YOM = $extend(YOM, {
-		'config': require('yom/config'),
-		'Error': require('yom/error'),
-		'browser': require('yom/browser'),
-		'string': require('yom/string'),
-		'object': require('yom/object'),
-		'array': require('yom/array'),
-		'Chunker': require('yom/chunker'),
-		'Class': require('yom/class'),
-		'HashArray': require('yom/hash-array'),
-		'InstanceManager': require('yom/instance-manager'),
-		'json': require('yom/json'),
-		'Observer': require('yom/observer'),
-		'Event': require('yom/event'),
-		'Element': require('yom/element'),
-		'cookie': require('yom/cookie'),
-		'Xhr': require('yom/xhr'),
-		'CrossDomainPoster': require('yom/cross-domain-poster'),
-		'pos': require('yom/pos'),
-		'util': require('yom/util'),
-		'JsLoader': require('yom/js-loader'),
-		'css': require('yom/css'),
-		'tmpl': require('yom/tmpl'),
-		'console': require('yom/console'),
-		'transition': require('yom/transition'),
-		'Tween': require('yom/tween'),
-		'flash': require('yom/flash'),
-		'widget': require('yom/widget')
+	YOM = object.extend(YOM, {
+		'config': require('./config'),
+		'Error': require('./error'),
+		'browser': require('./browser'),
+		'string': require('./string'),
+		'object': object,
+		'array': require('./array'),
+		'Chunker': require('./chunker'),
+		'Class': require('./class'),
+		'HashArray': require('./hash-array'),
+		'InstanceManager': require('./instance-manager'),
+		'json': require('./json'),
+		'Observer': require('./observer'),
+		'Event': require('./event'),
+		'Element': Elem,
+		'transition': require('./transition'),
+		'Tween': require('./tween'),
+		'cookie': require('./cookie'),
+		'Xhr': require('./xhr'),
+		'CrossDomainPoster': require('./cross-domain-poster'),
+		'pos': require('./pos'),
+		'util': require('./util'),
+		'JsLoader': require('./js-loader'),
+		'css': require('./css'),
+		'tmpl': require('./tmpl'),
+		'console': require('./console'),
+		'flash': require('./flash'),
+		'widget': require('./widget')
 	});
 	
-	YOM.Event = $extend(YOM.Event, {
-		'Delegator': require('yom/event-delegator'),
-		'VirtualEventHandler': require('yom/event-virtual-handler'),
-		'MouseenterEventHandler': require('yom/event-mouseenter'),
-		'MouseleaveEventHandler': require('yom/event-mouseleave')
+	YOM.Event = object.extend(YOM.Event, {
+		'Delegator': require('./event-delegator'),
+		'VirtualEventHandler': require('./event-virtual-handler'),
+		'MouseenterEventHandler': require('./event-mouseenter'),
+		'MouseleaveEventHandler': require('./event-mouseleave')
 	});
 	
-	require('yom/element-fx');
+	require('./element-fx');
 	
 	return YOM;
 });
@@ -4123,38 +4167,12 @@ function $id(id) {
 
 function $query(sel, context) {
 	var Element = require('yom/element');
-	var res;
-	if(sel instanceof Element) {
-		return sel;
-	} else if(typeof sel == 'string') {
-		if(context) {
-			context = new Element(typeof context == 'string' ? (document.querySelectorAll ? document.querySelectorAll(context) : Sizzle(context)) : context);
-			res = context.find(sel);
-		} else {
-			res = new Element(document.querySelectorAll ? document.querySelectorAll(sel) : Sizzle(sel));
-		}
-	} else {
-		res = new Element(sel);
-	}
-	return res;
+	return Element.query(sel, context);
 };
 
 function $getClean(obj) {
 	var object = require('yom/object');
-	var cleaned;
-	if(obj && obj.getClean) {
-		cleaned = obj.getClean();
-	} else if(typeof obj == 'object') {
-		cleaned = {};
-		for(var p in obj) {
-			if(object.hasOwnProperty(obj, p)) {
-				cleaned[p] = obj[p];
-			}
-		}
-	} else {
-		cleaned = obj;
-	}
-	return cleaned;
+	return object.getClean(obj);
 };
 
 function $extend(origin, extend, check) {
@@ -4163,14 +4181,8 @@ function $extend(origin, extend, check) {
 };
 
 function $bind(that, fn) {
-	var array = require('yom/array');
-	if(fn.bind) {
-		return fn.bind(that);
-	} else {
-		return function() {
-			return fn.apply(that, array.getArray(arguments));
-		};
-	}
+	var object = require('yom/object');
+	return object.bind(that, fn);
 };
 
 function $now() {

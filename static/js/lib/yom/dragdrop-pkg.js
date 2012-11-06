@@ -1,7 +1,7 @@
 /**
  * @class YOM.dragdrop.Draggable
  */
-define('yom/draggable', ['require', 'yom/core-pkg'], function(require, YOM) {
+define('./draggable', ['./core-pkg'], function(YOM) {
 	function Draggable(el, opts) {
 		Draggable.superClass.constructor.call(this, {
 			dragmousedown: new YOM.Observer(),
@@ -37,7 +37,7 @@ define('yom/draggable', ['require', 'yom/core-pkg'], function(require, YOM) {
 	
 	YOM.Class.extend(Draggable, YOM.Event);
 	
-	Draggable.prototype = $extend(Draggable.prototype, {
+	Draggable.prototype = YOM.object.extend(Draggable.prototype, {
 		_mousedown: function(e) {
 			if(this._dragging) {
 				return;
@@ -114,7 +114,7 @@ define('yom/draggable', ['require', 'yom/core-pkg'], function(require, YOM) {
 				} else if(YOM(boundary).get()) {
 					boundary = YOM(boundary).getRect();
 				} else if(!isNaN(boundary.left) && !isNaN(boundary.top) && !isNaN(boundary.right) && !isNaN(boundary.bottom)) {
-					boundary = $extend(boundary, {width: boundary.right - boundary.left, height: boundary.bottom - boundary.top});
+					boundary = YOM.object.extend(boundary, {width: boundary.right - boundary.left, height: boundary.bottom - boundary.top});
 				} else {
 					boundary = null;
 				}
@@ -220,9 +220,9 @@ define('yom/draggable', ['require', 'yom/core-pkg'], function(require, YOM) {
 /**
  * @class YOM.dragdrop.Droppable
  */
-define('yom/droppable', ['require', 'yom/core-pkg'], function(require, YOM) {
+define('./droppable', ['./core-pkg', './draggable'], function(YOM, Draggable) {
 	YOM.dragdrop = YOM.dragdrop || {};
-	YOM.dragdrop.Draggable = require('yom/draggable');
+	YOM.dragdrop.Draggable = Draggable;
 	
 	function Droppable(el, dropboxes, opts) {
 		Droppable.superClass.constructor.call(this, el, opts);
@@ -246,7 +246,7 @@ define('yom/droppable', ['require', 'yom/core-pkg'], function(require, YOM) {
 	
 	YOM.Class.extend(Droppable, YOM.dragdrop.Draggable);
 	
-	Droppable.prototype = $extend(Droppable.prototype, {
+	Droppable.prototype = YOM.object.extend(Droppable.prototype, {
 		_clear: function() {
 			if(this._clone && this._el && this._el != this._oriEl) {
 				this._el.remove();
@@ -445,9 +445,9 @@ define('yom/droppable', ['require', 'yom/core-pkg'], function(require, YOM) {
 /**
  * @class YOM.dragdrop.Sortable
  */
-define('yom/sortable', ['require', 'yom/core-pkg'], function(require, YOM) {
+define('./sortable', ['./core-pkg', './droppable'], function(YOM, Droppable) {
 	YOM.dragdrop = YOM.dragdrop || {};
-	YOM.dragdrop.Droppable = require('yom/droppable');
+	YOM.dragdrop.Droppable = Droppable;
 	
 	var _DIRECTION_MAP = {'H': 'H', 'V': 'V'};
 	
@@ -739,9 +739,9 @@ define('yom/sortable', ['require', 'yom/core-pkg'], function(require, YOM) {
 /**
  * @class YOM.dragdrop.Resizeable
  */
-define('yom/resizeable', ['require', 'yom/core-pkg'], function(require, YOM) {
+define('./resizeable', ['./core-pkg', './draggable'], function(YOM, Draggable) {
 	YOM.dragdrop = YOM.dragdrop || {};
-	YOM.dragdrop.Draggable = require('yom/draggable');
+	YOM.dragdrop.Draggable = Draggable;
 	
 	function ResizeHandle(el, opts) {
 		ResizeHandle.superClass.constructor.call(this, el, opts);
@@ -750,7 +750,7 @@ define('yom/resizeable', ['require', 'yom/core-pkg'], function(require, YOM) {
 	
 	YOM.Class.extend(ResizeHandle, YOM.dragdrop.Draggable);
 	
-	ResizeHandle.prototype = $extend(ResizeHandle.prototype, {
+	ResizeHandle.prototype = YOM.object.extend(ResizeHandle.prototype, {
 		_mousedown: function(e) {
 			ResizeHandle.superClass._mousedown.call(this, e);
 			YOM.Event.cancelBubble(e);
@@ -820,11 +820,11 @@ define('yom/resizeable', ['require', 'yom/core-pkg'], function(require, YOM) {
 	
 	YOM.Class.extend(Resizeable, YOM.Event);
 	
-	Resizeable.prototype = $extend(Resizeable.prototype, {
+	Resizeable.prototype = YOM.object.extend(Resizeable.prototype, {
 		_init: function() {
 			var attr = {'data-yom-type': 'resizeHandle'};
 			var extra = YOM.browser.isQuirksMode() && YOM.browser.ie ? 2 : 0;
-			var style = $extend({
+			var style = YOM.object.extend({
 				border: 'solid 1px #000',
 				width: 6 + extra + 'px',
 				height: 6 + extra + 'px',
@@ -848,7 +848,7 @@ define('yom/resizeable', ['require', 'yom/core-pkg'], function(require, YOM) {
 			if(this._opts.handles) {
 				YOM.object.each(this._opts.handles, function(t) {
 					if(handleTypes[t]) {
-						resizeHandle = new ResizeHandle(this._el.append(YOM.Element.create('div', attr, $extend(style, handleTypes[t]))).setHtml('&nbsp'), {scrollContainer: this._opts.scrollContainer, handleType: t});
+						resizeHandle = new ResizeHandle(this._el.append(YOM.Element.create('div', attr, YOM.object.extend(style, handleTypes[t]))).setHtml('&nbsp'), {scrollContainer: this._opts.scrollContainer, handleType: t});
 						resizeHandle.addEventListener('dragmove', this.bound.move);
 						resizeHandle.addEventListener('dragmousedown', this.bound.mousedown);
 						this._resizeHandles.push(resizeHandle);
@@ -857,13 +857,13 @@ define('yom/resizeable', ['require', 'yom/core-pkg'], function(require, YOM) {
 			} else {
 				if(this._el.getStyle('position') == 'absolute') {
 					YOM.object.each(handleTypes, function(s, t) {
-						resizeHandle = new ResizeHandle(this._el.append(YOM.Element.create('div', attr, $extend(style, s))).setHtml('&nbsp'), {scrollContainer: this._opts.scrollContainer, handleType: t});
+						resizeHandle = new ResizeHandle(this._el.append(YOM.Element.create('div', attr, YOM.object.extend(style, s))).setHtml('&nbsp'), {scrollContainer: this._opts.scrollContainer, handleType: t});
 						resizeHandle.addEventListener('dragmove', this.bound.move);
 						resizeHandle.addEventListener('dragmousedown', this.bound.mousedown);
 						this._resizeHandles.push(resizeHandle);
 					}, this);
 				} else {
-					resizeHandle = new ResizeHandle(this._el.append(YOM.Element.create('div', attr, $extend(style, handleTypes['RB']))).setHtml('&nbsp'), {scrollContainer: this._opts.scrollContainer, handleType: 'RB'});
+					resizeHandle = new ResizeHandle(this._el.append(YOM.Element.create('div', attr, YOM.object.extend(style, handleTypes['RB']))).setHtml('&nbsp'), {scrollContainer: this._opts.scrollContainer, handleType: 'RB'});
 					resizeHandle.addEventListener('dragmove', this.bound.move);
 					resizeHandle.addEventListener('dragmousedown', this.bound.mousedown);
 					this._resizeHandles.push(resizeHandle);
@@ -893,7 +893,7 @@ define('yom/resizeable', ['require', 'yom/core-pkg'], function(require, YOM) {
 				} else if(YOM(boundary).get()) {
 					boundary = YOM(boundary).getRect();
 				} else if(!isNaN(parseInt(boundary.left)) && !isNaN(parseInt(boundary.top)) && !isNaN(parseInt(boundary.right)) && !isNaN(parseInt(boundary.bottom))) {
-					boundary = $extend(boundary, {width: boundary.right - boundary.left, height: boundary.bottom - boundary.top});
+					boundary = YOM.object.extend(boundary, {width: boundary.right - boundary.left, height: boundary.bottom - boundary.top});
 				} else {
 					boundary = null;
 				}
@@ -1037,9 +1037,9 @@ define('yom/resizeable', ['require', 'yom/core-pkg'], function(require, YOM) {
  */
 define(function(require) {
 	return {
-		'Draggable': require('yom/draggable'),
-		'Droppable': require('yom/droppable'),
-		'Sortable': require('yom/sortable'),
-		'Resizeable': require('yom/resizeable')
+		'Draggable': require('./draggable'),
+		'Droppable': require('./droppable'),
+		'Sortable': require('./sortable'),
+		'Resizeable': require('./resizeable')
 	};
 });

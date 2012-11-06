@@ -124,6 +124,7 @@ var define, require;
 	_gcfg.debug = !!_gcfg.debug || location.href.indexOf('yom-debug=1') > 0;
 	var _interactiveMode = false;
 	var _loadingCount = 0;
+	var _scriptBeingInserted = null;
 	
 	var _hold = {};//loading or waiting dependencies
 	var _defQueue = [];
@@ -161,12 +162,7 @@ var define, require;
 	};
 	
 	new Def('require', _gcfg, {}, {}, function(context) {
-		var base = context.base;
-		var moduleFullUrl;
-		if(base) {
-			moduleFullUrl = _getFullUrl(base.nrmId, base.baseUrl);	
-		}
-		return _makeRequire({config: context.config, moduleFullUrl: moduleFullUrl});
+		return _makeRequire({config: context.config, base: context.base});
 	});
 	new Def('exports', _gcfg, {}, {}, function(context) {
 		return {};
@@ -393,17 +389,22 @@ var define, require;
 		map[depReverseUrl] = 1;
 	};
 	
-	function _hasCircularDep(depReverseUrl, url) {
+	function _hasCircularDep(depReverseUrl, url, _checkedUrls) {
 		var depMap = _getDepReverseMap(depReverseUrl);
 		var p;
+		_checkedUrls = _checkedUrls || {};
+		if(_checkedUrls[depReverseUrl]) {
+			return false;
+		}
 		if(url == depReverseUrl || depMap[url]) {
 			return true;
 		}
+		_checkedUrls[depReverseUrl] = 1;
 		for(p in depMap) {
 			if(!_hasOwnProperty(depMap, p)) {
 				continue;
 			}
-			if(_hasCircularDep(p, url)) {
+			if(_hasCircularDep(p, url, _checkedUrls)) {
 				return true;
 			}
 		}
@@ -444,7 +445,7 @@ var define, require;
 		if(_isUnnormalId(id)) {
 			return id;
 		}
-		if(base && id.indexOf('./') === 0) {
+		if(base && id.indexOf('.') === 0) {
 			nrmId = _getRelativePath(base.nrmId, id);
 		} else {
 			nrmId = id;
@@ -594,7 +595,7 @@ var define, require;
 	function _processDefQueue(nrmId, baseUrl) {
 		var def = _defQueue.shift();
 		while(def) {
-			_defineCall(def.id, def.nrmId, def.deps, def.factory, {
+			_defineCall(def.id, def.deps, def.factory, {
 				nrmId: nrmId || '',
 				baseUrl: baseUrl || ''
 			}, def.config);
@@ -623,7 +624,9 @@ var define, require;
 		jsNode.src = _getFullUrl(nrmId, baseUrl) + (urlArg ? '?' + urlArg : '');
 		jsNode.setAttribute('data-nrm-id', nrmId);
 		jsNode.setAttribute('data-base-url', baseUrl);
+		_scriptBeingInserted = jsNode;
 		_head.insertBefore(jsNode, _head.firstChild);
+		_scriptBeingInserted = null;
 		_loadingCount++;
 		if(_loadingCount === 1 && _gcfg.onLoadStart) {
 			_gcfg.onLoadStart();
@@ -710,21 +713,17 @@ var define, require;
 	/**
 	 * define
 	 */
-	function _defineCall(id, nrmId, deps, factory, loadInfo, config) {
-		var conf, hold, depMap;
+	function _defineCall(id, deps, factory, loadInfo, config) {
+		var nrmId, conf, loadHold, hold, depMap;
 		var baseUrl = loadInfo.baseUrl;
-		if(nrmId) {
-			hold = _getHold(nrmId, baseUrl);
-			if(hold) {
-				hold.defineCall();
-			} else {//multiple define in a file
-				hold = _getHold(loadInfo.nrmId, baseUrl);
-				hold = new Hold(id, nrmId, hold && hold.getConfig() || config);
-				hold.defineCall();
-			}
-		} else {//anonymous define
+		loadHold = _getHold(loadInfo.nrmId, baseUrl);
+		nrmId = _normalizeId(id, loadInfo, loadHold && loadHold.getConfig().path);
+		if(!nrmId || nrmId == loadInfo.nrmId) {
 			nrmId = loadInfo.nrmId;
-			hold = _getHold(nrmId, baseUrl);
+			hold = loadHold;
+			hold.defineCall();
+		} else {//multiple define in a file
+			hold = new Hold(id, nrmId, loadHold && loadHold.getConfig() || config);
 			hold.defineCall();
 		}
 		conf = _extendConfig(['charset', 'baseUrl', 'source', 'path', 'shim', 'urlArgs'], hold.getConfig(), config);
@@ -753,13 +752,12 @@ var define, require;
 		context.parentConfig = context.parentConfig || _gcfg;
 		config = _extendConfig(['charset', 'baseUrl', 'source', 'path', 'shim', 'urlArgs'], context.parentConfig, context.config);
 		function def(id, deps, factory) {
-			var nrmId, script, factoryStr, reqFnName;
+			var script, factoryStr, reqFnName;
 			if(typeof id != 'string') {
 				factory = deps;
 				deps = id;
 				id = '';
 			}
-			nrmId = _normalizeId(id, '', config.path);
 			if(!_isArray(deps)) {
 				factory = deps;
 				deps = [];
@@ -772,12 +770,12 @@ var define, require;
 					.replace(new RegExp('[(=;:{}&|]\\s*' + reqFnName + '\\(\\s*["\']([^"\'\\s]+)["\']\\s*\\)', 'g'), function(m, dep) {//extract dependencies
 						deps.push(dep);
 					});
-				deps = (factory.length === 1? ['require'] : ['require', 'exports', 'module']).concat(deps);
+				deps = (factory.length === 1 ? ['require'] : ['require', 'exports', 'module']).concat(deps);
 			}
 			if(_interactiveMode) {
-				script = _getInteractiveScript();
+				script = _scriptBeingInserted || _getInteractiveScript();
 				if(script) {
-					_defineCall(id, nrmId, deps, factory, {
+					_defineCall(id, deps, factory, {
 						nrmId: script.getAttribute('data-nrm-id'),
 						baseUrl: script.getAttribute('data-base-url')
 					}, config);
@@ -785,7 +783,6 @@ var define, require;
 			} else {
 				_defQueue.push({
 					id: id,
-					nrmId: nrmId,
 					deps: deps,
 					factory: factory,
 					config: config
@@ -830,15 +827,15 @@ var define, require;
 			}
 			conf = _extendConfig(['charset', 'baseUrl', 'path', 'shim', 'urlArgs'], config, sourceConf);
 			nrmId = _normalizeId(id, context.base, conf.path);
+			def = _getDefined(nrmId, conf.baseUrl);
 			fullUrl = _getFullUrl(nrmId, conf.baseUrl);
 			if(context.base) {
 				baseFullUrl = _getFullUrl(context.base.nrmId, context.base.baseUrl);
 				_setDepReverseMap(fullUrl, baseFullUrl);
-				if(_hasCircularDep(baseFullUrl, fullUrl)) {//cirular dependency
+				if(!def && _hasCircularDep(baseFullUrl, fullUrl)) {//cirular dependency
 					return {};
 				}
 			}
-			def = _getDefined(nrmId, conf.baseUrl);
 			if(def) {
 				return {inst: def};
 			} else {
@@ -964,9 +961,8 @@ var define, require;
 			return config;
 		};
 		req.toUrl = function(url, onlyPath) {
-			var moduleFullUrl = context.moduleFullUrl;
-			if(moduleFullUrl) {
-				url = _getRelativePath(moduleFullUrl, url);
+			if(context.base) {
+				url = _getRelativePath(_getFullUrl(context.base.nrmId, context.base.baseUrl), url);
 			} else {
 				url = _getRelativePath(config.baseUrl + '/', url);
 			}

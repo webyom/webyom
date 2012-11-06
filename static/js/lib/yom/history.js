@@ -1,9 +1,7 @@
 /**
  * @namespace YOM.history
  */
-define(function(require) {
-	var YOM = require('yom/core-pkg');
-	
+define(['./core-pkg'], function(YOM) {
 	var _ID = 127;
 	var _INTERVAL = 100;
 	

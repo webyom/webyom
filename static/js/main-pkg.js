@@ -1,7 +1,7 @@
 /**
  * @namespace $$.config
  */
-define('main/config', ['require', 'yom/core-pkg'], function(require, $) {
+define('./config', ['require', 'yom/core-pkg'], function(require, $) {
 	var _updater = {};
 	var _config = {
 		TITLE_POSTFIX: 'Webyom - Gary\'s Blog',
@@ -63,7 +63,7 @@ define('main/config', ['require', 'yom/core-pkg'], function(require, $) {
 /**
  * @namespace $$.storage
  */
-define('main/storage', ['require'], function(require) {
+define('./storage', ['require'], function(require) {
 	function _do(cb) {
 		require(['yom/local-storage'], function(ls) {
 			cb(ls);
@@ -129,7 +129,7 @@ define('main/storage', ['require'], function(require) {
 /**
  * @namespace $$.tooltip
  */
-define('main/tooltip', ['require', 'yom/core-pkg'], function(require, $) {
+define('./tooltip', ['require', 'yom/core-pkg'], function(require, $) {
 	var _guideTooltip;
 	var _guidePool = [];
 	
@@ -250,7 +250,7 @@ define('main/tooltip', ['require', 'yom/core-pkg'], function(require, $) {
 /**
  * @namespace $$.ui
  */
-define('main/ui', ['require', 'yom/core-pkg', 'main/storage', 'main/tooltip'], function(require, $, storage, tooltip) {
+define('./ui', ['require', 'yom/core-pkg', './storage', './tooltip'], function(require, $, storage, tooltip) {
 	var _USER_NAME = $$userName;
 	var _TMPL = {
 		HEADER: [
@@ -429,7 +429,7 @@ define('main/ui', ['require', 'yom/core-pkg', 'main/storage', 'main/tooltip'], f
 /**
  * @namespace $$.util
  */
-define('main/util', ['require', 'yom/core-pkg'], function(require, $) {
+define('./util', ['require', 'yom/core-pkg'], function(require, $) {
 	var util = {
 		_ID: 202
 	};
@@ -565,6 +565,8 @@ define('main/util', ['require', 'yom/core-pkg'], function(require, $) {
 			require(['yom/widget/mask', 'yom/widget/dialog'], function(Mask, Dialog) {
 				_init();
 				(instGetter || $empty).call(null, new Dialog(opt).popup());
+			}, function(code) {
+				alert('Require error code: ' + code);
 			});
 		};
 		
@@ -643,7 +645,7 @@ function $$confirm(msg, opt) {
 /**
  * @namespace $$.Handler
  */
-define('main/handler', ['require', 'yom/core-pkg', 'yom/history', 'main/config', 'main/ui'], function(require, $, ajaxHistory, config, ui) {
+define('./handler', ['require', 'yom/core-pkg', 'yom/history', './config', './ui'], function(require, $, ajaxHistory, config, ui) {
 	var $$ = {
 		config: config,
 		ui: ui
@@ -949,12 +951,12 @@ define('main/handler', ['require', 'yom/core-pkg', 'yom/history', 'main/config',
  */
 define(function(require) {
 	var $$ = {
-		config: require('main/config'),
-		storage: require('main/storage'),
-		tooltip: require('main/tooltip'),
-		ui: require('main/ui'),
-		util: require('main/util'),
-		Handler: require('main/handler')
+		config: require('./config'),
+		storage: require('./storage'),
+		tooltip: require('./tooltip'),
+		ui: require('./ui'),
+		util: require('./util'),
+		Handler: require('./handler')
 	};
 	
 	return $$;

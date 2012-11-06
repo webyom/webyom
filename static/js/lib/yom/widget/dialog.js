@@ -2,7 +2,7 @@
  * @namespace YOM.widget.Dialog
  */
 define(function(require) {
-	var YOM = require('yom/core-pkg');
+	var YOM = require('../core-pkg');
 	
 	var _ID = 128002;
 	var _INIT_WIDTH = 60;
@@ -98,7 +98,7 @@ define(function(require) {
 		this._el = YOM(document.body).append(YOM.Element.create('div', {
 			'data-type': 'yom-dialog-wrapper',
 			'class': opt.noBorder && opt.src ? '' : 'yom-dialog-wrapper'
-		}, $extend({
+		}, YOM.object.extend({
 			display: 'none',
 			position: 'absolute'
 		}, opt.noBorder && opt.src ? {
@@ -144,7 +144,7 @@ define(function(require) {
 		_im.each(cb, bind);
 	};
 	
-	$extend(Dialog.prototype, {
+	YOM.object.extend(Dialog.prototype, {
 		_dragstart: function() {
 			this._dragging = true;
 		},

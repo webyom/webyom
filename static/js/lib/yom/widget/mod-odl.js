@@ -2,7 +2,7 @@
  * @fileoverview ModOdl Widget
  */
 define(function(require) {
-	var YOM = require('yom/core-pkg');
+	var YOM = require('../core-pkg');
 	
 	var _ID = 128004;
 	

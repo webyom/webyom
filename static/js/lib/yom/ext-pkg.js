@@ -1,7 +1,7 @@
 /**
  * @class YOM.Chunker
  */
-define('yom/chunker', ['require', 'yom/core-pkg'], function(require, YOM) {
+define('./chunker', ['./core-pkg'], function(YOM) {
 	var Chunker = function(processer, opt) {
 		opt = opt || {};
 		this._bind = opt.bind;
@@ -75,7 +75,7 @@ define('yom/chunker', ['require', 'yom/core-pkg'], function(require, YOM) {
 /**
  * @namespace YOM.console
  */
-define('yom/console', ['require', 'yom/core-pkg', 'yom/chunker'], function(require, YOM, Chunker) {
+define('./console', ['./core-pkg', './chunker'], function(YOM, Chunker) {
 	var _TMPL = [
 		'<div style="background: #555; padding: 2px; padding-top: 0; font-size: 12px; font-family: Courier New, Courier, monospace;">',
 			'<h2 style="margin: 0; font-size: 14px; line-height: 22px; color: #fff; padding: 2px; padding-top: 0;">',
@@ -347,8 +347,8 @@ define('yom/console', ['require', 'yom/core-pkg', 'yom/chunker'], function(requi
  */
 define(function(require) {
 	var ext = {
-		'Chunker': require('yom/chunker'),
-		'console': require('yom/console')
+		'Chunker': require('./chunker'),
+		'console': require('./console')
 	};
 	
 	return ext;

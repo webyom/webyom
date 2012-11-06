@@ -25,10 +25,12 @@
             <path path="${src.dir}/src/core/instance-manager.js"/>
             <path path="${src.dir}/src/core/json-sans-eval.js"/>
             <path path="${src.dir}/src/core/json.js"/>
-            <path path="${src.dir}/src/core/element.js"/>
-            <path path="${src.dir}/src/core/element-fx.js"/>
             <path path="${src.dir}/src/core/observer.js"/>
             <path path="${src.dir}/src/core/event.js"/>
+            <path path="${src.dir}/src/core/element.js"/>
+            <path path="${src.dir}/src/core/transition.js"/>
+            <path path="${src.dir}/src/core/tween.js"/>
+            <path path="${src.dir}/src/core/element-fx.js"/>
             <path path="${src.dir}/src/core/event-delegator.js"/>
             <path path="${src.dir}/src/core/event-virtual-handler.js"/>
             <path path="${src.dir}/src/core/event-mouseenter.js"/>
@@ -41,8 +43,6 @@
             <path path="${src.dir}/src/core/js-loader.js"/>
             <path path="${src.dir}/src/core/css.js"/>
             <path path="${src.dir}/src/core/tmpl.js"/>
-            <path path="${src.dir}/src/core/transition.js"/>
-            <path path="${src.dir}/src/core/tween.js"/>
             <path path="${src.dir}/src/core/flash.js"/>
             <path path="${src.dir}/src/core/widget.js"/>
             <path path="${src.dir}/src/core/core-pkg.js"/>

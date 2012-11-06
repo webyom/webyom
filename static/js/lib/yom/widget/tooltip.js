@@ -2,7 +2,7 @@
  * @namespace YOM.widget.Tooltip
  */
 define(function(require) {
-	var YOM = require('yom/core-pkg');
+	var YOM = require('../core-pkg');
 	
 	var _ID = 128003;
 	var _FX_DURATION = 300;
@@ -74,7 +74,7 @@ define(function(require) {
 		_im.each(cb, bind);
 	};
 	
-	$extend(Tooltip.prototype, {
+	YOM.object.extend(Tooltip.prototype, {
 		_bindEvent: function() {
 			var opt = this._opt;
 			var btns = opt.btns;
