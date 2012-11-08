@@ -4108,7 +4108,7 @@ define('./widget', [], {
 /**
  * @namespace
  */
-define(['require', document.querySelectorAll ? '' : './inc/sizzle'], function(require, Sizzle) {
+define(['require', document.querySelectorAll ? '' : 'yom/inc/sizzle'], function(require, Sizzle) {
 	var YOM = function(sel, context) {
 		return Elem.query(sel, context);
 	};

@@ -5,7 +5,7 @@ define(['./core-pkg'], function(YOM) {
 	var _ID = 127;
 	var _INTERVAL = 100;
 	
-	var _ieFrameSrc = '/static/inc/webyom-js/history-blank.html';
+	var _ieFrameSrc = require.toUrl('./history-blank.html', true);
 	var _domain = '';
 	var _ieFrame = null;
 	var _markCacheIndexHash = {};

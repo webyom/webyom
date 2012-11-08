@@ -2,7 +2,7 @@
  * @namespace $$.ui
  */
 define('./ui', ['require', 'yom/core-pkg', './storage', './tooltip'], function(require, $, storage, tooltip) {
-	var _USER_NAME = $$userName;
+	var _USER_NAME = window.$$userName;
 	var _TMPL = {
 		HEADER: [
 			'<h1>Webyom</h1>', 
@@ -15,7 +15,7 @@ define('./ui', ['require', 'yom/core-pkg', './storage', './tooltip'], function(r
 			'<div id="loginInfo">' + (_USER_NAME ? 'Welcome, ' + _USER_NAME + '! <a href="/logout/">logout&gt;&gt;</a>' : 'Welcome, guest!') + '</div>'
 		].join(''),
 		CONTENT: {
-			FRAME: $$uiContentTmpl,
+			FRAME: window.$$uiContentTmpl,
 			SIDE_WHOAMI: [
 				'<p>', 
 					'<img src="/static/img/myPhoto.jpg" alt="Who am I?" />', 

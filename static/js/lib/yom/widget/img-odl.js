@@ -2,7 +2,7 @@
  * @fileoverview ImgOdl Widget
  */
 define(function(require) {
-	var YOM = require('yom/core-pkg');
+	var YOM = require('../core-pkg');
 	
 	var _ID = 128005;
 	var _SRC_ATTR_NAME = 'data-init-src';
@@ -100,7 +100,7 @@ define(function(require) {
 				return;
 			}
 			this._loadOnDemand();
-			this._intervalRef = setInterval($bind(this, this._loadOnDemand), this._interval);
+			this._intervalRef = setInterval(YOM.object.bind(this, this._loadOnDemand), this._interval);
 		},
 		
 		/**
@@ -122,7 +122,7 @@ define(function(require) {
 				return;
 			}
 			this._loadOnDemand();
-			this._intervalRef = setInterval($bind(this, this._loadOnDemand), this._interval);
+			this._intervalRef = setInterval(YOM.object.bind(this, this._loadOnDemand), this._interval);
 		},
 		
 		/**

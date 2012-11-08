@@ -18,6 +18,11 @@
             <path path="${src.dir}/handler.js"/>
             <path path="${src.dir}/main-pkg.js"/>
         </concat>
+        
+        <concat destfile="${build.dir}/require.js" encoding="${charset}" outputencoding="${charset}" fixlastline="yes">
+            <path path="${src.dir}/require-config.js"/>
+				<path path="../../../../js-lib/yom/src/require/require.js"/>
+        </concat>
     </target>
 
     <target name="build" depends="concat,common.build">

@@ -43,7 +43,7 @@ define(function(require) {
 		},
 		
 		_add: function(el, callback, offset) {
-			offset = offset || $(el).getRect().top;
+			offset = offset || YOM(el).getRect().top;
 			offset = offset > this._preLoadHeight ? offset - this._preLoadHeight : 0;
 			this._list[offset] = this._list[offset] || [];
 			this._list[offset].push(function() {
@@ -51,13 +51,13 @@ define(function(require) {
 			});
 			this._count++;
 			if(!this._intervalRef) {
-				this._intervalRef = setInterval($bind(this, this._loadOnDemand), this._interval);
+				this._intervalRef = setInterval(YOM.object.bind(this, this._loadOnDemand), this._interval);
 			}
 		},
 		
 		add: function(els, callback, offset) {
 			var self = this;
-			$(els).each(function(el) {
+			YOM(els).each(function(el) {
 				self._add(el, callback, offset);
 			});
 		}
