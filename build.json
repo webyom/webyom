@@ -88,6 +88,18 @@
 		{
 			"inputs": ["static/js/mod/src/about-contact.js"],
 			"output": "static/js/mod/about-contact.js"
+		},
+		{
+			"inputs": ["static/css/src/main.css", "static/css/src/util.css"],
+			"output": "static/css/c.css"
+		},
+		{
+			"inputs": ["static/css/src/form.css", "static/css/src/button.css"],
+			"output": "static/css/form.css"
+		},
+		{
+			"inputs": ["static/css/src/yuiEditor.css"],
+			"output": "static/css/yuiEditor.css"
 		}
 	],
 	"exclude": {
