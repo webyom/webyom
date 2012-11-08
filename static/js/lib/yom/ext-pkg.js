@@ -72,6 +72,8 @@ define('./chunker', ['./core-pkg'], function(YOM) {
 	
 	return Chunker;
 });
+
+
 /**
  * @namespace YOM.console
  */
@@ -355,6 +357,7 @@ define('./console', ['global', './core-pkg', './chunker'], function(global, YOM,
 		turnOff: turnOff
 	};
 });
+
 /**
  * @namespace
  */

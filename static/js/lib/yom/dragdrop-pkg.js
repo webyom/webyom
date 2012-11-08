@@ -217,6 +217,8 @@ define('./draggable', ['./core-pkg'], function(YOM) {
 	
 	return Draggable;
 });
+
+
 /**
  * @class YOM.dragdrop.Droppable
  */
@@ -442,6 +444,8 @@ define('./droppable', ['./core-pkg', './draggable'], function(YOM, Draggable) {
 	
 	return Droppable;
 });
+
+
 /**
  * @class YOM.dragdrop.Sortable
  */
@@ -736,6 +740,8 @@ define('./sortable', ['./core-pkg', './droppable'], function(YOM, Droppable) {
 	
 	return Sortable;
 });
+
+
 /**
  * @class YOM.dragdrop.Resizeable
  */
@@ -1032,6 +1038,8 @@ define('./resizeable', ['./core-pkg', './draggable'], function(YOM, Draggable) {
 	
 	return Resizeable;
 });
+
+
 /**
  * @namespace YOM.dragdrop
  */

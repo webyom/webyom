@@ -60,6 +60,8 @@ define('./config', ['require', 'yom/core-pkg'], function(require, $) {
 		extend: extend
 	};
 });
+
+
 /**
  * @namespace $$.storage
  */
@@ -126,6 +128,8 @@ define('./storage', ['require'], function(require) {
 		doUnlessKey: doUnlessKey
 	};
 });
+
+
 /**
  * @namespace $$.tooltip
  */
@@ -247,6 +251,8 @@ define('./tooltip', ['require', 'yom/core-pkg'], function(require, $) {
 		guide: guide
 	};
 });
+
+
 /**
  * @namespace $$.ui
  */
@@ -426,6 +432,8 @@ define('./ui', ['require', 'yom/core-pkg', './storage', './tooltip'], function(r
 		processing: processing
 	};
 });
+
+
 /**
  * @namespace $$.util
  */
@@ -641,6 +649,8 @@ function $$confirm(msg, opt) {
 		$$.util.dialog.confirm(msg, opt);
 	});
 };
+
+
 
 /**
  * @namespace $$.Handler
@@ -946,6 +956,8 @@ define('./handler', ['require', 'yom/core-pkg', 'yom/history', './config', './ui
 	
 	return Handler;
 });
+
+
 /**
  * @namespace $$
  */

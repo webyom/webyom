@@ -1,184 +1,4 @@
 /**
- * YOM framework
- * Copyright (c) 2012 Gary Wang, webyom@gmail.com http://webyom.org
- * Under the MIT license
- * https://github.com/webyom/yom
- */
-
-/*
-ID LIST:
-100: base
-101: error
-102: class
-103: array
-104: browser
-105: cookie
-106: css
-107: element
-108: event
-109: js_loader
-110: object
-111: observer
-112: pos
-113: js
-114: tmpl
-115: util
-116: xhr
-117: string
-118: console
-119: transition
-120: tween
-121: localStorage
-122: dragdrop
-123: HashArray
-124: InstanceManager
-125: CrossDomainPoster
-126: json
-127: history
-128: widget
-129: flash
-128001: Mask widget
-128002: Dialog widget
-128003: Tooltip widget
-128004: ModOdl widget
-128005: ImgOdl widget
-*/
-
-/**
- * @namespace YOM.config
- */
-define('./config', [], function() {
-	var t = document.domain.split('.'), l = t.length;
-	return {
-		debug: location.href.indexOf('yom-debug=1') > 0,
-		domain: t.slice(l - 2, l).join('.')
-	};
-});
-/**
- * @class YOM.Error
- */
-/*
-Code Description:
-YOM.Class
-	10101: constructor - arguments length error
-YOM.JsLoader
-	10201: load fail
-	10202: callback fail
-YOM.Xhr
-	10401: onerror
-*/
-define('./error', [], function() {
-	var YomError = function(code, opt) {
-		if(typeof opt == 'string') {
-			opt = {message: opt};
-		}
-		this.opt = opt || {};
-		if(code instanceof YomError) {
-			this.name = code.name;
-			this.code = code.code;
-			this.message = code.message;
-		} else if(code instanceof Error || Object.prototype.toString.call(code) == '[object Error]') {
-			this.name = code.name;
-			this.code = 0;
-			this.message = code.message;
-		} else {
-			this.name = this.opt.name || 'YOM Error';
-			this.code = +code;
-			this.message = this.opt.message || '';
-		}
-	};
-	
-	YomError._ID = 101;
-	
-	YomError.getCode = function(id, code) {
-		if(code < 10) {
-			code = '0' + code;
-		}
-		return parseInt(id + '' + code);
-	};
-	
-	YomError.prototype.toString = function() {
-		return this.name + ': ' + this.message + (this.code ? ' [' + this.code + ']' : '');
-	};
-	
-	return YomError;
-});
-/**
- * @namespace YOM.browser
- */
-define('./browser', [], function() {
-	var _ua = navigator.userAgent.toLowerCase();
-	
-	return {
-		_ID: 104,
-		v: +(_ua.match(/(?:version|firefox|chrome|safari|opera|msie)[\/: ]([\d]+)/) || [0, 0])[1],
-		ie: (/msie/).test(_ua) && !(/opera/).test(_ua),
-		opera: (/opera/).test(_ua),
-		firefox: (/firefox/).test(_ua),
-		chrome: (/chrome/).test(_ua),
-		safari: (/safari/).test(_ua) && !(/chrome/).test(_ua) && !(/android/).test(_ua),
-		iphone: (/iphone|ipod/).test(_ua),
-		ipad: (/ipad/).test(_ua),
-		android: (/android/).test(_ua),
-		
-		isQuirksMode: function() {
-			return document.compatMode != 'CSS1Compat';
-		}
-	};
-});
-/**
- * @namespace YOM.string
- */
-define('./string', [], {
-	_ID: 117,
-	
-	getByteLength: function(str) {
-		return str.replace(/[^\x00-\xff]/g, 'xx').length;
-	},
-	
-	headByByte: function(str, len, postFix) {
-		if(this.getByteLength(str) <= len) {
-			return str;
-		}
-		postFix = postFix || '';
-		var l;
-		if(postFix) {
-			l = len = len - this.getByteLength(postFix);
-		} else {
-			l = len;
-		}
-		do {
-			str = str.slice(0, l--);
-		} while(this.getByteLength(str) > len);
-		return str + postFix;
-	},
-	
-	encodeHtml: function(str) {
-		return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\x60/g, '&#96;').replace(/\x27/g, '&#39;').replace(/\x22/g, '&quot;');
-	},
-	
-	decodeHtml: function(str) {
-		return (str + '').replace(/&quot;/g, '\x22').replace(/&#0*39;/g, '\x27').replace(/&#0*96;/g, '\x60').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&');
-	},
-	
-	trim: function(str) {
-		if(str.trim) {
-			return str.trim();
-		} else {
-			return str.replace(/^\s+|\s+$/, '');
-		}
-	},
-	
-	toCamelCase: function(str) {
-		return str.replace(/[-_]+(\w)([^-_]*)/g, function($1, $2, $3) {return $2.toUpperCase() + $3.toLowerCase();});
-	},
-	
-	toJoinCase: function(str, joiner) {
-		joiner = joiner || '-';
-		return str.replace(/[A-Z]/g, function($1) {return joiner + $1.toLowerCase();}).replace(new RegExp("^" + joiner), '');
-	}
-});
-/**
  * @namespace YOM.object
  */
 define('./object', ['require'], function(require) {
@@ -313,948 +133,7 @@ define('./object', ['require'], function(require) {
 		}
 	};
 });
-/**
- * @namespace YOM.array
- */
-define('./array', ['./object'], function(object) {
-	var YOM = {
-		'object': object
-	};
-	
-	return {
-		_ID: 103,
-		
-		isArray: Array.isArray || function(obj) {
-			return YOM.object.toString(obj) == '[object Array]';
-		},
-	
-		each: function(arr, fn, bind) {
-			for(var i = 0, l = arr.length; i < l; i++) {
-				if(fn.call(bind || arr, arr[i], i, arr) === false) {
-					break;
-				}
-			}
-		},
-		
-		remove: function(arr, item) {
-			var isFn = typeof item == 'function';
-			var flag;
-			for(var i = arr.length - 1; i >= 0; i--) {
-				flag = isFn && item(arr[i], i, arr);
-				if(arr[i] == item || flag) {
-					arr.splice(i, 1);
-					if(flag === -1) {
-						break;
-					}
-				}
-			}
-			return arr;
-		},
-		
-		getArray: function(obj) {
-			return Array.prototype.slice.call(obj);
-		},
-		
-		filter: function(arr, fn) {
-			if(typeof arr.filter == 'function') {
-				return arr.filter(fn);
-			} else {
-				var res = [];
-				YOM.object.each(arr, function(item, i) {
-					if(fn(item, i, arr)) {
-						res.push(item);
-					}
-				});
-				return res;
-			}
-		}
-	};
-});
-/**
- * @class YOM.Class
- */
-define('./class', ['./error', './object', './array'], function(Err, object, array) {
-	var YOM = {
-		'Error': Err,
-		'object': object,
-		'array': array
-	};
-	
-	var Class = function() {};
 
-	var _ID = 102;
-	
-	Class.extend = function(subClass, superClass) {
-		if(arguments.length < 2) {
-			throw new YOM.Error(YOM.Error.getCode(_ID, 1));
-		}
-		var F = function() {};
-		F.prototype = superClass.prototype;
-		subClass.prototype = new F();
-		subClass.prototype.constructor = subClass;
-		subClass.superClass = superClass.prototype;
-		if(superClass.prototype.constructor == Object.prototype.constructor) {
-			superClass.prototype.constructor = superClass;
-		}
-		return subClass;
-	};
-	
-	Class.genericize = function(obj, props, opt) {
-		opt = opt || {};
-		if(!YOM.array.isArray(props)) {
-			props = [props];
-		}
-		YOM.object.each(props, function(prop) {
-			if((!opt.check || !obj[prop]) && YOM.object.isFunction(obj.prototype[prop])) {
-				obj[prop] = function(){
-					var args = YOM.array.getArray(arguments);
-					return obj.prototype[prop].apply(opt.bind || args.shift(), args);
-				};
-			}
-		});
-	};
-	
-	return Class;
-});
-
-/**
- * @class YOM.HashArray
- */
-define('./hash-array', [], function() {
-	var HashArray = function() {
-		this._items = [];
-		this._k2i = {};
-		this._i2k = [];
-		for(var i = 0, l = arguments.length; i < l; i += 2) {
-			if(this._isValidKey(arguments[i])) {
-				this._items.push(arguments[i + 1]);
-				this._i2k.push(arguments[i]);
-				this._k2i[arguments[i]] = this.size() - 1;
-			}
-		}
-	};
-	
-	HashArray._ID = 123;
-	
-	HashArray.prototype = {
-		_isValidKey: function(key) {
-			return key && typeof key == 'string';
-		},
-		
-		size: function() {
-			return this._items.length;	
-		},
-		
-		get: function(key) {
-			if(typeof key == 'string') {
-				return this._items[this._k2i[key]];
-			} else {
-				return this._items[key];
-			}
-		},
-		
-		set: function(key, val) {
-			if(this._isValidKey(key)) {
-				if(this._k2i[key] >= 0) {
-					this._items[this._k2i[key]] = val;
-				}
-			} else if(typeof key == 'number') {
-				if(key < this._items.length) {
-					this._items[key] = val;
-				}
-			}
-		},
-		
-		remove: function(key) {
-			if(this._isValidKey(key)) {
-				if(this._k2i[key] >= 0) {
-					return this.splice(this._k2i[key], 1);
-				}
-			} else if(typeof key == 'number') {
-				if(key < this._items.length) {
-					return this.splice(key, 1);
-				}
-			}
-			return null;
-		},
-		
-		hasKey: function(key) {
-			return this._k2i[key] >= 0;
-		},
-		
-		hasValue: function(val) {
-			var has = false;
-			this.each(function(v) {
-				if(val === v) {
-					has = true;
-					return false;
-				}
-				return true;
-			});
-			return has;
-		},
-		
-		each: function(cb) {
-			for(var i = 0, l = this._items.length; i < l; i++) {
-				if(cb(this._items[i], i, this._i2k[i]) ===  false) {
-					break;
-				}
-			}
-		},
-		
-		push: function(key, val) {
-			if(!this._isValidKey(key)) {
-				return;
-			}
-			var i = this._items.length;
-			this._items.push(val);
-			this._i2k.push(key);
-			this._k2i[key] = i;
-		},
-		
-		pop: function() {
-			var dk = this._i2k.pop();
-			var dv = this._items.pop();
-			delete this._k2i[dk];
-			return dk ? new HashArray(dk, dv) : undefined;
-		},
-		
-		unshift: function(key, val) {
-			if(!this._isValidKey(key)) {
-				return;
-			}
-			this._items.unshift(val);
-			this._i2k.unshift(key);
-			for(var k in this._k2i) {
-				if(this._k2i.hasOwnProperty(k)) {
-					this._k2i[k]++;
-				}
-			}
-			this._k2i[key] = 0;
-		},
-		
-		shift: function() {
-			var dk = this._i2k.shift();
-			var dv = this._items.shift();
-			for(var k in this._k2i) {
-				if(this._k2i.hasOwnProperty(k)) {
-					if(dk == k) {
-						delete this._k2i[k];
-					} else {
-						this._k2i[k]--;
-					}
-				}
-			}
-			return dk ? new HashArray(dk, dv) : undefined;
-		},
-		
-		slice: function(s, e) {
-			var ks, vs, res;
-			ks = this._i2k.slice(s, e);
-			vs = this._items.slice(s, e);
-			res = new HashArray();
-			for(i = 0, l = ks.length; i < l; i++) {
-				res.push(ks[i], vs[i]);
-			}
-			return res;
-		},
-		
-		splice: function(s, c) {
-			var dks, dvs, i, l, res;
-			var ks = [], vs = [];
-			for(i = 2, l = arguments.length; i < l; i += 2) {
-				if(this._isValidKey(arguments[i])) {
-					ks.push(arguments[i]);
-					vs.push(arguments[i + 1]);
-				}
-			}
-			dks = Array.prototype.splice.apply(this._i2k, [s, c].concat(ks));
-			dvs = Array.prototype.splice.apply(this._items, [s, c].concat(vs));
-			res = new HashArray();
-			for(i = 0, l = dks.length; i < l; i++) {
-				if(this._k2i.hasOwnProperty(dks[i])) {
-					delete this._k2i[dks[i]];
-				}
-				res.push(dks[i], dvs[i]);
-			}
-			for(i = s, l = this._i2k.length; i < l; i++) {
-				this._k2i[this._i2k[i]] = i;
-			}
-			return res;
-		},
-		
-		concat: function(ha) {
-			var res, i, l;
-			var ks = [], vs = [];
-			if(!(ha instanceof HashArray)) {
-				return this;
-			}
-			res = new HashArray();
-			for(i = 0, l = this.size(); i < l; i++) {
-				res.push(this._i2k[i], this._items[i]);
-			}
-			for(i = 0, l = ha.size(); i < l; i++) {
-				res.push(ha._i2k[i], ha._items[i]);
-			}
-			return res;
-		},
-		
-		join: function(s) {
-			return this._items.join(s);
-		},
-		
-		constructor: HashArray
-	};
-	
-	return HashArray;
-});
-/**
- * @class YOM.InstanceManager
- */
-define('./instance-manager', ['./object', './array'], function(object, array) {
-	var YOM = {
-		'object': object,
-		'array': array
-	};
-		
-	var InstanceManager = function() {
-		this._init();
-	};
-	
-	InstanceManager._ID = 124;
-	
-	InstanceManager.prototype = {
-		_init: function() {
-			this._pool = [];
-		},
-		
-		add: function(inst) {
-			var id = $getUniqueId();
-			this._pool.push({id: id, inst: inst});
-			return id;
-		},
-		
-		get: function(id) {
-			var res;
-			YOM.object.each(this._pool, function(item) {
-				if(item.id == id) {
-					res = item.inst;
-					return false;
-				}
-				return true;
-			});
-			return res;
-		},
-		
-		remove: function(id) {
-			YOM.array.remove(this._pool, function(item) {
-				if(item.id == id) {
-					return -1;
-				}
-				return 0;
-			});
-		},
-		
-		count: function() {
-			return this._pool.length;
-		},
-		
-		each: function(cb, bind) {
-			YOM.object.each(this._pool, function(item) {
-				if(item) {
-					return cb.call(bind, item.inst, item.id);
-				}
-				return true;
-			});
-		},
-		
-		clear: function() {
-			this._init();
-		},
-		
-		constructor: InstanceManager
-	};
-	
-	return InstanceManager;
-});
-// This source code is free for use in the public domain.
-// NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
-
-// http://code.google.com/p/json-sans-eval/
-
-/**
- * Parses a string of well-formed JSON text.
- *
- * If the input is not well-formed, then behavior is undefined, but it is
- * deterministic and is guaranteed not to modify any object other than its
- * return value.
- *
- * This does not use `eval` so is less likely to have obscure security bugs than
- * json2.js.
- * It is optimized for speed, so is much faster than json_parse.js.
- *
- * This library should be used whenever security is a concern (when JSON may
- * come from an untrusted source), speed is a concern, and erroring on malformed
- * JSON is *not* a concern.
- *
- *                      Pros                   Cons
- *                    +-----------------------+-----------------------+
- * json_sans_eval.js  | Fast, secure          | Not validating        |
- *                    +-----------------------+-----------------------+
- * json_parse.js      | Validating, secure    | Slow                  |
- *                    +-----------------------+-----------------------+
- * json2.js           | Fast, some validation | Potentially insecure  |
- *                    +-----------------------+-----------------------+
- *
- * json2.js is very fast, but potentially insecure since it calls `eval` to
- * parse JSON data, so an attacker might be able to supply strange JS that
- * looks like JSON, but that executes arbitrary javascript.
- * If you do have to use json2.js with untrusted data, make sure you keep
- * your version of json2.js up to date so that you get patches as they're
- * released.
- *
- * @param {string} json per RFC 4627
- * @param {function (this:Object, string, *):*} opt_reviver optional function
- *     that reworks JSON objects post-parse per Chapter 15.12 of EcmaScript3.1.
- *     If supplied, the function is called with a string key, and a value.
- *     The value is the property of 'this'.  The reviver should return
- *     the value to use in its place.  So if dates were serialized as
- *     {@code { "type": "Date", "time": 1234 }}, then a reviver might look like
- *     {@code
- *     function (key, value) {
- *       if (value && typeof value === 'object' && 'Date' === value.type) {
- *         return new Date(value.time);
- *       } else {
- *         return value;
- *       }
- *     }}.
- *     If the reviver returns {@code undefined} then the property named by key
- *     will be deleted from its container.
- *     {@code this} is bound to the object containing the specified property.
- * @return {Object|Array}
- * @author Mike Samuel <mikesamuel@gmail.com>
- */
-define('./json-sans-eval', [], function() {
-var jsonParse = (function () {
-  var number
-      = '(?:-?\\b(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\\b)';
-  var oneChar = '(?:[^\\0-\\x08\\x0a-\\x1f\"\\\\]'
-      + '|\\\\(?:[\"/\\\\bfnrt]|u[0-9A-Fa-f]{4}))';
-  var string = '(?:\"' + oneChar + '*\")';
-
-  // Will match a value in a well-formed JSON file.
-  // If the input is not well-formed, may match strangely, but not in an unsafe
-  // way.
-  // Since this only matches value tokens, it does not match whitespace, colons,
-  // or commas.
-  var jsonToken = new RegExp(
-      '(?:false|true|null|[\\{\\}\\[\\]]'
-      + '|' + number
-      + '|' + string
-      + ')', 'g');
-
-  // Matches escape sequences in a string literal
-  var escapeSequence = new RegExp('\\\\(?:([^u])|u(.{4}))', 'g');
-
-  // Decodes escape sequences in object literals
-  var escapes = {
-    '"': '"',
-    '/': '/',
-    '\\': '\\',
-    'b': '\b',
-    'f': '\f',
-    'n': '\n',
-    'r': '\r',
-    't': '\t'
-  };
-  function unescapeOne(_, ch, hex) {
-    return ch ? escapes[ch] : String.fromCharCode(parseInt(hex, 16));
-  }
-
-  // A non-falsy value that coerces to the empty string when used as a key.
-  var EMPTY_STRING = new String('');
-  var SLASH = '\\';
-
-  // Constructor to use based on an open token.
-  var firstTokenCtors = { '{': Object, '[': Array };
-
-  var hop = Object.hasOwnProperty;
-
-  return function (json, opt_reviver) {
-    // Split into tokens
-    var toks = json.match(jsonToken);
-    // Construct the object to return
-    var result;
-    var tok = toks[0];
-    var topLevelPrimitive = false;
-    if ('{' === tok) {
-      result = {};
-    } else if ('[' === tok) {
-      result = [];
-    } else {
-      // The RFC only allows arrays or objects at the top level, but the JSON.parse
-      // defined by the EcmaScript 5 draft does allow strings, booleans, numbers, and null
-      // at the top level.
-      result = [];
-      topLevelPrimitive = true;
-    }
-
-    // If undefined, the key in an object key/value record to use for the next
-    // value parsed.
-    var key;
-    // Loop over remaining tokens maintaining a stack of uncompleted objects and
-    // arrays.
-    var stack = [result];
-    for (var i = 1 - topLevelPrimitive, n = toks.length; i < n; ++i) {
-      tok = toks[i];
-
-      var cont;
-      switch (tok.charCodeAt(0)) {
-        default:  // sign or digit
-          cont = stack[0];
-          cont[key || cont.length] = +(tok);
-          key = void 0;
-          break;
-        case 0x22:  // '"'
-          tok = tok.substring(1, tok.length - 1);
-          if (tok.indexOf(SLASH) !== -1) {
-            tok = tok.replace(escapeSequence, unescapeOne);
-          }
-          cont = stack[0];
-          if (!key) {
-            if (cont instanceof Array) {
-              key = cont.length;
-            } else {
-              key = tok || EMPTY_STRING;  // Use as key for next value seen.
-              break;
-            }
-          }
-          cont[key] = tok;
-          key = void 0;
-          break;
-        case 0x5b:  // '['
-          cont = stack[0];
-          stack.unshift(cont[key || cont.length] = []);
-          key = void 0;
-          break;
-        case 0x5d:  // ']'
-          stack.shift();
-          break;
-        case 0x66:  // 'f'
-          cont = stack[0];
-          cont[key || cont.length] = false;
-          key = void 0;
-          break;
-        case 0x6e:  // 'n'
-          cont = stack[0];
-          cont[key || cont.length] = null;
-          key = void 0;
-          break;
-        case 0x74:  // 't'
-          cont = stack[0];
-          cont[key || cont.length] = true;
-          key = void 0;
-          break;
-        case 0x7b:  // '{'
-          cont = stack[0];
-          stack.unshift(cont[key || cont.length] = {});
-          key = void 0;
-          break;
-        case 0x7d:  // '}'
-          stack.shift();
-          break;
-      }
-    }
-    // Fail if we've got an uncompleted object.
-    if (topLevelPrimitive) {
-      if (stack.length !== 1) { throw new Error(); }
-      result = result[0];
-    } else {
-      if (stack.length) { throw new Error(); }
-    }
-
-    if (opt_reviver) {
-      // Based on walk as implemented in http://www.json.org/json2.js
-      var walk = function (holder, key) {
-        var value = holder[key];
-        if (value && typeof value === 'object') {
-          var toDelete = null;
-          for (var k in value) {
-            if (hop.call(value, k) && value !== holder) {
-              // Recurse to properties first.  This has the effect of causing
-              // the reviver to be called on the object graph depth-first.
-
-              // Since 'this' is bound to the holder of the property, the
-              // reviver can access sibling properties of k including ones
-              // that have not yet been revived.
-
-              // The value returned by the reviver is used in place of the
-              // current value of property k.
-              // If it returns undefined then the property is deleted.
-              var v = walk(value, k);
-              if (v !== void 0) {
-                value[k] = v;
-              } else {
-                // Deleting properties inside the loop has vaguely defined
-                // semantics in ES3 and ES3.1.
-                if (!toDelete) { toDelete = []; }
-                toDelete.push(k);
-              }
-            }
-          }
-          if (toDelete) {
-            for (var i = toDelete.length; --i >= 0;) {
-              delete value[toDelete[i]];
-            }
-          }
-        }
-        return opt_reviver.call(holder, key, value);
-      };
-      result = walk({ '': result }, '');
-    }
-
-    return result;
-  };
-})();
-
-return jsonParse;
-});
-/**
- * @namespace YOM.json
- */
-define('./json', ['./error', './object', './array', './json-sans-eval'], function(Err, object, array, jsonParse) {
-	var YOM = {
-		'Error': Err,
-		'object': object,
-		'array': array,
-		'jsonParse': jsonParse
-	};
-	
-	var _ID = 126;
-	
-	var _escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
-	var _meta = {
-		'\b': '\\b',
-		'\t': '\\t',
-		'\n': '\\n',
-		'\f': '\\f',
-		'\r': '\\r',
-		'"' : '\\"',
-		'\\': '\\\\'
-	};
-	
-	function _quote(str) {
-		_escapable.lastIndex = 0;
-		return _escapable.test(str) ? '"' + str.replace(_escapable, function(c) {
-			return _meta[c] || '\\u' + ('0000' + c.charCodeAt(0).toString(16)).slice(-4);
-		}) + '"' : '"' + str + '"';
-	};
-	
-	return {
-		parse: function(str) {
-			return YOM.jsonParse(str);
-		},
-		
-		stringify: function(obj, prettify, objIndentLevel) {
-			var self = this;
-			var res, tmp, indent, newLine;
-			if(prettify) {
-				objIndentLevel = objIndentLevel || 1;
-				newLine = '\n';
-			} else {
-				objIndentLevel = 0;
-				newLine = '';
-			}
-			switch(typeof obj) {
-			case 'string':
-				res = _quote(obj);
-				break;
-			case 'boolean':
-				res = obj.toString();
-				break;
-			case 'number':
-				if(isNaN(obj)) {
-					throw new YOM.Error(YOM.Error.getCode(_ID, 1), 'NaN not supported.');
-				} else if(!isFinite(obj)) {
-					throw new YOM.Error(YOM.Error.getCode(_ID, 2), 'Infinite number not supported.');
-				} else {
-					res = obj.toString();
-				}
-				break;
-			case 'object':
-				if(!obj) {
-					res = 'null';
-					break;
-				}
-				tmp = [];
-				if(obj.__YOM_JSON_STRINGIFY_MARKED__) {
-					throw new YOM.Error(YOM.Error.getCode(_ID, 1), 'YOM.json.stringify can not deal with circular reference.');
-				}
-				obj.__YOM_JSON_STRINGIFY_MARKED__ = 1;
-				if(YOM.array.isArray(obj)) {
-					YOM.object.each(obj, function(val) {
-						var s = self.stringify(val, prettify, objIndentLevel);
-						s && tmp.push(s);
-					});
-					res = '[' + tmp.join(', ') + ']';
-				} else {
-					indent = [];
-					for(var i = 0; i < objIndentLevel; i++) {
-						indent.push('    ');
-					}
-					YOM.object.each(obj, function(val, key) {
-						if(key == '__YOM_JSON_STRINGIFY_MARKED__' || val === YOM.object.PRIVATE_PROPERTY) {
-							return;
-						}
-						if(YOM.object.hasOwnProperty(obj, key)) {
-							var s = self.stringify(val, prettify, objIndentLevel + 1);
-							s && tmp.push(indent.join('') + _quote(key) + ': ' + s);
-						}
-					});
-					indent.pop();
-					if(tmp.length) {
-						res = '{' + newLine + tmp.join(', ' + newLine) + newLine + indent.join('') + '}';
-					} else {
-						res = '{}';
-					}
-				}
-				delete obj.__YOM_JSON_STRINGIFY_MARKED__;
-				break;
-			default:
-				throw new YOM.Error(YOM.Error.getCode(_ID, 3), typeof obj + ' type not supported.');
-			}
-			return res;
-		}
-	};
-});
-/**
- * @class YOM.Observer
- */
-define('./observer', ['./object'], function(object) {
-	var Observer = function () {
-		this._subscribers = [];
-	};
-	
-	Observer.prototype = {
-		subscribe: function(subscriber, bind) {
-			subscriber = bind ? object.bind(bind, subscriber) : subscriber;
-			for(var i = 0, l = this._subscribers.length; i < l; i++) {
-				if(subscriber == this._subscribers[i]) {
-					return null;
-				}
-			}
-			this._subscribers.push(subscriber);
-			return subscriber;
-		},
-		
-		remove: function(subscriber) {
-			var res = [];
-			if(subscriber) {
-				for(var i = this._subscribers.length - 1; i >= 0; i--) {
-					if(subscriber == this._subscribers[i]) {
-						res = res.concat(this._subscribers.splice(i, 1));
-					}
-				}
-			} else {
-				res = this._subscribers;
-				this._subscribers = [];
-			}
-			return res;
-		},
-		
-		dispatch: function(e, bind) {
-			var res, tmp, subscriber;
-			for(var i = this._subscribers.length - 1; i >= 0; i--) {
-				subscriber = this._subscribers[i];
-				if(!subscriber) {
-					continue;				
-				}
-				tmp = subscriber.call(bind, e);
-				res = tmp === false || res === false ? false : tmp;
-			}
-			return res;
-		},
-		
-		constructor: Observer
-	};
-	
-	Observer._ID = 111;
-	
-	return Observer;
-});
-/**
- * @class YOM.Event
- */
-define('./event', ['./error', './object', './observer'], function(Err, object, Observer) {
-	var YOM = {
-		'Error': Err,
-		'object': object,
-		'Observer': Observer
-	};
-	
-	var _ID = 108;
-	
-	var _elRefCount = 0;
-	_customizedEventHash = {
-		
-	};
-	
-	function _getObserver(instance, type) {
-		if(!instance instanceof Evt) {
-			throw new YOM.Error(YOM.Error.getCode(_ID, 1));
-		}
-		instance._observers = instance._observers || {};
-		instance._observers[type] = instance._observers[type] || new YOM.Observer();
-		return instance._observers[type];
-	};
-	
-	function _getObservers(instance) {
-		if(!instance instanceof Evt) {
-			throw new YOM.Error(YOM.Error.getCode(_ID, 1));
-		}
-		instance._observers = instance._observers || {};
-		return instance._observers;
-	};
-	
-	function Evt(observers) {
-		this._observers = YOM.object.getClean(observers) || {};
-	};
-	
-	Evt.prototype = {
-		addObservers: function(newObservers) {
-			var observers = _getObservers(this);
-			newObservers = YOM.object.getClean(newObservers);
-			for(var type in newObservers) {
-				if(newObservers[type] instanceof YOM.Observer) {
-					observers[type] = newObservers[type];
-				}
-			}
-		},
-		
-		addEventListener: function(type, listener, bind) {
-			var observer = _getObserver(this, type);
-			if(!observer) {
-				throw new YOM.Error(YOM.Error.getCode(_ID, 1));
-			}
-			return observer.subscribe(listener, bind);
-		},
-		
-		removeEventListener: function(type, listener) {
-			var observer = _getObserver(this, type);
-			if(!observer) {
-				throw new YOM.Error(YOM.Error.getCode(_ID, 2));
-			}
-			return observer.remove(listener);
-		},
-		
-		dispatchEvent: function(e, asyn) {
-			if(typeof e == 'string') {
-				e = {type: e};
-			}
-			var self = this;
-			var observer = _getObserver(this, e.type);
-			if(!observer) {
-				throw new YOM.Error(YOM.Error.getCode(_ID, 3));
-			}
-			if(asyn) {
-				setTimeout(function() {
-					observer.dispatch.call(observer, e, self);
-				}, 0);
-				return undefined;
-			} else {
-				return observer.dispatch.call(observer, e, self);
-			}
-		},
-		
-		createEvent: function(type, opt) {
-			var e = YOM.object.clone(opt) || {};
-			e.type = type;
-			return e;
-		},
-		
-		constructor: Evt
-	};
-	
-	Evt.addListener = function(el, eType, listener, bind) {
-		var cEvent, cEventHandler;
-		eType = eType.toLowerCase();
-		listener = bind ? YOM.object.bind(bind, listener) : listener;
-		cEvent = _customizedEventHash[eType];
-		if(cEvent) {
-			el.elEventRef = el.elEventRef || ++_elRefCount;
-			cEventHandler = cEvent.elEventRefHandlerHash[el.elEventRef];
-			if(!cEventHandler) {
-				cEventHandler = cEvent.elEventRefHandlerHash[el.elEventRef] = new cEvent.Handler(el);
-			}
-			cEventHandler.addListener(listener);
-		} else if(el.addEventListener) {
-			el.addEventListener(eType, listener, false);
-		} else {
-			el.attachEvent('on' + eType, listener);
-		}
-		return listener;
-	};
-	
-	Evt.removeListener = function(el, eType, listener) {
-		var cEvent, cEventHandler;
-		eType = eType.toLowerCase();
-		cEvent = _customizedEventHash[eType];
-		if(cEvent) {
-			cEventHandler = cEvent.elEventRefHandlerHash[el.elEventRef];
-			if(cEventHandler) {
-				cEventHandler.removeListener(listener);
-			}
-		} else if(el.removeEventListener) {
-			el.removeEventListener(eType, listener, false);
-		} else {
-			el.detachEvent('on' + eType, listener);
-		}
-	};
-	
-	Evt.addCustomizedEvent = function(type, Handler) {
-		_customizedEventHash[type] = {
-			Handler: Handler,
-			elEventRefHandlerHash: {}
-		};
-	};
-	
-	Evt.removeCustomizedEventHandler = function(type, ref) {
-		var cEvent = _customizedEventHash[type];
-		if(cEvent) {
-			cEvent.elEventRefHandlerHash[ref] = null;
-		}
-	};
-	
-	Evt.cancelBubble = function(e) {
-		if(e.stopPropagation) {
-			e.stopPropagation();
-		} else {
-			e.cancelBubble = true;
-		}
-	};
-	
-	Evt.preventDefault = function(e) {
-		if(e.preventDefault) {
-			e.preventDefault();
-		} else {
-			e.returnValue = false;
-		}
-	};
-	
-	Evt.getTarget = function(e) {
-		return e.target || e.srcElement;
-	};
-	
-	Evt.getPageX = function(e) {
-		return e.pageX != undefined ? e.pageX : e.clientX + Math.max(document.documentElement.scrollLeft, document.body.scrollLeft);
-	};
-	
-	Evt.getPageY = function(e) {
-		return e.pageY != undefined ? e.pageY : e.clientY + Math.max(document.documentElement.scrollTop, document.body.scrollTop);
-	};
-	
-	return Evt;
-});
 /**
  * @class YOM.Element
  */
@@ -2176,6 +1055,1148 @@ define('./element', ['./browser', './string', './object', './array', './event'],
 	
 	return Elem;
 });
+
+
+/**
+ * YOM framework
+ * Copyright (c) 2012 Gary Wang, webyom@gmail.com http://webyom.org
+ * Under the MIT license
+ * https://github.com/webyom/yom
+ */
+
+/*
+ID LIST:
+100: base
+101: error
+102: class
+103: array
+104: browser
+105: cookie
+106: css
+107: element
+108: event
+109: js_loader
+110: object
+111: observer
+112: pos
+113: js
+114: tmpl
+115: util
+116: xhr
+117: string
+118: console
+119: transition
+120: tween
+121: localStorage
+122: dragdrop
+123: HashArray
+124: InstanceManager
+125: CrossDomainPoster
+126: json
+127: history
+128: widget
+129: flash
+128001: Mask widget
+128002: Dialog widget
+128003: Tooltip widget
+128004: ModOdl widget
+128005: ImgOdl widget
+*/
+
+/**
+ * @namespace YOM.config
+ */
+define('./config', [], function() {
+	var t = document.domain.split('.'), l = t.length;
+	return {
+		debug: location.href.indexOf('yom-debug=1') > 0,
+		domain: t.slice(l - 2, l).join('.')
+	};
+});
+
+
+/**
+ * @class YOM.Error
+ */
+/*
+Code Description:
+YOM.Class
+	10101: constructor - arguments length error
+YOM.JsLoader
+	10201: load fail
+	10202: callback fail
+YOM.Xhr
+	10401: onerror
+*/
+define('./error', [], function() {
+	var YomError = function(code, opt) {
+		if(typeof opt == 'string') {
+			opt = {message: opt};
+		}
+		this.opt = opt || {};
+		if(code instanceof YomError) {
+			this.name = code.name;
+			this.code = code.code;
+			this.message = code.message;
+		} else if(code instanceof Error || Object.prototype.toString.call(code) == '[object Error]') {
+			this.name = code.name;
+			this.code = 0;
+			this.message = code.message;
+		} else {
+			this.name = this.opt.name || 'YOM Error';
+			this.code = +code;
+			this.message = this.opt.message || '';
+		}
+	};
+	
+	YomError._ID = 101;
+	
+	YomError.getCode = function(id, code) {
+		if(code < 10) {
+			code = '0' + code;
+		}
+		return parseInt(id + '' + code);
+	};
+	
+	YomError.prototype.toString = function() {
+		return this.name + ': ' + this.message + (this.code ? ' [' + this.code + ']' : '');
+	};
+	
+	return YomError;
+});
+
+/**
+ * @namespace YOM.browser
+ */
+define('./browser', [], function() {
+	var _ua = navigator.userAgent.toLowerCase();
+	
+	return {
+		_ID: 104,
+		v: +(_ua.match(/(?:version|firefox|chrome|safari|opera|msie)[\/: ]([\d]+)/) || [0, 0])[1],
+		ie: (/msie/).test(_ua) && !(/opera/).test(_ua),
+		opera: (/opera/).test(_ua),
+		firefox: (/firefox/).test(_ua),
+		chrome: (/chrome/).test(_ua),
+		safari: (/safari/).test(_ua) && !(/chrome/).test(_ua) && !(/android/).test(_ua),
+		iphone: (/iphone|ipod/).test(_ua),
+		ipad: (/ipad/).test(_ua),
+		android: (/android/).test(_ua),
+		
+		isQuirksMode: function() {
+			return document.compatMode != 'CSS1Compat';
+		}
+	};
+});
+
+
+/**
+ * @namespace YOM.string
+ */
+define('./string', [], {
+	_ID: 117,
+	
+	getByteLength: function(str) {
+		return str.replace(/[^\x00-\xff]/g, 'xx').length;
+	},
+	
+	headByByte: function(str, len, postFix) {
+		if(this.getByteLength(str) <= len) {
+			return str;
+		}
+		postFix = postFix || '';
+		var l;
+		if(postFix) {
+			l = len = len - this.getByteLength(postFix);
+		} else {
+			l = len;
+		}
+		do {
+			str = str.slice(0, l--);
+		} while(this.getByteLength(str) > len);
+		return str + postFix;
+	},
+	
+	encodeHtml: function(str) {
+		return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\x60/g, '&#96;').replace(/\x27/g, '&#39;').replace(/\x22/g, '&quot;');
+	},
+	
+	decodeHtml: function(str) {
+		return (str + '').replace(/&quot;/g, '\x22').replace(/&#0*39;/g, '\x27').replace(/&#0*96;/g, '\x60').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&');
+	},
+	
+	trim: function(str) {
+		if(str.trim) {
+			return str.trim();
+		} else {
+			return str.replace(/^\s+|\s+$/, '');
+		}
+	},
+	
+	toCamelCase: function(str) {
+		return str.replace(/[-_]+(\w)([^-_]*)/g, function($1, $2, $3) {return $2.toUpperCase() + $3.toLowerCase();});
+	},
+	
+	toJoinCase: function(str, joiner) {
+		joiner = joiner || '-';
+		return str.replace(/[A-Z]/g, function($1) {return joiner + $1.toLowerCase();}).replace(new RegExp("^" + joiner), '');
+	}
+});
+
+/**
+ * @namespace YOM.array
+ */
+define('./array', ['./object'], function(object) {
+	var YOM = {
+		'object': object
+	};
+	
+	return {
+		_ID: 103,
+		
+		isArray: Array.isArray || function(obj) {
+			return YOM.object.toString(obj) == '[object Array]';
+		},
+	
+		each: function(arr, fn, bind) {
+			for(var i = 0, l = arr.length; i < l; i++) {
+				if(fn.call(bind || arr, arr[i], i, arr) === false) {
+					break;
+				}
+			}
+		},
+		
+		remove: function(arr, item) {
+			var isFn = typeof item == 'function';
+			var flag;
+			for(var i = arr.length - 1; i >= 0; i--) {
+				flag = isFn && item(arr[i], i, arr);
+				if(arr[i] == item || flag) {
+					arr.splice(i, 1);
+					if(flag === -1) {
+						break;
+					}
+				}
+			}
+			return arr;
+		},
+		
+		getArray: function(obj) {
+			return Array.prototype.slice.call(obj);
+		},
+		
+		filter: function(arr, fn) {
+			if(typeof arr.filter == 'function') {
+				return arr.filter(fn);
+			} else {
+				var res = [];
+				YOM.object.each(arr, function(item, i) {
+					if(fn(item, i, arr)) {
+						res.push(item);
+					}
+				});
+				return res;
+			}
+		}
+	};
+});
+
+/**
+ * @class YOM.Class
+ */
+define('./class', ['./error', './object', './array'], function(Err, object, array) {
+	var YOM = {
+		'Error': Err,
+		'object': object,
+		'array': array
+	};
+	
+	var Class = function() {};
+
+	var _ID = 102;
+	
+	Class.extend = function(subClass, superClass) {
+		if(arguments.length < 2) {
+			throw new YOM.Error(YOM.Error.getCode(_ID, 1));
+		}
+		var F = function() {};
+		F.prototype = superClass.prototype;
+		subClass.prototype = new F();
+		subClass.prototype.constructor = subClass;
+		subClass.superClass = superClass.prototype;
+		if(superClass.prototype.constructor == Object.prototype.constructor) {
+			superClass.prototype.constructor = superClass;
+		}
+		return subClass;
+	};
+	
+	Class.genericize = function(obj, props, opt) {
+		opt = opt || {};
+		if(!YOM.array.isArray(props)) {
+			props = [props];
+		}
+		YOM.object.each(props, function(prop) {
+			if((!opt.check || !obj[prop]) && YOM.object.isFunction(obj.prototype[prop])) {
+				obj[prop] = function(){
+					var args = YOM.array.getArray(arguments);
+					return obj.prototype[prop].apply(opt.bind || args.shift(), args);
+				};
+			}
+		});
+	};
+	
+	return Class;
+});
+
+
+
+/**
+ * @class YOM.HashArray
+ */
+define('./hash-array', [], function() {
+	var HashArray = function() {
+		this._items = [];
+		this._k2i = {};
+		this._i2k = [];
+		for(var i = 0, l = arguments.length; i < l; i += 2) {
+			if(this._isValidKey(arguments[i])) {
+				this._items.push(arguments[i + 1]);
+				this._i2k.push(arguments[i]);
+				this._k2i[arguments[i]] = this.size() - 1;
+			}
+		}
+	};
+	
+	HashArray._ID = 123;
+	
+	HashArray.prototype = {
+		_isValidKey: function(key) {
+			return key && typeof key == 'string';
+		},
+		
+		size: function() {
+			return this._items.length;	
+		},
+		
+		get: function(key) {
+			if(typeof key == 'string') {
+				return this._items[this._k2i[key]];
+			} else {
+				return this._items[key];
+			}
+		},
+		
+		set: function(key, val) {
+			if(this._isValidKey(key)) {
+				if(this._k2i[key] >= 0) {
+					this._items[this._k2i[key]] = val;
+				}
+			} else if(typeof key == 'number') {
+				if(key < this._items.length) {
+					this._items[key] = val;
+				}
+			}
+		},
+		
+		remove: function(key) {
+			if(this._isValidKey(key)) {
+				if(this._k2i[key] >= 0) {
+					return this.splice(this._k2i[key], 1);
+				}
+			} else if(typeof key == 'number') {
+				if(key < this._items.length) {
+					return this.splice(key, 1);
+				}
+			}
+			return null;
+		},
+		
+		hasKey: function(key) {
+			return this._k2i[key] >= 0;
+		},
+		
+		hasValue: function(val) {
+			var has = false;
+			this.each(function(v) {
+				if(val === v) {
+					has = true;
+					return false;
+				}
+				return true;
+			});
+			return has;
+		},
+		
+		each: function(cb) {
+			for(var i = 0, l = this._items.length; i < l; i++) {
+				if(cb(this._items[i], i, this._i2k[i]) ===  false) {
+					break;
+				}
+			}
+		},
+		
+		push: function(key, val) {
+			if(!this._isValidKey(key)) {
+				return;
+			}
+			var i = this._items.length;
+			this._items.push(val);
+			this._i2k.push(key);
+			this._k2i[key] = i;
+		},
+		
+		pop: function() {
+			var dk = this._i2k.pop();
+			var dv = this._items.pop();
+			delete this._k2i[dk];
+			return dk ? new HashArray(dk, dv) : undefined;
+		},
+		
+		unshift: function(key, val) {
+			if(!this._isValidKey(key)) {
+				return;
+			}
+			this._items.unshift(val);
+			this._i2k.unshift(key);
+			for(var k in this._k2i) {
+				if(this._k2i.hasOwnProperty(k)) {
+					this._k2i[k]++;
+				}
+			}
+			this._k2i[key] = 0;
+		},
+		
+		shift: function() {
+			var dk = this._i2k.shift();
+			var dv = this._items.shift();
+			for(var k in this._k2i) {
+				if(this._k2i.hasOwnProperty(k)) {
+					if(dk == k) {
+						delete this._k2i[k];
+					} else {
+						this._k2i[k]--;
+					}
+				}
+			}
+			return dk ? new HashArray(dk, dv) : undefined;
+		},
+		
+		slice: function(s, e) {
+			var ks, vs, res;
+			ks = this._i2k.slice(s, e);
+			vs = this._items.slice(s, e);
+			res = new HashArray();
+			for(i = 0, l = ks.length; i < l; i++) {
+				res.push(ks[i], vs[i]);
+			}
+			return res;
+		},
+		
+		splice: function(s, c) {
+			var dks, dvs, i, l, res;
+			var ks = [], vs = [];
+			for(i = 2, l = arguments.length; i < l; i += 2) {
+				if(this._isValidKey(arguments[i])) {
+					ks.push(arguments[i]);
+					vs.push(arguments[i + 1]);
+				}
+			}
+			dks = Array.prototype.splice.apply(this._i2k, [s, c].concat(ks));
+			dvs = Array.prototype.splice.apply(this._items, [s, c].concat(vs));
+			res = new HashArray();
+			for(i = 0, l = dks.length; i < l; i++) {
+				if(this._k2i.hasOwnProperty(dks[i])) {
+					delete this._k2i[dks[i]];
+				}
+				res.push(dks[i], dvs[i]);
+			}
+			for(i = s, l = this._i2k.length; i < l; i++) {
+				this._k2i[this._i2k[i]] = i;
+			}
+			return res;
+		},
+		
+		concat: function(ha) {
+			var res, i, l;
+			var ks = [], vs = [];
+			if(!(ha instanceof HashArray)) {
+				return this;
+			}
+			res = new HashArray();
+			for(i = 0, l = this.size(); i < l; i++) {
+				res.push(this._i2k[i], this._items[i]);
+			}
+			for(i = 0, l = ha.size(); i < l; i++) {
+				res.push(ha._i2k[i], ha._items[i]);
+			}
+			return res;
+		},
+		
+		join: function(s) {
+			return this._items.join(s);
+		},
+		
+		constructor: HashArray
+	};
+	
+	return HashArray;
+});
+
+
+/**
+ * @class YOM.InstanceManager
+ */
+define('./instance-manager', ['./object', './array'], function(object, array) {
+	var YOM = {
+		'object': object,
+		'array': array
+	};
+		
+	var InstanceManager = function() {
+		this._init();
+	};
+	
+	InstanceManager._ID = 124;
+	
+	InstanceManager.prototype = {
+		_init: function() {
+			this._pool = [];
+		},
+		
+		add: function(inst) {
+			var id = $getUniqueId();
+			this._pool.push({id: id, inst: inst});
+			return id;
+		},
+		
+		get: function(id) {
+			var res;
+			YOM.object.each(this._pool, function(item) {
+				if(item.id == id) {
+					res = item.inst;
+					return false;
+				}
+				return true;
+			});
+			return res;
+		},
+		
+		remove: function(id) {
+			YOM.array.remove(this._pool, function(item) {
+				if(item.id == id) {
+					return -1;
+				}
+				return 0;
+			});
+		},
+		
+		count: function() {
+			return this._pool.length;
+		},
+		
+		each: function(cb, bind) {
+			YOM.object.each(this._pool, function(item) {
+				if(item) {
+					return cb.call(bind, item.inst, item.id);
+				}
+				return true;
+			});
+		},
+		
+		clear: function() {
+			this._init();
+		},
+		
+		constructor: InstanceManager
+	};
+	
+	return InstanceManager;
+});
+
+
+// This source code is free for use in the public domain.
+// NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
+
+// http://code.google.com/p/json-sans-eval/
+
+/**
+ * Parses a string of well-formed JSON text.
+ *
+ * If the input is not well-formed, then behavior is undefined, but it is
+ * deterministic and is guaranteed not to modify any object other than its
+ * return value.
+ *
+ * This does not use `eval` so is less likely to have obscure security bugs than
+ * json2.js.
+ * It is optimized for speed, so is much faster than json_parse.js.
+ *
+ * This library should be used whenever security is a concern (when JSON may
+ * come from an untrusted source), speed is a concern, and erroring on malformed
+ * JSON is *not* a concern.
+ *
+ *                      Pros                   Cons
+ *                    +-----------------------+-----------------------+
+ * json_sans_eval.js  | Fast, secure          | Not validating        |
+ *                    +-----------------------+-----------------------+
+ * json_parse.js      | Validating, secure    | Slow                  |
+ *                    +-----------------------+-----------------------+
+ * json2.js           | Fast, some validation | Potentially insecure  |
+ *                    +-----------------------+-----------------------+
+ *
+ * json2.js is very fast, but potentially insecure since it calls `eval` to
+ * parse JSON data, so an attacker might be able to supply strange JS that
+ * looks like JSON, but that executes arbitrary javascript.
+ * If you do have to use json2.js with untrusted data, make sure you keep
+ * your version of json2.js up to date so that you get patches as they're
+ * released.
+ *
+ * @param {string} json per RFC 4627
+ * @param {function (this:Object, string, *):*} opt_reviver optional function
+ *     that reworks JSON objects post-parse per Chapter 15.12 of EcmaScript3.1.
+ *     If supplied, the function is called with a string key, and a value.
+ *     The value is the property of 'this'.  The reviver should return
+ *     the value to use in its place.  So if dates were serialized as
+ *     {@code { "type": "Date", "time": 1234 }}, then a reviver might look like
+ *     {@code
+ *     function (key, value) {
+ *       if (value && typeof value === 'object' && 'Date' === value.type) {
+ *         return new Date(value.time);
+ *       } else {
+ *         return value;
+ *       }
+ *     }}.
+ *     If the reviver returns {@code undefined} then the property named by key
+ *     will be deleted from its container.
+ *     {@code this} is bound to the object containing the specified property.
+ * @return {Object|Array}
+ * @author Mike Samuel <mikesamuel@gmail.com>
+ */
+define('./json-sans-eval', [], function() {
+var jsonParse = (function () {
+  var number
+      = '(?:-?\\b(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\\b)';
+  var oneChar = '(?:[^\\0-\\x08\\x0a-\\x1f\"\\\\]'
+      + '|\\\\(?:[\"/\\\\bfnrt]|u[0-9A-Fa-f]{4}))';
+  var string = '(?:\"' + oneChar + '*\")';
+
+  // Will match a value in a well-formed JSON file.
+  // If the input is not well-formed, may match strangely, but not in an unsafe
+  // way.
+  // Since this only matches value tokens, it does not match whitespace, colons,
+  // or commas.
+  var jsonToken = new RegExp(
+      '(?:false|true|null|[\\{\\}\\[\\]]'
+      + '|' + number
+      + '|' + string
+      + ')', 'g');
+
+  // Matches escape sequences in a string literal
+  var escapeSequence = new RegExp('\\\\(?:([^u])|u(.{4}))', 'g');
+
+  // Decodes escape sequences in object literals
+  var escapes = {
+    '"': '"',
+    '/': '/',
+    '\\': '\\',
+    'b': '\b',
+    'f': '\f',
+    'n': '\n',
+    'r': '\r',
+    't': '\t'
+  };
+  function unescapeOne(_, ch, hex) {
+    return ch ? escapes[ch] : String.fromCharCode(parseInt(hex, 16));
+  }
+
+  // A non-falsy value that coerces to the empty string when used as a key.
+  var EMPTY_STRING = new String('');
+  var SLASH = '\\';
+
+  // Constructor to use based on an open token.
+  var firstTokenCtors = { '{': Object, '[': Array };
+
+  var hop = Object.hasOwnProperty;
+
+  return function (json, opt_reviver) {
+    // Split into tokens
+    var toks = json.match(jsonToken);
+    // Construct the object to return
+    var result;
+    var tok = toks[0];
+    var topLevelPrimitive = false;
+    if ('{' === tok) {
+      result = {};
+    } else if ('[' === tok) {
+      result = [];
+    } else {
+      // The RFC only allows arrays or objects at the top level, but the JSON.parse
+      // defined by the EcmaScript 5 draft does allow strings, booleans, numbers, and null
+      // at the top level.
+      result = [];
+      topLevelPrimitive = true;
+    }
+
+    // If undefined, the key in an object key/value record to use for the next
+    // value parsed.
+    var key;
+    // Loop over remaining tokens maintaining a stack of uncompleted objects and
+    // arrays.
+    var stack = [result];
+    for (var i = 1 - topLevelPrimitive, n = toks.length; i < n; ++i) {
+      tok = toks[i];
+
+      var cont;
+      switch (tok.charCodeAt(0)) {
+        default:  // sign or digit
+          cont = stack[0];
+          cont[key || cont.length] = +(tok);
+          key = void 0;
+          break;
+        case 0x22:  // '"'
+          tok = tok.substring(1, tok.length - 1);
+          if (tok.indexOf(SLASH) !== -1) {
+            tok = tok.replace(escapeSequence, unescapeOne);
+          }
+          cont = stack[0];
+          if (!key) {
+            if (cont instanceof Array) {
+              key = cont.length;
+            } else {
+              key = tok || EMPTY_STRING;  // Use as key for next value seen.
+              break;
+            }
+          }
+          cont[key] = tok;
+          key = void 0;
+          break;
+        case 0x5b:  // '['
+          cont = stack[0];
+          stack.unshift(cont[key || cont.length] = []);
+          key = void 0;
+          break;
+        case 0x5d:  // ']'
+          stack.shift();
+          break;
+        case 0x66:  // 'f'
+          cont = stack[0];
+          cont[key || cont.length] = false;
+          key = void 0;
+          break;
+        case 0x6e:  // 'n'
+          cont = stack[0];
+          cont[key || cont.length] = null;
+          key = void 0;
+          break;
+        case 0x74:  // 't'
+          cont = stack[0];
+          cont[key || cont.length] = true;
+          key = void 0;
+          break;
+        case 0x7b:  // '{'
+          cont = stack[0];
+          stack.unshift(cont[key || cont.length] = {});
+          key = void 0;
+          break;
+        case 0x7d:  // '}'
+          stack.shift();
+          break;
+      }
+    }
+    // Fail if we've got an uncompleted object.
+    if (topLevelPrimitive) {
+      if (stack.length !== 1) { throw new Error(); }
+      result = result[0];
+    } else {
+      if (stack.length) { throw new Error(); }
+    }
+
+    if (opt_reviver) {
+      // Based on walk as implemented in http://www.json.org/json2.js
+      var walk = function (holder, key) {
+        var value = holder[key];
+        if (value && typeof value === 'object') {
+          var toDelete = null;
+          for (var k in value) {
+            if (hop.call(value, k) && value !== holder) {
+              // Recurse to properties first.  This has the effect of causing
+              // the reviver to be called on the object graph depth-first.
+
+              // Since 'this' is bound to the holder of the property, the
+              // reviver can access sibling properties of k including ones
+              // that have not yet been revived.
+
+              // The value returned by the reviver is used in place of the
+              // current value of property k.
+              // If it returns undefined then the property is deleted.
+              var v = walk(value, k);
+              if (v !== void 0) {
+                value[k] = v;
+              } else {
+                // Deleting properties inside the loop has vaguely defined
+                // semantics in ES3 and ES3.1.
+                if (!toDelete) { toDelete = []; }
+                toDelete.push(k);
+              }
+            }
+          }
+          if (toDelete) {
+            for (var i = toDelete.length; --i >= 0;) {
+              delete value[toDelete[i]];
+            }
+          }
+        }
+        return opt_reviver.call(holder, key, value);
+      };
+      result = walk({ '': result }, '');
+    }
+
+    return result;
+  };
+})();
+
+return jsonParse;
+});
+
+/**
+ * @namespace YOM.json
+ */
+define('./json', ['./error', './object', './array', './json-sans-eval'], function(Err, object, array, jsonParse) {
+	var YOM = {
+		'Error': Err,
+		'object': object,
+		'array': array,
+		'jsonParse': jsonParse
+	};
+	
+	var _ID = 126;
+	
+	var _escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+	var _meta = {
+		'\b': '\\b',
+		'\t': '\\t',
+		'\n': '\\n',
+		'\f': '\\f',
+		'\r': '\\r',
+		'"' : '\\"',
+		'\\': '\\\\'
+	};
+	
+	function _quote(str) {
+		_escapable.lastIndex = 0;
+		return _escapable.test(str) ? '"' + str.replace(_escapable, function(c) {
+			return _meta[c] || '\\u' + ('0000' + c.charCodeAt(0).toString(16)).slice(-4);
+		}) + '"' : '"' + str + '"';
+	};
+	
+	return {
+		parse: function(str) {
+			return YOM.jsonParse(str);
+		},
+		
+		stringify: function(obj, prettify, objIndentLevel) {
+			var self = this;
+			var res, tmp, indent, newLine;
+			if(prettify) {
+				objIndentLevel = objIndentLevel || 1;
+				newLine = '\n';
+			} else {
+				objIndentLevel = 0;
+				newLine = '';
+			}
+			switch(typeof obj) {
+			case 'string':
+				res = _quote(obj);
+				break;
+			case 'boolean':
+				res = obj.toString();
+				break;
+			case 'number':
+				if(isNaN(obj)) {
+					throw new YOM.Error(YOM.Error.getCode(_ID, 1), 'NaN not supported.');
+				} else if(!isFinite(obj)) {
+					throw new YOM.Error(YOM.Error.getCode(_ID, 2), 'Infinite number not supported.');
+				} else {
+					res = obj.toString();
+				}
+				break;
+			case 'object':
+				if(!obj) {
+					res = 'null';
+					break;
+				}
+				tmp = [];
+				if(obj.__YOM_JSON_STRINGIFY_MARKED__) {
+					throw new YOM.Error(YOM.Error.getCode(_ID, 1), 'YOM.json.stringify can not deal with circular reference.');
+				}
+				obj.__YOM_JSON_STRINGIFY_MARKED__ = 1;
+				if(YOM.array.isArray(obj)) {
+					YOM.object.each(obj, function(val) {
+						var s = self.stringify(val, prettify, objIndentLevel);
+						s && tmp.push(s);
+					});
+					res = '[' + tmp.join(', ') + ']';
+				} else {
+					indent = [];
+					for(var i = 0; i < objIndentLevel; i++) {
+						indent.push('    ');
+					}
+					YOM.object.each(obj, function(val, key) {
+						if(key == '__YOM_JSON_STRINGIFY_MARKED__' || val === YOM.object.PRIVATE_PROPERTY) {
+							return;
+						}
+						if(YOM.object.hasOwnProperty(obj, key)) {
+							var s = self.stringify(val, prettify, objIndentLevel + 1);
+							s && tmp.push(indent.join('') + _quote(key) + ': ' + s);
+						}
+					});
+					indent.pop();
+					if(tmp.length) {
+						res = '{' + newLine + tmp.join(', ' + newLine) + newLine + indent.join('') + '}';
+					} else {
+						res = '{}';
+					}
+				}
+				delete obj.__YOM_JSON_STRINGIFY_MARKED__;
+				break;
+			default:
+				throw new YOM.Error(YOM.Error.getCode(_ID, 3), typeof obj + ' type not supported.');
+			}
+			return res;
+		}
+	};
+});
+
+
+/**
+ * @class YOM.Observer
+ */
+define('./observer', ['./object'], function(object) {
+	var Observer = function () {
+		this._subscribers = [];
+	};
+	
+	Observer.prototype = {
+		subscribe: function(subscriber, bind) {
+			subscriber = bind ? object.bind(bind, subscriber) : subscriber;
+			for(var i = 0, l = this._subscribers.length; i < l; i++) {
+				if(subscriber == this._subscribers[i]) {
+					return null;
+				}
+			}
+			this._subscribers.push(subscriber);
+			return subscriber;
+		},
+		
+		remove: function(subscriber) {
+			var res = [];
+			if(subscriber) {
+				for(var i = this._subscribers.length - 1; i >= 0; i--) {
+					if(subscriber == this._subscribers[i]) {
+						res = res.concat(this._subscribers.splice(i, 1));
+					}
+				}
+			} else {
+				res = this._subscribers;
+				this._subscribers = [];
+			}
+			return res;
+		},
+		
+		dispatch: function(e, bind) {
+			var res, tmp, subscriber;
+			for(var i = this._subscribers.length - 1; i >= 0; i--) {
+				subscriber = this._subscribers[i];
+				if(!subscriber) {
+					continue;				
+				}
+				tmp = subscriber.call(bind, e);
+				res = tmp === false || res === false ? false : tmp;
+			}
+			return res;
+		},
+		
+		constructor: Observer
+	};
+	
+	Observer._ID = 111;
+	
+	return Observer;
+});
+
+/**
+ * @class YOM.Event
+ */
+define('./event', ['./error', './object', './observer'], function(Err, object, Observer) {
+	var YOM = {
+		'Error': Err,
+		'object': object,
+		'Observer': Observer
+	};
+	
+	var _ID = 108;
+	
+	var _elRefCount = 0;
+	_customizedEventHash = {
+		
+	};
+	
+	function _getObserver(instance, type) {
+		if(!instance instanceof Evt) {
+			throw new YOM.Error(YOM.Error.getCode(_ID, 1));
+		}
+		instance._observers = instance._observers || {};
+		instance._observers[type] = instance._observers[type] || new YOM.Observer();
+		return instance._observers[type];
+	};
+	
+	function _getObservers(instance) {
+		if(!instance instanceof Evt) {
+			throw new YOM.Error(YOM.Error.getCode(_ID, 1));
+		}
+		instance._observers = instance._observers || {};
+		return instance._observers;
+	};
+	
+	function Evt(observers) {
+		this._observers = YOM.object.getClean(observers) || {};
+	};
+	
+	Evt.prototype = {
+		addObservers: function(newObservers) {
+			var observers = _getObservers(this);
+			newObservers = YOM.object.getClean(newObservers);
+			for(var type in newObservers) {
+				if(newObservers[type] instanceof YOM.Observer) {
+					observers[type] = newObservers[type];
+				}
+			}
+		},
+		
+		addEventListener: function(type, listener, bind) {
+			var observer = _getObserver(this, type);
+			if(!observer) {
+				throw new YOM.Error(YOM.Error.getCode(_ID, 1));
+			}
+			return observer.subscribe(listener, bind);
+		},
+		
+		removeEventListener: function(type, listener) {
+			var observer = _getObserver(this, type);
+			if(!observer) {
+				throw new YOM.Error(YOM.Error.getCode(_ID, 2));
+			}
+			return observer.remove(listener);
+		},
+		
+		dispatchEvent: function(e, asyn) {
+			if(typeof e == 'string') {
+				e = {type: e};
+			}
+			var self = this;
+			var observer = _getObserver(this, e.type);
+			if(!observer) {
+				throw new YOM.Error(YOM.Error.getCode(_ID, 3));
+			}
+			if(asyn) {
+				setTimeout(function() {
+					observer.dispatch.call(observer, e, self);
+				}, 0);
+				return undefined;
+			} else {
+				return observer.dispatch.call(observer, e, self);
+			}
+		},
+		
+		createEvent: function(type, opt) {
+			var e = YOM.object.clone(opt) || {};
+			e.type = type;
+			return e;
+		},
+		
+		constructor: Evt
+	};
+	
+	Evt.addListener = function(el, eType, listener, bind) {
+		var cEvent, cEventHandler;
+		eType = eType.toLowerCase();
+		listener = bind ? YOM.object.bind(bind, listener) : listener;
+		cEvent = _customizedEventHash[eType];
+		if(cEvent) {
+			el.elEventRef = el.elEventRef || ++_elRefCount;
+			cEventHandler = cEvent.elEventRefHandlerHash[el.elEventRef];
+			if(!cEventHandler) {
+				cEventHandler = cEvent.elEventRefHandlerHash[el.elEventRef] = new cEvent.Handler(el);
+			}
+			cEventHandler.addListener(listener);
+		} else if(el.addEventListener) {
+			el.addEventListener(eType, listener, false);
+		} else {
+			el.attachEvent('on' + eType, listener);
+		}
+		return listener;
+	};
+	
+	Evt.removeListener = function(el, eType, listener) {
+		var cEvent, cEventHandler;
+		eType = eType.toLowerCase();
+		cEvent = _customizedEventHash[eType];
+		if(cEvent) {
+			cEventHandler = cEvent.elEventRefHandlerHash[el.elEventRef];
+			if(cEventHandler) {
+				cEventHandler.removeListener(listener);
+			}
+		} else if(el.removeEventListener) {
+			el.removeEventListener(eType, listener, false);
+		} else {
+			el.detachEvent('on' + eType, listener);
+		}
+	};
+	
+	Evt.addCustomizedEvent = function(type, Handler) {
+		_customizedEventHash[type] = {
+			Handler: Handler,
+			elEventRefHandlerHash: {}
+		};
+	};
+	
+	Evt.removeCustomizedEventHandler = function(type, ref) {
+		var cEvent = _customizedEventHash[type];
+		if(cEvent) {
+			cEvent.elEventRefHandlerHash[ref] = null;
+		}
+	};
+	
+	Evt.cancelBubble = function(e) {
+		if(e.stopPropagation) {
+			e.stopPropagation();
+		} else {
+			e.cancelBubble = true;
+		}
+	};
+	
+	Evt.preventDefault = function(e) {
+		if(e.preventDefault) {
+			e.preventDefault();
+		} else {
+			e.returnValue = false;
+		}
+	};
+	
+	Evt.getTarget = function(e) {
+		return e.target || e.srcElement;
+	};
+	
+	Evt.getPageX = function(e) {
+		return e.pageX != undefined ? e.pageX : e.clientX + Math.max(document.documentElement.scrollLeft, document.body.scrollLeft);
+	};
+	
+	Evt.getPageY = function(e) {
+		return e.pageY != undefined ? e.pageY : e.clientY + Math.max(document.documentElement.scrollTop, document.body.scrollTop);
+	};
+	
+	return Evt;
+});
+
 /**
  * Inspired by KISSY
  * @namespace YOM.transition
@@ -2337,6 +2358,8 @@ define('./transition', [], function() {
 		}
 	};
 });
+
+
 /**
  * Inspired by KISSY
  * @class YOM.Tween
@@ -2714,377 +2737,8 @@ define('./tween', ['./browser', './object', './instance-manager', './element', '
 	
 	return Tween;
 });
-/**
- * YOM.Element FX extention, inspired by KISSY
- */
-define('./element-fx', ['./object', './array', './element', './tween'], function(object, array, Elem, Tween) {
-	var YOM = {
-		'object': object,
-		'array': array,
-		'Element': Elem,
-		'Tween': Tween
-	};
-	
-	YOM.object.extend(YOM.Element.prototype, (function() {
-		var _DURATION = 300;
-		var _CONF = {
-			fxShow: {style: ['overflow', 'opacity', 'width', 'height'], isShow: 1},
-			fxHide: {style: ['overflow', 'opacity', 'width', 'height']},
-			fxToggle: {style: []},
-			fadeIn: {style: ['opacity'], isShow: 1},
-			fadeOut: {style: ['opacity']},
-			slideDown: {style: ['overflow', 'height'], isShow: 1},
-			slideUp: {style: ['overflow', 'height']}
-		};
-		
-		function _doFx(type, el, duration, complete) {
-			var conf, iStyle, oStyle, tStyle, isShow, width, height;
-			YOM.Tween.stopAllTween(el);
-			if(type == 'fxToggle') {
-				type = el.getStyle('display') == 'none' ? 'fxShow' : 'fxHide';
-			}
-			conf = _CONF[type];
-			iStyle = {};
-			oStyle = {};
-			tStyle = {};
-			isShow = conf.isShow;
-			isShow && el.show();
-			YOM.object.each(conf.style, function(prop) {
-				switch(prop) {
-				case 'overflow':
-					iStyle.overflow = el.getStyle('overflow');
-					oStyle.overflow = 'hidden';
-					break;
-				case 'opacity':
-					iStyle.opacity = 1;
-					if(isShow) {
-						oStyle.opacity = 0;
-						tStyle.opacity = 1;
-					} else {
-						tStyle.opacity = 0;
-					}
-					break;
-				case 'width':
-					width = el.getStyle('width');
-					iStyle.width = width;
-					width = width == 'auto' ? Math.max(el.getAttr('clientWidth'), el.getAttr('offsetWidth')) + 'px' : width;
-					if(isShow) {
-						oStyle.width = '0px';
-						tStyle.width = width;
-					} else {
-						oStyle.width = width;
-						tStyle.width = '0px';
-					}
-					break;
-				case 'height':
-					height = el.getStyle('height');
-					iStyle.height = height;
-					height = height == 'auto' ? Math.max(el.getAttr('clientHeight'), el.getAttr('offsetHeight')) + 'px' : height;
-					if(isShow) {
-						oStyle.height = '0px';
-						tStyle.height = height;
-					} else {
-						oStyle.height = height;
-						tStyle.height = '0px';
-					}
-					break;
-				default:
-				}
-			});
-			el.setStyle(oStyle);
-			new YOM.Tween(el, duration, {
-				target: {
-					style: tStyle
-				},
-				transition: 'easeOut',
-				prior: true,
-				complete: function() {
-					isShow || el.hide();
-					el.setStyle(iStyle);
-					complete && complete.call(el, isShow ? 'SHOW' : 'HIDE');
-				}
-			}).play();
-		};
-		
-		var fx = {
-			tween: function() {
-				var args = YOM.array.getArray(arguments);
-				this.each(function(el) {
-					YOM.Tween.apply(this, [el].concat(args)).play();
-				});
-				return this;
-			}
-		};
-		
-		YOM.object.each(['fxShow', 'fxHide', 'fxToggle', 'fadeIn', 'fadeOut', 'slideDown', 'slideUp'], function(type) {
-			fx[type] = function(duration, complete) {
-				if(!this.size()) {
-					return this;
-				}
-				var self = this;
-				duration = duration || _DURATION;
-				this.each(function(el) {
-					_doFx.call(self, type, new YOM.Element(el), duration, complete);
-				});
-				return this;
-			};
-		});
-		
-		return fx;
-	})(), true);
-	
-	return {};
-});
-/**
- * @class YOM.Event.Delegator
- */
-define('./event-delegator', ['./object', './event', './element'], function(object, Evt, Elem) {
-	var YOM = {
-		'object': object,
-		'Event': Evt,
-		'Element': Elem
-	};
-	
-	var _pageDelegator;
-	
-	/**
-	 * @class
-	 */
-	function Delegator(ele, opt) {
-		opt = opt || {};
-		this._ele = YOM.Element.query(ele);
-		this._delegatedTypes = {};
-		this._handlers = {};
-		this._eventHook = opt.eventHook;
-	};
-	
-	Delegator.getPageDelegator = function() {
-		_pageDelegator = _pageDelegator || new Delegator(document.body);
-		return _pageDelegator;
-	};
-	
-	Delegator.prototype = {
-		delegate: function(type, handlerName, handler, opt) {
-			type = type.toLowerCase();
-			opt = opt || {};
-			this._delegateEvent(type, opt.maxBubble >= 0 ? opt.maxBubble : 1983);
-			this._handlers[type][handlerName] = handler;
-			return this;
-		},
-		
-		remove: function(type, handlerName) {
-			if(!this._delegatedTypes[type]) {
-				return;
-			}
-			if(handlerName) {
-				delete this._handlers[type][handlerName];
-			} else {
-				this._ele.removeEventListener(type, this._delegatedTypes[type].listener);
-				delete this._handlers[type];
-				delete this._delegatedTypes[type];
-			}
-		},
-		
-		_delegateEvent: function(type, maxBubble) {
-			var flag = this._delegatedTypes[type];
-			if(flag) {
-				flag.maxBubble = Math.max(flag.maxBubble, maxBubble);
-				return;
-			} else {
-				var listener = YOM.object.bind(this, this._eventListener);
-				this._ele.addEventListener(type, listener);
-				this._handlers[type] = {};
-				this._delegatedTypes[type] = {maxBubble: maxBubble, listener: listener};
-			}
-		},
-		
-		_eventListener: function(evt) {
-			var target, $target, type, flag, handler, maxBubble, bubbleTimes;
-			target = YOM.Event.getTarget(evt);
-			type = evt.type.toLowerCase();
-			if(this._eventHook && this._eventHook(target, evt, type) === false) {
-				return;
-			}
-			maxBubble = this._delegatedTypes[type].maxBubble;
-			bubbleTimes = 0;
-			while(target && target != this._ele) {
-				$target = new YOM.Element(target);
-				if(target.disabled || $target.getAttr('disabled')) {
-					return;
-				}
-				flag = $target.getDatasetVal('yom-' + type);
-				if(flag) {
-					flag = flag.split(' ');
-					handler = this._handlers[type][flag.shift()];
-					flag.unshift(evt);
-					if(handler && handler.apply(target, flag) === false) {
-						break;
-					}
-				}
-				if(bubbleTimes >= maxBubble) {
-					break;
-				}
-				target = target.parentNode;
-				bubbleTimes++;
-			}
-		},
-		
-		constructor: Delegator
-	};
-	
-	return Delegator;
-});
-/**
- * @class YOM.Event.VirtualEventHandler
- */
-define('./event-virtual-handler', ['./object', './event'], function(object, Evt) {
-	var YOM = {
-		'object': object,
-		'Event': Evt
-	};
-	
-	var VirtualEventHandler = function(el) {
-		this._delegateEl = el;
-		this._targetEl = null;
-		this._listenerPool = [];
-		this._listenerCount = 0;
-	};
-	
-	VirtualEventHandler.prototype = {
-		_destroy: function() {
-			YOM.Event.removeCustomizedEventHandler(this.name, this._delegateEl.elEventRef);
-		},
-		
-		_dispatch: function(e) {
-			YOM.object.each(this._listenerPool, function(listener) {
-				listener(e);
-			});
-		},
-		
-		addListener: function(listener) {
-			var found;
-			if(!listener) {
-				return null;
-			}
-			YOM.object.each(this._listenerPool, function(item) {
-				if(listener == item) {
-					found = 1;
-					return false;
-				}
-				return true;
-			});
-			if(found) {
-				return null;
-			}
-			this._listenerCount++;
-			return this._listenerPool.push(listener);
-		},
-		
-		removeListener: function(listener) {
-			var found = null;
-			var self = this;
-			YOM.object.each(this._listenerPool, function(item, i) {
-				if(listener == item) {
-					found = item;
-					self._listenerPool.splice(i, 1);
-					this._listenerCount--;
-					return false;
-				}
-				return true;
-			});
-			if(!this._listenerCount) {
-				this._destroy();
-			}
-			return found;
-		},
-		
-		constructor: VirtualEventHandler
-	};
-	
-	return VirtualEventHandler;
-});
-/**
- * @class YOM.Event.MouseenterEventHandler
- */
-define('./event-mouseenter', ['./browser', './object', './array', './class', './event', './element', './event-virtual-handler'], function(browser, object, array, Class, Evt, Elem, VirtualEventHandler) {
-	var YOM = {
-		'browser': browser,
-		'object': object,
-		'array': array,
-		'Class': Class,
-		'Event': Evt,
-		'Element': Elem
-	};
-	YOM.Event.VirtualEventHandler = VirtualEventHandler;
-	
-	var MouseenterEventHandler = function(el) {
-		this.name = 'mouseenter';
-		MouseenterEventHandler.superClass.constructor.apply(this, YOM.array.getArray(arguments));
-		this._bound = {
-			mouseover: YOM.object.bind(this, this._mouseover)
-		};
-		YOM.Event.addListener(this._delegateEl, 'mouseover', this._bound.mouseover);
-	};
-	
-	YOM.Class.extend(MouseenterEventHandler, YOM.Event.VirtualEventHandler);
-	
-	MouseenterEventHandler.prototype._destroy = function() {
-		YOM.Event.removeListener(this._delegateEl, 'mouseover', this._bound.mouseover);
-		MouseenterEventHandler.superClass._destroy.apply(this, YOM.array.getArray(arguments));
-	};
-		
-	MouseenterEventHandler.prototype._mouseover = function(e) {
-		if(!YOM.Element.contains(this._delegateEl, e.relatedTarget)) {
-			e.cType = this.name;
-			this._dispatch(e);
-		}
-	};
-	
-	YOM.browser.ie || YOM.Event.addCustomizedEvent('mouseenter', MouseenterEventHandler);
-	
-	return MouseenterEventHandler;
-});
-/**
- * @class YOM.Event.MouseleaveEventHandler
- */
-define('./event-mouseleave', ['./browser', './object', './array', './class', './event', './element', './event-virtual-handler'], function(browser, object, array, Class, Evt, Elem, VirtualEventHandler) {
-	var YOM = {
-		'browser': browser,
-		'object': object,
-		'array': array,
-		'Class': Class,
-		'Event': Evt,
-		'Element': Elem
-	};
-	YOM.Event.VirtualEventHandler = VirtualEventHandler;
-	
-	var MouseleaveEventHandler = function(el) {
-		this.name = 'mouseleave';
-		MouseleaveEventHandler.superClass.constructor.apply(this, YOM.array.getArray(arguments));
-		this._bound = {
-			mouseout: YOM.object.bind(this, this._mouseout)
-		};
-		YOM.Event.addListener(this._delegateEl, 'mouseout', this._bound.mouseout);
-	};
-	
-	YOM.Class.extend(MouseleaveEventHandler, YOM.Event.VirtualEventHandler);
-	
-	MouseleaveEventHandler.prototype._destroy = function() {
-		YOM.Event.removeListener(this._delegateEl, 'mouseout', this._bound.mouseout);
-		MouseleaveEventHandler.superClass._destroy.apply(this, YOM.array.getArray(arguments));
-	};
-		
-	MouseleaveEventHandler.prototype._mouseout = function(e) {
-		if(!YOM.Element.contains(this._delegateEl, e.relatedTarget)) {
-			e.cType = this.name;
-			this._dispatch(e);
-		}
-	};
-	
-	YOM.browser.ie || YOM.Event.addCustomizedEvent('mouseleave', MouseleaveEventHandler);
-	
-	return MouseleaveEventHandler;
-});
+
+
 /**
  * @namespace YOM.cookie
  */
@@ -3115,6 +2769,8 @@ define('./cookie', ['./config'], function(config) {
 		}
 	};
 });
+
+
 /**
  * @namespace YOM.Xhr
  */
@@ -3285,6 +2941,8 @@ define('./xhr', ['./config', './error', './class', './object', './instance-manag
 	
 	return Xhr;
 });
+
+
 /**
  * @class YOM.CrossDomainPoster
  */
@@ -3474,6 +3132,8 @@ define('./cross-domain-poster', ['require', './config', './error', './object', '
 	
 	return CrossDomainPoster;
 });
+
+
 /**
  * @namespace YOM.pos
  */
@@ -3523,6 +3183,7 @@ define('./pos', ['./object'], function(object) {
 		}
 	};
 });
+
 /**
  * @namespace YOM.util
  */
@@ -3601,6 +3262,8 @@ define('./util', ['./object'], function(object) {
 		}
 	};
 });
+
+
 /**
  * @class YOM.JsLoader
  */
@@ -3846,6 +3509,7 @@ define('./js-loader', ['./config', './error', './browser', './object', './class'
 	
 	return JsLoader;
 });
+
 /**
  * @namespace YOM.css
  */
@@ -3920,6 +3584,7 @@ define('./css', ['./object', './array', './class', './event', './element'], func
 		unload: unload
 	});
 });
+
 /**
  * @namespace YOM.tmpl
  */
@@ -4005,6 +3670,8 @@ define('./tmpl', ['./browser', './string', './object'], function(browser, string
 		renderId: renderId
 	};
 });
+
+
 /**
  * @namespace YOM.flash
  */
@@ -4099,12 +3766,396 @@ define('./flash', ['./browser', './object'], function(browser, object) {
 		invoke: invoke
 	};
 });
+
+
 /**
  * @namespace
  */
 define('./widget', [], {
 	_ID: 128
 });
+
+
+/**
+ * @class YOM.Event.Delegator
+ */
+define('./event-delegator', ['./object', './event', './element'], function(object, Evt, Elem) {
+	var YOM = {
+		'object': object,
+		'Event': Evt,
+		'Element': Elem
+	};
+	
+	var _pageDelegator;
+	
+	/**
+	 * @class
+	 */
+	function Delegator(ele, opt) {
+		opt = opt || {};
+		this._ele = YOM.Element.query(ele);
+		this._delegatedTypes = {};
+		this._handlers = {};
+		this._eventHook = opt.eventHook;
+	};
+	
+	Delegator.getPageDelegator = function() {
+		_pageDelegator = _pageDelegator || new Delegator(document.body);
+		return _pageDelegator;
+	};
+	
+	Delegator.prototype = {
+		delegate: function(type, handlerName, handler, opt) {
+			type = type.toLowerCase();
+			opt = opt || {};
+			this._delegateEvent(type, opt.maxBubble >= 0 ? opt.maxBubble : 1983);
+			this._handlers[type][handlerName] = handler;
+			return this;
+		},
+		
+		remove: function(type, handlerName) {
+			if(!this._delegatedTypes[type]) {
+				return;
+			}
+			if(handlerName) {
+				delete this._handlers[type][handlerName];
+			} else {
+				this._ele.removeEventListener(type, this._delegatedTypes[type].listener);
+				delete this._handlers[type];
+				delete this._delegatedTypes[type];
+			}
+		},
+		
+		_delegateEvent: function(type, maxBubble) {
+			var flag = this._delegatedTypes[type];
+			if(flag) {
+				flag.maxBubble = Math.max(flag.maxBubble, maxBubble);
+				return;
+			} else {
+				var listener = YOM.object.bind(this, this._eventListener);
+				this._ele.addEventListener(type, listener);
+				this._handlers[type] = {};
+				this._delegatedTypes[type] = {maxBubble: maxBubble, listener: listener};
+			}
+		},
+		
+		_eventListener: function(evt) {
+			var target, $target, type, flag, handler, maxBubble, bubbleTimes;
+			target = YOM.Event.getTarget(evt);
+			type = evt.type.toLowerCase();
+			if(this._eventHook && this._eventHook(target, evt, type) === false) {
+				return;
+			}
+			maxBubble = this._delegatedTypes[type].maxBubble;
+			bubbleTimes = 0;
+			while(target && target != this._ele) {
+				$target = new YOM.Element(target);
+				if(target.disabled || $target.getAttr('disabled')) {
+					return;
+				}
+				flag = $target.getDatasetVal('yom-' + type);
+				if(flag) {
+					flag = flag.split(' ');
+					handler = this._handlers[type][flag.shift()];
+					flag.unshift(evt);
+					if(handler && handler.apply(target, flag) === false) {
+						break;
+					}
+				}
+				if(bubbleTimes >= maxBubble) {
+					break;
+				}
+				target = target.parentNode;
+				bubbleTimes++;
+			}
+		},
+		
+		constructor: Delegator
+	};
+	
+	return Delegator;
+});
+
+
+/**
+ * @class YOM.Event.VirtualEventHandler
+ */
+define('./event-virtual-handler', ['./object', './event'], function(object, Evt) {
+	var YOM = {
+		'object': object,
+		'Event': Evt
+	};
+	
+	var VirtualEventHandler = function(el) {
+		this._delegateEl = el;
+		this._targetEl = null;
+		this._listenerPool = [];
+		this._listenerCount = 0;
+	};
+	
+	VirtualEventHandler.prototype = {
+		_destroy: function() {
+			YOM.Event.removeCustomizedEventHandler(this.name, this._delegateEl.elEventRef);
+		},
+		
+		_dispatch: function(e) {
+			YOM.object.each(this._listenerPool, function(listener) {
+				listener(e);
+			});
+		},
+		
+		addListener: function(listener) {
+			var found;
+			if(!listener) {
+				return null;
+			}
+			YOM.object.each(this._listenerPool, function(item) {
+				if(listener == item) {
+					found = 1;
+					return false;
+				}
+				return true;
+			});
+			if(found) {
+				return null;
+			}
+			this._listenerCount++;
+			return this._listenerPool.push(listener);
+		},
+		
+		removeListener: function(listener) {
+			var found = null;
+			var self = this;
+			YOM.object.each(this._listenerPool, function(item, i) {
+				if(listener == item) {
+					found = item;
+					self._listenerPool.splice(i, 1);
+					this._listenerCount--;
+					return false;
+				}
+				return true;
+			});
+			if(!this._listenerCount) {
+				this._destroy();
+			}
+			return found;
+		},
+		
+		constructor: VirtualEventHandler
+	};
+	
+	return VirtualEventHandler;
+});
+
+
+/**
+ * @class YOM.Event.MouseenterEventHandler
+ */
+define('./event-mouseenter', ['./browser', './object', './array', './class', './event', './element', './event-virtual-handler'], function(browser, object, array, Class, Evt, Elem, VirtualEventHandler) {
+	var YOM = {
+		'browser': browser,
+		'object': object,
+		'array': array,
+		'Class': Class,
+		'Event': Evt,
+		'Element': Elem
+	};
+	YOM.Event.VirtualEventHandler = VirtualEventHandler;
+	
+	var MouseenterEventHandler = function(el) {
+		this.name = 'mouseenter';
+		MouseenterEventHandler.superClass.constructor.apply(this, YOM.array.getArray(arguments));
+		this._bound = {
+			mouseover: YOM.object.bind(this, this._mouseover)
+		};
+		YOM.Event.addListener(this._delegateEl, 'mouseover', this._bound.mouseover);
+	};
+	
+	YOM.Class.extend(MouseenterEventHandler, YOM.Event.VirtualEventHandler);
+	
+	MouseenterEventHandler.prototype._destroy = function() {
+		YOM.Event.removeListener(this._delegateEl, 'mouseover', this._bound.mouseover);
+		MouseenterEventHandler.superClass._destroy.apply(this, YOM.array.getArray(arguments));
+	};
+		
+	MouseenterEventHandler.prototype._mouseover = function(e) {
+		if(!YOM.Element.contains(this._delegateEl, e.relatedTarget)) {
+			e.cType = this.name;
+			this._dispatch(e);
+		}
+	};
+	
+	YOM.browser.ie || YOM.Event.addCustomizedEvent('mouseenter', MouseenterEventHandler);
+	
+	return MouseenterEventHandler;
+});
+
+
+/**
+ * @class YOM.Event.MouseleaveEventHandler
+ */
+define('./event-mouseleave', ['./browser', './object', './array', './class', './event', './element', './event-virtual-handler'], function(browser, object, array, Class, Evt, Elem, VirtualEventHandler) {
+	var YOM = {
+		'browser': browser,
+		'object': object,
+		'array': array,
+		'Class': Class,
+		'Event': Evt,
+		'Element': Elem
+	};
+	YOM.Event.VirtualEventHandler = VirtualEventHandler;
+	
+	var MouseleaveEventHandler = function(el) {
+		this.name = 'mouseleave';
+		MouseleaveEventHandler.superClass.constructor.apply(this, YOM.array.getArray(arguments));
+		this._bound = {
+			mouseout: YOM.object.bind(this, this._mouseout)
+		};
+		YOM.Event.addListener(this._delegateEl, 'mouseout', this._bound.mouseout);
+	};
+	
+	YOM.Class.extend(MouseleaveEventHandler, YOM.Event.VirtualEventHandler);
+	
+	MouseleaveEventHandler.prototype._destroy = function() {
+		YOM.Event.removeListener(this._delegateEl, 'mouseout', this._bound.mouseout);
+		MouseleaveEventHandler.superClass._destroy.apply(this, YOM.array.getArray(arguments));
+	};
+		
+	MouseleaveEventHandler.prototype._mouseout = function(e) {
+		if(!YOM.Element.contains(this._delegateEl, e.relatedTarget)) {
+			e.cType = this.name;
+			this._dispatch(e);
+		}
+	};
+	
+	YOM.browser.ie || YOM.Event.addCustomizedEvent('mouseleave', MouseleaveEventHandler);
+	
+	return MouseleaveEventHandler;
+});
+
+
+/**
+ * YOM.Element FX extention, inspired by KISSY
+ */
+define('./element-fx', ['./object', './array', './element', './tween'], function(object, array, Elem, Tween) {
+	var YOM = {
+		'object': object,
+		'array': array,
+		'Element': Elem,
+		'Tween': Tween
+	};
+	
+	YOM.object.extend(YOM.Element.prototype, (function() {
+		var _DURATION = 300;
+		var _CONF = {
+			fxShow: {style: ['overflow', 'opacity', 'width', 'height'], isShow: 1},
+			fxHide: {style: ['overflow', 'opacity', 'width', 'height']},
+			fxToggle: {style: []},
+			fadeIn: {style: ['opacity'], isShow: 1},
+			fadeOut: {style: ['opacity']},
+			slideDown: {style: ['overflow', 'height'], isShow: 1},
+			slideUp: {style: ['overflow', 'height']}
+		};
+		
+		function _doFx(type, el, duration, complete) {
+			var conf, iStyle, oStyle, tStyle, isShow, width, height;
+			YOM.Tween.stopAllTween(el);
+			if(type == 'fxToggle') {
+				type = el.getStyle('display') == 'none' ? 'fxShow' : 'fxHide';
+			}
+			conf = _CONF[type];
+			iStyle = {};
+			oStyle = {};
+			tStyle = {};
+			isShow = conf.isShow;
+			isShow && el.show();
+			YOM.object.each(conf.style, function(prop) {
+				switch(prop) {
+				case 'overflow':
+					iStyle.overflow = el.getStyle('overflow');
+					oStyle.overflow = 'hidden';
+					break;
+				case 'opacity':
+					iStyle.opacity = 1;
+					if(isShow) {
+						oStyle.opacity = 0;
+						tStyle.opacity = 1;
+					} else {
+						tStyle.opacity = 0;
+					}
+					break;
+				case 'width':
+					width = el.getStyle('width');
+					iStyle.width = width;
+					width = width == 'auto' ? Math.max(el.getAttr('clientWidth'), el.getAttr('offsetWidth')) + 'px' : width;
+					if(isShow) {
+						oStyle.width = '0px';
+						tStyle.width = width;
+					} else {
+						oStyle.width = width;
+						tStyle.width = '0px';
+					}
+					break;
+				case 'height':
+					height = el.getStyle('height');
+					iStyle.height = height;
+					height = height == 'auto' ? Math.max(el.getAttr('clientHeight'), el.getAttr('offsetHeight')) + 'px' : height;
+					if(isShow) {
+						oStyle.height = '0px';
+						tStyle.height = height;
+					} else {
+						oStyle.height = height;
+						tStyle.height = '0px';
+					}
+					break;
+				default:
+				}
+			});
+			el.setStyle(oStyle);
+			new YOM.Tween(el, duration, {
+				target: {
+					style: tStyle
+				},
+				transition: 'easeOut',
+				prior: true,
+				complete: function() {
+					isShow || el.hide();
+					el.setStyle(iStyle);
+					complete && complete.call(el, isShow ? 'SHOW' : 'HIDE');
+				}
+			}).play();
+		};
+		
+		var fx = {
+			tween: function() {
+				var args = YOM.array.getArray(arguments);
+				this.each(function(el) {
+					YOM.Tween.apply(this, [el].concat(args)).play();
+				});
+				return this;
+			}
+		};
+		
+		YOM.object.each(['fxShow', 'fxHide', 'fxToggle', 'fadeIn', 'fadeOut', 'slideDown', 'slideUp'], function(type) {
+			fx[type] = function(duration, complete) {
+				if(!this.size()) {
+					return this;
+				}
+				var self = this;
+				duration = duration || _DURATION;
+				this.each(function(el) {
+					_doFx.call(self, type, new YOM.Element(el), duration, complete);
+				});
+				return this;
+			};
+		});
+		
+		return fx;
+	})(), true);
+	
+	return {};
+});
+
 /**
  * @namespace
  */
