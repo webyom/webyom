@@ -75,7 +75,7 @@ define('./chunker', ['./core-pkg'], function(YOM) {
 /**
  * @namespace YOM.console
  */
-define('./console', ['./core-pkg', './chunker'], function(YOM, Chunker) {
+define('./console', ['global', './core-pkg', './chunker'], function(global, YOM, Chunker) {
 	var _TMPL = [
 		'<div style="background: #555; padding: 2px; padding-top: 0; font-size: 12px; font-family: Courier New, Courier, monospace;">',
 			'<h2 style="margin: 0; font-size: 14px; line-height: 22px; color: #fff; padding: 2px; padding-top: 0;">',
@@ -94,6 +94,7 @@ define('./console', ['./core-pkg', './chunker'], function(YOM, Chunker) {
 		'</div>'
 	].join('');
 	
+	var _global = global;
 	var _on = 0;
 	var _el = {};
 	var _chunker = null;
@@ -267,6 +268,16 @@ define('./console', ['./core-pkg', './chunker'], function(YOM, Chunker) {
 		_el.output.scrollTop = 999999999;
 	};
 	
+	function setGlobal(g) {
+		if(g && g.eval) {
+			_global = g;
+		}
+	};
+	
+	function resetGlobal() {
+		_global = global;
+	};
+	
 	function log(str, type, lead) {
 		_init();
 		if(typeof str != 'string') {
@@ -284,7 +295,7 @@ define('./console', ['./core-pkg', './chunker'], function(YOM, Chunker) {
 		if(str) {
 			this.log('<span style="color: blue;">' + YOM.string.encodeHtml(str) + '</span>', '', '&gt;&gt;');
 			try {
-				this.log(_stringifyObj(window.eval(str)));
+				this.log(_stringifyObj(_global.eval(str)));
 			} catch(e) {
 				this.log(new YOM.Error(e).toString(), 1);
 			}
@@ -332,6 +343,8 @@ define('./console', ['./core-pkg', './chunker'], function(YOM, Chunker) {
 	
 	return {
 		_ID: 118,
+		setGlobal: setGlobal,
+		resetGlobal: resetGlobal,
 		log: log,
 		eval: eval,
 		error: error,

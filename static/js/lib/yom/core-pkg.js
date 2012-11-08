@@ -77,7 +77,7 @@ define('./error', [], function() {
 			this.name = code.name;
 			this.code = code.code;
 			this.message = code.message;
-		} else if(code instanceof Error) {
+		} else if(code instanceof Error || Object.prototype.toString.call(code) == '[object Error]') {
 			this.name = code.name;
 			this.code = 0;
 			this.message = code.message;
@@ -4126,10 +4126,10 @@ define(['require', document.querySelectorAll ? '' : 'yom/inc/sizzle'], function(
 		'string': require('./string'),
 		'object': object,
 		'array': require('./array'),
-		'Chunker': require('./chunker'),
 		'Class': require('./class'),
 		'HashArray': require('./hash-array'),
 		'InstanceManager': require('./instance-manager'),
+		'jsonSansEval': require('./json-sans-eval'),
 		'json': require('./json'),
 		'Observer': require('./observer'),
 		'Event': require('./event'),
@@ -4144,7 +4144,6 @@ define(['require', document.querySelectorAll ? '' : 'yom/inc/sizzle'], function(
 		'JsLoader': require('./js-loader'),
 		'css': require('./css'),
 		'tmpl': require('./tmpl'),
-		'console': require('./console'),
 		'flash': require('./flash'),
 		'widget': require('./widget')
 	});
