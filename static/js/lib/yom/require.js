@@ -8,6 +8,10 @@
 var define, require;
 
 ;(function(global) {
+	if(require._YOM_) {
+		return;
+	}
+	
 	/**
 	 * utils
 	 */
@@ -134,16 +138,14 @@ var define, require;
 	var _plugin = {};
 	var _depReverseMap = {};
 	
-	function Def(nrmId, baseUrl, config, exports, module, getter, loader) {
+	function Def(nrmId, baseUrl, exports, module, getter, loader) {
 		this._nrmId = nrmId;
 		this._baseUrl = baseUrl;
-		this._config = config;
 		this._exports = exports;
 		this._module = module;
 		this._getter = getter;
 		this._loader = loader;
-		this._fullUrl = _getFullUrl(nrmId, baseUrl);
-		_defined[this._fullUrl] = this;
+		_defined[module.uri] = this;
 	};
 	
 	Def.prototype = {
@@ -162,17 +164,17 @@ var define, require;
 		constructor: Def
 	};
 	
-	new Def('require', _gcfg.baseUrl, _gcfg, {}, {}, function(context) {
+	new Def('require', _gcfg.baseUrl, {}, {id: 'require', uri: 'require'}, function(context) {
 		return _makeRequire({config: context.config, base: context.base});
 	});
-	new Def('exports', _gcfg.baseUrl, _gcfg, {}, {}, function(context) {
+	new Def('exports', _gcfg.baseUrl, {}, {id: 'exports', uri: 'exports'}, function(context) {
 		return {};
 	});
-	new Def('module', _gcfg.baseUrl, _gcfg, {}, {}, function(context) {
+	new Def('module', _gcfg.baseUrl, {}, {id: 'module', uri: 'module'}, function(context) {
 		return {};
 	});
-	new Def('global', _gcfg.baseUrl, _gcfg, global, {});
-	new Def('domReady', _gcfg.baseUrl, _gcfg, {}, {}, function(context) {
+	new Def('global', _gcfg.baseUrl, global, {id: 'global', uri: 'global'});
+	new Def('domReady', _gcfg.baseUrl, {}, {id: 'domReady', uri: 'domReady'}, function(context) {
 		return {};
 	}, (function() {
 		var _queue = [];
@@ -232,8 +234,8 @@ var define, require;
 		this._defineCalled = false;
 		this._queue = [];
 		this._shim = config.shim[_removeIdPrefix(id)];
-		this._fullUrl = _getFullUrl(nrmId, baseUrl);
-		_hold[this._fullUrl] = this;
+		this._uri = _getFullUrl(nrmId, baseUrl);
+		_hold[this._uri] = this;
 	};
 	
 	Hold.prototype = {
@@ -259,7 +261,7 @@ var define, require;
 		},
 		
 		remove: function() {
-			delete _hold[this._fullUrl];
+			delete _hold[this._uri];
 		},
 		
 		dispatch: function(errCode, opt) {
@@ -267,7 +269,7 @@ var define, require;
 			while(this._queue.length) {
 				callback = this._queue.shift();
 				if(callback) {
-					callback(errCode, opt || {url: this._fullUrl});
+					callback(errCode, opt || {uri: this._uri});
 				}
 			}
 		},
@@ -316,7 +318,7 @@ var define, require;
 				if(shim.init) {
 					exports = shim.init.apply(global, args) || exports;
 				}
-				new Def(nrmId, baseUrl, config, exports, {});
+				new Def(nrmId, baseUrl, exports, {id: nrmId, uri: _getFullUrl(nrmId, baseUrl)});
 				hold.dispatch(0);
 				hold.remove();
 			}, function(code, opt) {
@@ -428,6 +430,10 @@ var define, require;
 		return (/^https?:|^\/|.js$/).test(id);
 	};
 	
+	function _isRelativePath(path) {
+		return (path + '').indexOf('.') === 0;
+	};
+	
 	function _removeIdPrefix(id) {
 		return id.replace(/^([a-zA-Z0-9_\-]+?!)?([a-zA-Z0-9_\-]+?#)?/, '');
 	};
@@ -455,9 +461,9 @@ var define, require;
 		if(_isUnnormalId(id)) {
 			return id;
 		}
-		if(base && id.indexOf('.') === 0) {
+		if(base && _isRelativePath(id)) {
 			if(_isUnnormalId(base.nrmId)) {
-				id += 'js';
+				id += '.js';
 			}
 			return _resolvePath(base.nrmId, id);
 		} else {
@@ -514,7 +520,7 @@ var define, require;
 	};
 	
 	function _resolvePath(base, path) {
-		if(path.indexOf('.') !== 0) {
+		if(!_isRelativePath(path)) {
 			return path;
 		}
 		var bArr = base.split('/'),
@@ -563,7 +569,7 @@ var define, require;
 		baseUrl = baseUrl || _gcfg.baseUrl;
 		if(_RESERVED_NRM_ID[nrmId] || _isUnnormalId(nrmId)) {
 			url = nrmId;
-		} else if(nrmId && nrmId.indexOf('.') === 0) {
+		} else if(nrmId && _isRelativePath(nrmId)) {
 			url = _resolvePath(baseUrl + '/', nrmId) + '.js';
 		} else if(nrmId) {
 			url = baseUrl + '/' + nrmId + '.js';
@@ -610,29 +616,35 @@ var define, require;
 		}
 	};
 	
-	function _processDefQueue(nrmId, baseUrl) {
-		var def, queue, defQueue, postDefQueue;
-		if(_interactiveMode) {
-			queue = _getInteractiveDefQueue(nrmId, baseUrl);
-			defQueue = queue['defQueue'];
-			postDefQueue = queue['postDefQueue'];
+	function _dealError(code, opt, errCallback) {
+		opt = opt || {};
+		if(errCallback) {
+			errCallback(code, opt);
+		} else if(_gcfg.errCallback) {
+			_gcfg.errCallback(code, opt);
 		} else {
-			defQueue = _defQueue;
-			postDefQueue = _postDefQueue;
+			throw new Error('Load error.');
 		}
-		def = defQueue.shift();
-		while(def) {
-			_defineCall(def.id, def.deps, def.factory, {
-				nrmId: nrmId || '',
-				baseUrl: baseUrl || ''
-			}, def.config, postDefQueue);
-			def = defQueue.shift();
-		}
-		def = postDefQueue.shift();
-		while(def) {
-			_postDefineCall(def.base, def.deps, def.factory, def.hold, def.config);
-			def = postDefQueue.shift();
-		}
+	};
+	
+	function _loadPlugin(pluginName, id, config, onRequire) {
+		require(['require-plugin/' + pluginName], function(pluginDef) {
+			var plugin = _plugin[pluginName];
+			if(!plugin) {
+				if(pluginDef.factory) {
+					plugin = _plugin[pluginName] = pluginDef.factory(Plugin);
+				} else {
+					plugin = _plugin[pluginName] = _extend(new Plugin(pluginName), pluginDef);
+				}
+			}
+			plugin.require(id, config, function(res) {
+				onRequire(0);
+			}, function(errCode, opt) {
+				onRequire(errCode, opt);
+			});
+		}, function(errCode, opt) {
+			onRequire(errCode, opt);
+		});
 	};
 	
 	function _doLoad(id, nrmId, config, onRequire, hold) {
@@ -673,14 +685,14 @@ var define, require;
 			if(jsNode && (jsNode.readyState == 'loaded' || jsNode.readyState == 'complete')) {
 				_endLoad(jsNode, _ieOnload);
 				jsNode = null;
-				_processDefQueue(nrmId, baseUrl);
+				_processDefQueue(nrmId, baseUrl, config);
 				_checkHoldDefine(hold);
 			}
 		};
 		function _onload() {
 			var def;
 			_endLoad(jsNode, _onload, _onerror);
-			_processDefQueue(nrmId, baseUrl);
+			_processDefQueue(nrmId, baseUrl, config);
 			_checkHoldDefine(hold);
 		};
 		function _onerror() {
@@ -718,35 +730,30 @@ var define, require;
 		}
 	};
 	
-	function _dealError(code, opt, errCallback) {
-		opt = opt || {};
-		if(errCallback) {
-			errCallback(code, opt);
-		} else if(_gcfg.errCallback) {
-			_gcfg.errCallback(code, opt);
+	function _processDefQueue(nrmId, baseUrl, config) {
+		var def, queue, defQueue, postDefQueue;
+		if(_interactiveMode) {
+			queue = _getInteractiveDefQueue(nrmId, baseUrl);
+			defQueue = queue['defQueue'];
+			postDefQueue = queue['postDefQueue'];
 		} else {
-			throw new Error('Load error.');
+			defQueue = _defQueue;
+			postDefQueue = _postDefQueue;
 		}
-	};
-	
-	function _loadPlugin(pluginName, id, config, onRequire) {
-		require(['require-plugin/' + pluginName], function(pluginDef) {
-			var plugin = _plugin[pluginName];
-			if(!plugin) {
-				if(pluginDef.factory) {
-					plugin = _plugin[pluginName] = pluginDef.factory(Plugin);
-				} else {
-					plugin = _plugin[pluginName] = _extend(new Plugin(pluginName), pluginDef);
-				}
-			}
-			plugin.require(id, config, function(res) {
-				onRequire(0);
-			}, function(errCode, opt) {
-				onRequire(errCode, opt);
-			});
-		}, function(errCode, opt) {
-			onRequire(errCode, opt);
-		});
+		def = defQueue.shift();
+		while(def) {
+			_defineCall(def.id, def.deps, def.factory, {
+				nrmId: nrmId || '',
+				baseUrl: baseUrl || '',
+				config: config
+			}, def.config, postDefQueue);
+			def = defQueue.shift();
+		}
+		def = postDefQueue.shift();
+		while(def) {
+			_postDefineCall(def.base, def.deps, def.factory, def.hold, def.config);
+			def = postDefQueue.shift();
+		}
 	};
 	
 	/**
@@ -755,40 +762,50 @@ var define, require;
 	function _defineCall(id, deps, factory, loadInfo, config, postDefQueue) {
 		var nrmId, conf, loadHold, hold, depMap;
 		var baseUrl = loadInfo.baseUrl;
+		var baseConfig = loadInfo.config || config;
+		config = _extendConfig(['charset', 'baseUrl', 'source', 'path', 'shim', 'urlArgs'], baseConfig, config);
 		loadHold = _getHold(loadInfo.nrmId, baseUrl);
-		nrmId = _normalizeId(id, loadInfo, loadHold && loadHold.getConfig().path);
+		nrmId = _normalizeId(id, loadInfo, config.path);
 		if(!nrmId || nrmId == loadInfo.nrmId) {
 			nrmId = loadInfo.nrmId;
 			hold = loadHold;
 			hold.defineCall();
 		} else {//multiple define in a file
-			hold = new Hold(id, nrmId, loadHold && loadHold.getConfig() || config);
+			hold = new Hold(id, nrmId, baseConfig);
 			hold.defineCall();
 		}
 		postDefQueue.push({
 			base: {
 				nrmId: nrmId,
-				baseUrl: baseUrl
+				baseUrl: baseUrl,
+				config: baseConfig
 			},
 			deps: deps,
 			factory: factory,
 			hold: hold,
-			config: _extendConfig(['charset', 'baseUrl', 'source', 'path', 'shim', 'urlArgs'], hold.getConfig(), config)
+			config: config
 		});
 	};
 	
 	function _postDefineCall(base, deps, factory, hold, config) {
 		_makeRequire({config: config, base: base})(deps, function() {
+			var nrmId = base.nrmId;
+			var baseUrl = base.baseUrl || config.baseUrl;
 			var exports, module;
 			var args = _getArray(arguments);
-			exports = deps[1] == 'exports' ? args[1] : {};
-			module = deps[2] == 'module' ? args[2] : {};
+			module = {
+				id: nrmId,
+				uri: _getFullUrl(nrmId, baseUrl)
+			};
+			if(deps[2] == 'module') {
+				args[2] = module;
+			}
 			if(_isFunction(factory)) {
 				exports = factory.apply(null, args) || exports;
 			} else {
 				exports = factory;
 			}
-			new Def(base.nrmId, base.baseUrl, config, exports, module);
+			new Def(nrmId, baseUrl, exports, module);
 			hold.dispatch(0);
 			hold.remove();
 		}, function(code, opt) {
@@ -856,7 +873,7 @@ var define, require;
 		context.parentConfig = context.parentConfig || _gcfg;
 		config = _extendConfig(['charset', 'baseUrl', 'source', 'path', 'shim', 'urlArgs'], context.parentConfig, context.config);
 		function _getDef(id) {
-			var conf, nrmId, def, pluginName, sourceConf, fullUrl, baseFullUrl, loader;
+			var base, conf, nrmId, def, pluginName, sourceConf, fullUrl, baseFullUrl, loader;
 			if(!id) {
 				return {};
 			}
@@ -864,7 +881,6 @@ var define, require;
 			if(pluginName) {
 				return {plugin: _getPlugin(pluginName), load: {pluginName: pluginName, id: id, nrmId: id, config: config}};
 			}
-			sourceConf = config.source[_getSourceName(id)];
 			def = _defined[id];
 			if(def) {//reserved
 				loader = def.getLoader();
@@ -874,12 +890,17 @@ var define, require;
 					return {inst: def};
 				}
 			}
+			sourceConf = config.source[_getSourceName(id)];
 			conf = _extendConfig(['charset', 'baseUrl', 'path', 'shim', 'urlArgs'], config, sourceConf);
-			nrmId = _normalizeId(id, context.base, conf.path);
+			base = context.base;
+			nrmId = _normalizeId(id, base, conf.path);
+			if(_isRelativePath(id)) {
+				conf = base && base.config || conf;
+			}
 			def = _getDefined(nrmId, conf.baseUrl);
 			fullUrl = _getFullUrl(nrmId, conf.baseUrl);
-			if(context.base) {
-				baseFullUrl = _getFullUrl(context.base.nrmId, context.base.baseUrl);
+			if(base) {
+				baseFullUrl = _getFullUrl(base.nrmId, base.baseUrl);
 				_setDepReverseMap(fullUrl, baseFullUrl);
 				if(!def && _hasCircularDep(baseFullUrl, fullUrl)) {//cirular dependency
 					return {};
@@ -1025,6 +1046,8 @@ var define, require;
 	};
 	
 	require = _makeRequire();
+	
+	require._YOM_ = true;
 	
 	require._processDefQueue = _processDefQueue;//for modules built with require.js
 	

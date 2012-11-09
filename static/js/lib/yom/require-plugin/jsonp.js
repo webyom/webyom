@@ -77,7 +77,7 @@ define('require-plugin/jsonp', ['global'], function(global) {
 				charset = params['charset'] || 'utf-8';
 				_load(url, function(data, err) {
 					if(err) {
-						errCallback && errCallback(require.ERR_CODE.LOAD_ERROR, {url: url});
+						errCallback && errCallback(require.ERR_CODE.LOAD_ERROR, {uri: url});
 					} else {
 						_cache[url] = data;
 						callback(data);

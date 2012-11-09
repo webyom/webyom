@@ -1,3 +1,18 @@
+define('./console.html', [], function() {
+	function $encodeHtml(str) {
+		return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/`/g, '&#96;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+	};
+	return function($data, $util) {
+		$data = $data || {};
+		var _$out_= [];
+		var $print = function(str) {_$out_.push(str);};
+		with($data) {
+		_$out_.push('<div style="background: #555; padding: 2px; padding-top: 0; font-size: 12px; font-family: Courier New, Courier, monospace;"><h2 style="margin: 0; font-size: 14px; line-height: 22px; color: #fff; padding: 2px; padding-top: 0;"><span style="float: left;">Console</span><span title="Maxmize" id="yomConsoleColExpBtn" style="float: right; cursor: pointer; padding: 0 3px;">^</span><span title="Clear" id="yomConsoleClearBtn" style="float: right; cursor: pointer; padding: 0 3px; margin-right: 10px;">[C]</span></h2><div id="yomConsoleOutput" style="clear: both; height: 300px; overflow-y: scroll; background: #fff; padding: 0; display: none; text-align: left;"><div id="yomConsoleOutputBox" style="line-height: 15px;"></div><div><label for="yomConsoleInputBox" style="font-weight: bold; color: blue;">&gt;&gt;</label><input id="yomConsoleInputBox" type="text" style="width: 458px; border: none; font-family: Courier New, Courier, monospace;" onkeyup="if(event.keyCode === 13) {require(\'', $util.uri, '\').console.eval(this.value); return false;}" ondblclick="require(\'', $util.uri, '\').console.eval(this.value); return false;" /></div></div><div style="height: 0; line-height: 0; clear: both;">&nbsp;</div></div>');
+		}
+		return _$out_.join('');
+	};
+});
+
 /**
  * @class YOM.Chunker
  */
@@ -77,25 +92,8 @@ define('./chunker', ['./core-pkg'], function(YOM) {
 /**
  * @namespace YOM.console
  */
-define('./console', ['global', './core-pkg', './chunker'], function(global, YOM, Chunker) {
-	var _TMPL = [
-		'<div style="background: #555; padding: 2px; padding-top: 0; font-size: 12px; font-family: Courier New, Courier, monospace;">',
-			'<h2 style="margin: 0; font-size: 14px; line-height: 22px; color: #fff; padding: 2px; padding-top: 0;">',
-				'<span style="float: left;">Console</span>',
-				'<span title="Maxmize" id="yomConsoleColExpBtn" style="float: right; cursor: pointer; padding: 0 3px;">^</span>',
-				'<span title="Clear" id="yomConsoleClearBtn" style="float: right; cursor: pointer; padding: 0 3px; margin-right: 10px;">[C]</span>',
-			'</h2>',
-			'<div id="yomConsoleOutput" style="clear: both; height: 300px; overflow-y: scroll; background: #fff; padding: 0; display: none; text-align: left;">',
-				'<div id="yomConsoleOutputBox" style="line-height: 15px;"></div>',
-				'<div>',
-					'<label for="yomConsoleInputBox" style="font-weight: bold; color: blue;">&gt;&gt;</label>',
-					'<input id="yomConsoleInputBox" type="text" style="width: 458px; border: none; font-family: Courier New, Courier, monospace;" onkeyup="if(event.keyCode === 13) {require(\'yom/ext-pkg\').console.eval(this.value); return false;}" ondblclick="require(\'yom/ext-pkg\').console.eval(this.value); return false;" />',
-				'</div>',
-			'</div>',
-			'<div style="height: 0; line-height: 0; clear: both;">&nbsp;</div>',
-		'</div>'
-	].join('');
-	
+define('./console', ['require', 'exports', 'module', 'global', './core-pkg', './chunker', './console.html'], function(require, exports, module, global, YOM, Chunker) {
+	var _tmpl = require('./console.html');
 	var _global = global;
 	var _on = 0;
 	var _el = {};
@@ -149,7 +147,7 @@ define('./console', ['global', './core-pkg', './chunker'], function(global, YOM,
 			right: 0,
 			bottom: isIe6 ? Math.max(0, YOM.Element.getDocSize().height - YOM.Element.getViewRect().bottom) + 'px' : 0
 		}));
-		_el.container.innerHTML = YOM.tmpl.render(_TMPL, {});
+		_el.container.innerHTML = _tmpl({}, {uri: module.uri.split('/').slice(0, -1).join('/') + '/ext-pkg.js'});
 		_el.output = $id('yomConsoleOutput');
 		_el.outputBox = $id('yomConsoleOutputBox');
 		_el.inputBox = $id('yomConsoleInputBox');
@@ -361,7 +359,9 @@ define('./console', ['global', './core-pkg', './chunker'], function(global, YOM,
 /**
  * @namespace
  */
-define(['require', 'exports', 'module', './chunker', './console'], function(require) {
+define(['require', 'exports', 'module', './console.html', './chunker', './console'], function(require) {
+	var consoleTmpl = require('./console.html');
+	
 	var ext = {
 		'Chunker': require('./chunker'),
 		'console': require('./console')

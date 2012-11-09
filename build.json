@@ -13,8 +13,20 @@
 			"output": "static/js/lib/yom/dragdrop-pkg.js"
 		},
 		{
+			"input": "../js-lib/yom/widget/src/dialog/dialog.js",
+			"output": "static/js/lib/yom/widget/dialog.js"
+		},
+		{
+			"input": "../js-lib/yom/widget/src/tooltip/tooltip.js",
+			"output": "static/js/lib/yom/widget/tooltip.js"
+		},
+		{
 			"input": "static/js/src/main-pkg.js",
 			"output": "static/js/main-pkg.js"
+		},
+		{
+			"input": "static/js/mod/src/about-work.js",
+			"output": "static/js/mod/about-work.js"
 		}
 	],
 	"combines": [
@@ -37,14 +49,6 @@
 		{
 			"inputs": ["../js-lib/yom/widget/src/mask/mask.js"],
 			"output": "static/js/lib/yom/widget/mask.js"
-		},
-		{
-			"inputs": ["../js-lib/yom/widget/src/dialog/dialog.js"],
-			"output": "static/js/lib/yom/widget/dialog.js"
-		},
-		{
-			"inputs": ["../js-lib/yom/widget/src/tooltip/tooltip.js"],
-			"output": "static/js/lib/yom/widget/tooltip.js"
 		},
 		{
 			"inputs": ["../js-lib/yom/widget/src/mod-odl/mod-odl.js"],
@@ -80,10 +84,6 @@
 		{
 			"inputs": ["static/js/mod/src/about-profile.js"],
 			"output": "static/js/mod/about-profile.js"
-		},
-		{
-			"inputs": ["static/js/mod/src/about-work.js"],
-			"output": "static/js/mod/about-work.js"
 		},
 		{
 			"inputs": ["static/js/mod/src/about-contact.js"],

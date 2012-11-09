@@ -1,24 +1,34 @@
+define('./tooltip.html', [], function() {
+	function $encodeHtml(str) {
+		return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/`/g, '&#96;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+	};
+	return function($data, $util) {
+		$data = $data || {};
+		var _$out_= [];
+		var $print = function(str) {_$out_.push(str);};
+		with($data) {
+		_$out_.push('<div data-type="yom-tooltip-inner" class="yom-tooltip-inner"><div data-type="yom-tooltip-content" class="yom-tooltip-content">', content, '</div><div data-type="yom-tooltip-arrow-outer" class="yom-tooltip-arrow-outer"></div><div data-type="yom-tooltip-arrow-inner" class="yom-tooltip-arrow-inner"></div>');
+		if(!noCloseBtn) {
+		_$out_.push('<span data-type="yom-tooltip-close-btn" class="yom-tooltip-close-btn">\\u00d7</span>');
+		}
+		_$out_.push('</div>');
+		}
+		return _$out_.join('');
+	};
+});
+
 /**
  * @namespace YOM.widget.Tooltip
  */
-define(function(require) {
+define(['require', 'exports', 'module', '../core-pkg', './tooltip.html'], function(require) {
 	var YOM = require('../core-pkg');
 	
 	var _ID = 128003;
 	var _FX_DURATION = 300;
 	var _MIN_CLOSE_TIMEOUT = 1000;
 	var _DIRECTION_HASH = {L: 'L', R: 'R', T: 'T', B: 'B'};
-	var _TMPL = [
-		'<div data-type="yom-tooltip-inner" class="yom-tooltip-inner">',
-			'<div data-type="yom-tooltip-content" class="yom-tooltip-content"><%=content%></div>',
-			'<div data-type="yom-tooltip-arrow-outer" class="yom-tooltip-arrow-outer"></div>',
-			'<div data-type="yom-tooltip-arrow-inner" class="yom-tooltip-arrow-inner"></div>',
-			'<%if(!noCloseBtn) {%>',
-				'<span data-type="yom-tooltip-close-btn" class="yom-tooltip-close-btn">\u00d7</span>',
-			'<%}%>',
-		'</div>'
-	].join('');
 	
+	var _tmpl = require('./tooltip.html');
 	var _im = new YOM.InstanceManager();
 	
 	/**
@@ -47,7 +57,7 @@ define(function(require) {
 			position: 'absolute',
 			display: 'none'
 		}));
-		this._el.setHtml(YOM.tmpl.render(opt.tmpl || _TMPL, {
+		this._el.setHtml((opt.tmpl || _tmpl)({
 			id: this._id,
 			content: opt.content,
 			noCloseBtn: opt.noCloseBtn

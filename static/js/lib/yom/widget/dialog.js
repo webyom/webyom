@@ -1,7 +1,54 @@
+define('./dialog.html', [], function() {
+	function $encodeHtml(str) {
+		return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/`/g, '&#96;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+	};
+	return function($data, $util) {
+		$data = $data || {};
+		var _$out_= [];
+		var $print = function(str) {_$out_.push(str);};
+		with($data) {
+		_$out_.push('');
+		if(noBorder && src) {
+		_$out_.push('<iframe data-type="yom-dialog-frame" style="width: 100%; height: 100%;" frameborder="0" scrolling="no" allowtransparency="yes" src="', frameSrc, '"></iframe>');
+		} else {
+		_$out_.push('<div data-type="yom-dialog-inner" class="yom-dialog-inner" style="width: 100%; height: 100%; padding: 0; margin: 0; border: none; overflow: hidden;">');
+		if(title) {
+		_$out_.push('<div data-type="yom-dialog-title" class="yom-dialog-title" style="overflow: hidden; ', fixed ? "cursor: default;" : "", '"><h3>', title, '</h3><button data-type="yom-dialog-title-close-btn" class="yom-dialog-title-close-btn" title="Close">x</button></div>');
+		}
+		_$out_.push('');
+		if(src) {
+		_$out_.push('<iframe data-type="yom-dialog-frame" style="width: 100%; display: block;" frameborder="0" scrolling="no" allowtransparency="yes" src="', frameSrc, '"></iframe>');
+		} else {
+		_$out_.push('<div data-type="yom-dialog-content" class="yom-dialog-content" style="padding: ', contentPadding || 0, 'px; margin: 0; border: none; overflow: hidden;">', content, '</div>');
+		}
+		_$out_.push('');
+		if(btns || tips) {
+		_$out_.push('<div data-type="yom-dialog-footer" class="yom-dialog-footer" style="overflow: hidden;">');
+		if(tips) {
+		_$out_.push('<div data-type="yom-dialog-tips" class="yom-dialog-tips">', tips, '</div>');
+		}
+		_$out_.push('');
+		if(btns) {
+		_$out_.push('<div data-type="yom-dialog-btns" class="yom-dialog-btns">');
+		for(var i = 0, l = btns.length; i < l; i++) {var btn = btns[i];
+		_$out_.push('<button class="', btn.className, '" title="', btn.title || btn.text, '">', btn.text, '</button>');
+		}
+		_$out_.push('</div>');
+		}
+		_$out_.push('</div>');
+		}
+		_$out_.push('</div>');
+		}
+		_$out_.push('');
+		}
+		return _$out_.join('');
+	};
+});
+
 /**
  * @namespace YOM.widget.Dialog
  */
-define(function(require) {
+define(['require', 'exports', 'module', '../core-pkg', './dialog.html'], function(require) {
 	var YOM = require('../core-pkg');
 	
 	var _ID = 128002;
@@ -13,45 +60,8 @@ define(function(require) {
 	var _DEFAULT_HEIGHT = 200;
 	var _FX_DURATION = 300;
 	var _MIN_CLOSE_TIMEOUT = 1000;
-	var _TMPL = [
-		'<%if(noBorder && src) {%>',
-			'<iframe data-type="yom-dialog-frame" style="width: 100%; height: 100%;" frameborder="0" scrolling="no" allowtransparency="yes" src="<%=frameSrc%>"></iframe>',
-		'<%} else {%>',
-			'<div data-type="yom-dialog-inner" class="yom-dialog-inner" style="width: 100%; height: 100%; padding: 0; margin: 0; border: none; overflow: hidden;">',
-				'<%if(title) {%>',
-					'<div data-type="yom-dialog-title" class="yom-dialog-title" style="overflow: hidden; <%=fixed ? "cursor: default;" : ""%>">',
-						'<h3><%=title%></h3>',
-						'<button data-type="yom-dialog-title-close-btn" class="yom-dialog-title-close-btn" title="Close">x</button>',
-					'</div>',
-				'<%}%>',
-				'<%if(src) {%>',
-					'<iframe data-type="yom-dialog-frame" style="width: 100%; display: block;" frameborder="0" scrolling="no" allowtransparency="yes" src="<%=frameSrc%>"></iframe>',
-				'<%} else {%>',
-					'<div data-type="yom-dialog-content" class="yom-dialog-content" style="padding: <%=contentPadding || 0%>px; margin: 0; border: none; overflow: hidden;">',
-						'<%=content%>',
-					'</div>',
-				'<%}%>',
-				'<%if(btns || tips) {%>',
-					'<div data-type="yom-dialog-footer" class="yom-dialog-footer" style="overflow: hidden;">',
-						'<%if(tips) {%>',
-							'<div data-type="yom-dialog-tips" class="yom-dialog-tips">',
-								'<%=tips%>',
-							'</div>',
-						'<%}%>',
-						'<%if(btns) {%>',
-							'<div data-type="yom-dialog-btns" class="yom-dialog-btns">',
-								'<%for(var i = 0, l = btns.length; i < l; i++) {',
-									'var btn = btns[i];%>',
-									'<button class="<%=btn.className%>" title="<%=btn.title || btn.text%>"><%=btn.text%></button>',
-								'<%}%>',
-							'</div>',
-						'<%}%>',
-					'</div>',
-				'<%}%>',
-			'</div>',
-		'<%}%>'
-	].join('');
 	
+	var _tmpl = require('./dialog.html');
 	var _im = new YOM.InstanceManager();
 	
 	/**
@@ -106,7 +116,7 @@ define(function(require) {
 			margin: '0',
 			border: 'none'
 		} : {})));
-		this._el.setHtml(YOM.tmpl.render(opt.tmpl || _TMPL, {
+		this._el.setHtml((opt.tmpl || _tmpl)({
 			id: this._id,
 			title: opt.title,
 			content: opt.content,

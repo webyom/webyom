@@ -1,7 +1,7 @@
 /**
  * @namespace $$.Handler
  */
-define(['require', 'yom/core-pkg', 'yom/history', './config', './ui'], function(require, $, ajaxHistory, config, ui) {
+define(['require', 'global', 'yom/core-pkg', 'yom/history', './config', './ui'], function(require, global, $, ajaxHistory, config, ui) {
 	var $$ = {
 		config: config,
 		ui: ui
@@ -202,6 +202,10 @@ define(['require', 'yom/core-pkg', 'yom/history', './config', './ui'], function(
 			return 0;
 		}
 	});
+	
+	if(!global._WEBYOM_ORG_) {
+		return;
+	}
 	
 	(function() {
 		var _MARK_PREFIX = $$.config.get('MARK_PREFIX');

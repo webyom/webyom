@@ -1,4 +1,4 @@
-var require = {
+var require = require || {
 	baseUrl: 'http://www.webyom.org/static/js',
 	path: {
 		'yom': 'lib/yom',
