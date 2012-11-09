@@ -1,0 +1,53 @@
+<div class="block"><div class="blockInner">
+	<div class="article">
+		<h3><%=article.title%></h3>
+		<p class="credit">
+			by <a class="author" href="javascript:void(0);"><%=article.author%></a> at <%=article.creation_datetime%> <a id="viewCommentsLink" class="comments comments<%=article.comments%>" href="javascript:void(0);"><span id="commentsAmount1"><%=article.comments%></span> Comments</a>
+			<%if(is_admin) {%>
+				<a href="/view/write/<%=article.key_name%>">[Edit]</a>
+			<%}%>
+		</p>
+		<%=article.content%>
+		<%if(article.last_update_datetime) {%>
+			<p class="updateLog">Last updated by <%=article.last_updater%> on <%=article.last_update_datetime%></p>
+		<%}%>
+	</div>
+</div></div>
+<div data-mod-id="1" id="commentForm" class="block commnetBox sortable"><div class="handle"></div><div class="blockInner">
+	<h2>Leave Your Comment</h2>
+	<div class="body">
+		<label for="username">Your Name:</label> <span class="required">*</span><input type="text" id="username" name="username" />
+		<label for="website">Website:</label> <input type="text" id="website" name="website" value="http://" />
+		<label for="email">Email:</label> <input type="text" id="email" name="email" />
+	</div>
+	<textarea name="msgpost" id="msgpost" cols="50" rows="10"></textarea>
+	<div class="footer buttonGroup">
+		<button id="btnSubmit" type="button" class="size1 size1hl">Submit</button> 
+		<button id="btnReset" type="button" class="size1">Reset</button>
+	</div>
+</div></div>
+<div data-mod-id="2" id="comments" class="block sortable"><div class="handle"></div><div class="blockInner">
+	<h2>Comments (<span id="commentsAmount2"><%=article.comments%></span>)</h2>
+	<%for(var i = 0, l = comments.length; i < l; i++) {
+		var comment = comments[i]; if(!comment) {continue;}%>
+	<div class="comment">
+		<p class="credit">
+			by 
+			<%if(comment.website && comment.website != "http://") {%>
+				<a class="author" href="<%=comment.website%>" target="_blank"><%=comment.author%></a>
+			<%} else {%>
+				<%=comment.author%>
+			<%}%>
+			<%if(comment.email) {%>
+				(<%=comment.email%>)
+			<%}%>
+			 at <%=comment.creation_datetime%>
+			<%if(is_admin) {%>
+				<a href="javascript:void(0);" onclick="require('main-pkg').Handler.mod['ROOT'].mod['READ_ARTICLE'].delComment('<%=comment.key_name%>', '<%=article.key_name%>');">[Delete]</a>
+			<%}%>
+		</p>
+		<%=comment.content%>
+	</div>
+	<%}%>
+</div></div>
+<a id="commentsEnd"></a>

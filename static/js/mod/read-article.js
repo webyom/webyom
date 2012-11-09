@@ -1,63 +1,50 @@
-define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg'], function(require, $, ajaxHistory, $$) {
+define('./read-article.html', [], function() {
+	function $encodeHtml(str) {
+		return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/`/g, '&#96;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+	};
+	return function($data, $util) {
+		$data = $data || {};
+		var _$out_= [];
+		var $print = function(str) {_$out_.push(str);};
+		with($data) {
+		_$out_.push('<div class="block"><div class="blockInner"><div class="article"><h3>', article.title, '</h3><p class="credit">by <a class="author" href="javascript:void(0);">', article.author, '</a> at ', article.creation_datetime, ' <a id="viewCommentsLink" class="comments comments', article.comments, '" href="javascript:void(0);"><span id="commentsAmount1">', article.comments, '</span> Comments</a>');
+		if(is_admin) {
+		_$out_.push('<a href="/view/write/', article.key_name, '">[Edit]</a>');
+		}
+		_$out_.push('</p>', article.content, '');
+		if(article.last_update_datetime) {
+		_$out_.push('<p class="updateLog">Last updated by ', article.last_updater, ' on ', article.last_update_datetime, '</p>');
+		}
+		_$out_.push('</div></div></div><div data-mod-id="1" id="commentForm" class="block commnetBox sortable"><div class="handle"></div><div class="blockInner"><h2>Leave Your Comment</h2><div class="body"><label for="username">Your Name:</label> <span class="required">*</span><input type="text" id="username" name="username" /><label for="website">Website:</label> <input type="text" id="website" name="website" value="http://" /><label for="email">Email:</label> <input type="text" id="email" name="email" /></div><textarea name="msgpost" id="msgpost" cols="50" rows="10"></textarea><div class="footer buttonGroup"><button id="btnSubmit" type="button" class="size1 size1hl">Submit</button> <button id="btnReset" type="button" class="size1">Reset</button></div></div></div><div data-mod-id="2" id="comments" class="block sortable"><div class="handle"></div><div class="blockInner"><h2>Comments (<span id="commentsAmount2">', article.comments, '</span>)</h2>');
+		for(var i = 0, l = comments.length; i < l; i++) {var comment = comments[i]; if(!comment) {continue;}
+		_$out_.push('<div class="comment"><p class="credit">by ');
+		if(comment.website && comment.website != "http://") {
+		_$out_.push('<a class="author" href="', comment.website, '" target="_blank">', comment.author, '</a>');
+		} else {
+		_$out_.push('', comment.author, '');
+		}
+		_$out_.push('');
+		if(comment.email) {
+		_$out_.push('(', comment.email, ')');
+		}
+		_$out_.push(' at ', comment.creation_datetime, '');
+		if(is_admin) {
+		_$out_.push('<a href="javascript:void(0);" onclick="require(\'main-pkg\').Handler.mod[\'ROOT\'].mod[\'READ_ARTICLE\'].delComment(\'', comment.key_name, '\', \'', article.key_name, '\');">[Delete]</a>');
+		}
+		_$out_.push('</p>', comment.content, '</div>');
+		}
+		_$out_.push('</div></div><a id="commentsEnd"></a>');
+		}
+		return _$out_.join('');
+	};
+});
+
+define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg', './read-article.html'], function(require, $, ajaxHistory, $$) {
 	var modKey = 'read', 
 		modName = 'READ_ARTICLE', 
 		modId = 301;
 	
-	var _TMPL = [
-		'<div class="block"><div class="blockInner">',
-			'<div class="article">',
-				'<h3><%=article.title%></h3>',
-				'<p class="credit">',
-					'by <a class="author" href="javascript:void(0);"><%=article.author%></a> at <%=article.creation_datetime%> <a id="viewCommentsLink" class="comments comments<%=article.comments%>" href="javascript:void(0);"><span id="commentsAmount1"><%=article.comments%></span> Comments</a>',
-					'<%if(is_admin) {%>',
-						'<a href="/view/write/<%=article.key_name%>">[Edit]</a>',
-					'<%}%>',
-				'</p>',
-				'<%=article.content%>',
-				'<%if(article.last_update_datetime) {%>',
-					'<p class="updateLog">Last updated by <%=article.last_updater%> on <%=article.last_update_datetime%></p>',
-				'<%}%>',
-			'</div>',
-		'</div></div>',
-		'<div data-mod-id="1" id="commentForm" class="block commnetBox sortable"><div class="handle"></div><div class="blockInner">',
-			'<h2>Leave Your Comment</h2>',
-			'<div class="body">',
-				'<label for="username">Your Name:</label> <span class="required">*</span><input type="text" id="username" name="username" />',
-				'<label for="website">Website:</label> <input type="text" id="website" name="website" value="http://" />',
-				'<label for="email">Email:</label> <input type="text" id="email" name="email" />',
-			'</div>',
-			'<textarea name="msgpost" id="msgpost" cols="50" rows="10"></textarea>',
-			'<div class="footer buttonGroup">',
-				'<button id="btnSubmit" type="button" class="size1 size1hl">Submit</button> ',
-				'<button id="btnReset" type="button" class="size1">Reset</button>',
-			'</div>',
-		'</div></div>',
-		'<div data-mod-id="2" id="comments" class="block sortable"><div class="handle"></div><div class="blockInner">',
-			'<h2>Comments (<span id="commentsAmount2"><%=article.comments%></span>)</h2>',
-			'<%for(var i = 0, l = comments.length; i < l; i++) {',
-				'var comment = comments[i]; if(!comment) {continue;}%>',
-			'<div class="comment">',
-				'<p class="credit">',
-					'by ',
-					'<%if(comment.website && comment.website != "http://") {%>',
-						'<a class="author" href="<%=comment.website%>" target="_blank"><%=comment.author%></a>',
-					'<%} else {%>',
-						'<%=comment.author%>',
-					'<%}%>',
-					'<%if(comment.email) {%>',
-						'(<%=comment.email%>)',
-					'<%}%>',
-					' at <%=comment.creation_datetime%>',
-					'<%if(is_admin) {%>',
-						'<a href="javascript:void(0);" onclick="require(\'main-pkg\').Handler.mod[\'ROOT\'][\'' + modName + '\'].delComment(\'<%=comment.key_name%>\', \'<%=article.key_name%>\');">[Delete]</a>',
-					'<%}%>',
-				'</p>',
-				'<%=comment.content%>',
-			'</div>',
-			'<%}%>',
-		'</div></div>',
-		'<a id="commentsEnd"></a>'
-	].join('');
+	var _tmpl = require('./read-article.html');
 	
 	var _cssList = ['/static/js/lib/prettify/prettify.css', '/static/css/form.css'];
 	var _sortable = null;
@@ -169,7 +156,7 @@ define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg'], function(require,
 		data = data || ajaxHistory.getCache(fullMark);
 		if(data) {
 			ajaxHistory.setMark(fullMark, [data.article.title, reqInfo.modInfo.title, $$.config.get('TITLE_POSTFIX')].join(' - '));
-			$$.ui.setMainContent($.tmpl.render(_TMPL, data, {key: 'mod.readArticle'}));
+			$$.ui.setMainContent(_tmpl(data));
 			$$.ui.turnOnMenu('a');
 			$$.storage.get('commentModSequence', function(res) {
 				if(res) {

@@ -3,50 +3,7 @@ define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg', 'YUI#editor/editor
 		modName = 'WRITE_ARTICLE', 
 		modId = 302;
 	
-	var _TMPL = [
-		'<div id="writeArticle" class="sidePart"><div class="block yui-skin-sam"><div class="blockInner">',
-			'<h2>Write Article</h2>',
-			'<div id="form">',
-				'<p class="desc">You may use [html:code]Your code goes here[html:/code] to height-light a code segment.</p>',
-				'<table cellpadding="0" cellspacing="0">',
-					'<tr>',
-						'<td>',
-							'<label for="category"><strong>Category: *</strong></label><br />',
-							'<select id="category" name="category">',
-								'<option></option>',
-								'<option value="HTML">HTML</option>',
-								'<option value="CSS">CSS</option>',
-								'<option value="Java">Java</option>',
-								'<option value="Javascript">Javascript</option>',
-								'<option value="PHP">PHP</option>',
-								'<option value="Python">Python</option>',
-								'<option value="Others">Others</option>',
-							'</select>',
-						'</td>',
-						'<td>',
-							'<label for="title"><strong>Title: *</strong></label><br />',
-							'<input type="text" id="title" name="title" value="<%=title%>" />',
-						'</td>',
-					'</tr>',
-					'<tr>',
-						'<td>',
-							'<label for="originalWriter">Original Writer: </label><br />',
-							'<input type="text" id="originalWriter" name="originalWriter" />',
-						'</td>',
-						'<td>',
-							'<label for="originalUrl">Original Url: </label><br />',
-							'<input type="text" id="originalUrl" name="originalUrl" />',
-						'</td>',
-					'</tr>',
-				'</table>',
-			'</div>',
-			'<textarea name="msgpost" id="msgpost" cols="50" rows="10"><%=content%></textarea>',
-			'<div class="footer buttonGroup">',
-				'<button id="btnSubmit" type="submit" class="size1 size1hl">Submit</button>',
-				'<button id="btnReset" type="button" class="size1">Reset</button>',
-			'</div>',
-		'</div></div></div>'
-	].join('');
+	var _tmpl = require('./write-article.html');
 	
 	var _cssList = [
 		'http://yui.yahooapis.com/2.7.0/build/assets/skins/sam/skin.css',
@@ -55,7 +12,7 @@ define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg', 'YUI#editor/editor
 	];
 	
 	function _render(url, data, aid) {
-		$$.ui.setContent($.tmpl.render(_TMPL, data, {key: 'mod.writeArticle'}));
+		$$.ui.setContent(_tmpl(data));
 		$$.ui.turnOnMenu('a');
 		var myEditor = new Editor('msgpost', {   
 			height: '500px',   

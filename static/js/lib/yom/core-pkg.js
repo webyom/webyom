@@ -3616,7 +3616,7 @@ define('./tmpl', ['./browser', './string', './object'], function(browser, string
 		if(key) {
 			fn = _cache[key];
 			if(fn) {
-				return fn(data);
+				return fn.call(YOM, data, opt.util);
 			}
 		}
 		if(opt.mixinTmpl) {
@@ -3646,7 +3646,7 @@ define('./tmpl', ['./browser', './string', './object'], function(browser, string
 		if(key) {
 			_cache[key] = fn;
 		}
-		return fn.call(YOM, data);
+		return fn.call(YOM, data, opt.util);
 	};
 	
 	function renderId(id, data, opt) {
@@ -3655,7 +3655,7 @@ define('./tmpl', ['./browser', './string', './object'], function(browser, string
 		var key = opt.key = opt.key || id;
 		var fn = _cache[key];
 		if(fn) {
-			return fn(data);
+			return fn.call(YOM, data, opt.util);
 		}
 		return render($id(id).innerHTML, data, opt);
 	};
