@@ -1,4 +1,4 @@
-define('mod/article-list', ['require', 'yom/core-pkg', 'yom/history', 'main-pkg'], function(require, $, ajaxHistory, $$) {
+define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg'], function(require, $, ajaxHistory, $$) {
 	var modKey = 'list', 
 		modName = 'ARTICLE_LIST', 
 		modId = 300;

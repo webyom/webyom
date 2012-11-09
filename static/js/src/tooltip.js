@@ -1,7 +1,7 @@
 /**
  * @namespace $$.tooltip
  */
-define('./tooltip', ['require', 'yom/core-pkg'], function(require, $) {
+define(['require', 'yom/core-pkg'], function(require, $) {
 	var _guideTooltip;
 	var _guidePool = [];
 	

@@ -1,7 +1,7 @@
 /**
  * @namespace $$.Handler
  */
-define('./handler', ['require', 'yom/core-pkg', 'yom/history', './config', './ui'], function(require, $, ajaxHistory, config, ui) {
+define(['require', 'yom/core-pkg', 'yom/history', './config', './ui'], function(require, $, ajaxHistory, config, ui) {
 	var $$ = {
 		config: config,
 		ui: ui

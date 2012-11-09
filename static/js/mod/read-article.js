@@ -1,4 +1,4 @@
-define('mod/read-article', ['require', 'yom/core-pkg', 'yom/history', 'main-pkg'], function(require, $, ajaxHistory, $$) {
+define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg'], function(require, $, ajaxHistory, $$) {
 	var modKey = 'read', 
 		modName = 'READ_ARTICLE', 
 		modId = 301;

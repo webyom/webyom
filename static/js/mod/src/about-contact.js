@@ -1,4 +1,4 @@
-define('mod/about-contact', ['require', 'yom/core-pkg', 'yom/history', 'main-pkg'], function(require, $, ajaxHistory, $$) {
+define('['require', 'yom/core-pkg', 'yom/history', 'main-pkg'], function(require, $, ajaxHistory, $$) {
 	var modKey = 'contact', 
 		modName = 'CONTACT', 
 		modId = 30302;

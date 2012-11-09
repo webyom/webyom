@@ -1,7 +1,7 @@
 /**
  * @namespace YOM.object
  */
-define('./object', ['require'], function(require) {
+define('./object', ['require', 'exports', 'module', './array'], function(require) {
 	return {
 		_ID: 110,
 		
@@ -4159,7 +4159,7 @@ define('./element-fx', ['./object', './array', './element', './tween'], function
 /**
  * @namespace
  */
-define(['require', document.querySelectorAll ? '' : 'yom/inc/sizzle'], function(require, Sizzle) {
+define(['require', document.querySelectorAll ? '' : 'yom/inc/sizzle', './object', './element', './config', './error', './browser', './string', './array', './class', './hash-array', './instance-manager', './json-sans-eval', './json', './observer', './event', './transition', './tween', './cookie', './xhr', './cross-domain-poster', './pos', './util', './js-loader', './css', './tmpl', './flash', './widget', './event-delegator', './event-virtual-handler', './event-mouseenter', './event-mouseleave', './element-fx', 'yom/element', 'yom/object'], function(require, Sizzle) {
 	var YOM = function(sel, context) {
 		return Elem.query(sel, context);
 	};

@@ -1,7 +1,7 @@
 /**
  * @namespace $$.ui
  */
-define('./ui', ['require', 'yom/core-pkg', './storage', './tooltip'], function(require, $, storage, tooltip) {
+define(['require', 'yom/core-pkg', './storage', './tooltip'], function(require, $, storage, tooltip) {
 	var _USER_NAME = window.$$userName;
 	var _TMPL = {
 		HEADER: [

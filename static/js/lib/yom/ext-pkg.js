@@ -361,7 +361,7 @@ define('./console', ['global', './core-pkg', './chunker'], function(global, YOM,
 /**
  * @namespace
  */
-define(function(require) {
+define(['require', 'exports', 'module', './chunker', './console'], function(require) {
 	var ext = {
 		'Chunker': require('./chunker'),
 		'console': require('./console')

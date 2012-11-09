@@ -1,4 +1,4 @@
-define('mod/about-profile', ['require', 'yom/core-pkg', 'yom/history', 'main-pkg'], function(require, $, ajaxHistory, $$) {
+define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg'], function(require, $, ajaxHistory, $$) {
 	var modKey = 'profile', 
 		modName = 'PROFILE', 
 		modId = 30300;

@@ -1,7 +1,7 @@
 /**
  * @namespace $$.storage
  */
-define('./storage', ['require'], function(require) {
+define(['require'], function(require) {
 	function _do(cb) {
 		require(['yom/local-storage'], function(ls) {
 			cb(ls);

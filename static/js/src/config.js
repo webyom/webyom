@@ -1,7 +1,7 @@
 /**
  * @namespace $$.config
  */
-define('./config', ['require', 'yom/core-pkg'], function(require, $) {
+define(['require', 'yom/core-pkg'], function(require, $) {
 	var _updater = {};
 	var _config = {
 		TITLE_POSTFIX: 'Webyom - Gary\'s Blog',

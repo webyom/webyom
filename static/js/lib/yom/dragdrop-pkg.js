@@ -1043,7 +1043,7 @@ define('./resizeable', ['./core-pkg', './draggable'], function(YOM, Draggable) {
 /**
  * @namespace YOM.dragdrop
  */
-define(function(require) {
+define(['require', 'exports', 'module', './draggable', './droppable', './sortable', './resizeable'], function(require) {
 	return {
 		'Draggable': require('./draggable'),
 		'Droppable': require('./droppable'),

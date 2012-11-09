@@ -1,4 +1,4 @@
-define('mod/write-article', ['require', 'yom/core-pkg', 'yom/history', 'main-pkg', 'YUI#editor/editor-min'], function(require, $, ajaxHistory, $$, Editor) {
+define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg', 'YUI#editor/editor-min'], function(require, $, ajaxHistory, $$, Editor) {
 	var modKey = 'write', 
 		modName = 'WRITE_ARTICLE', 
 		modId = 302;

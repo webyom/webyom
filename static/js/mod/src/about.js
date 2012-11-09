@@ -1,4 +1,4 @@
-define('mod/about', ['require', 'yom/core-pkg', 'yom/history', 'main-pkg'], function(require, $, ajaxHistory, $$) {
+define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg'], function(require, $, ajaxHistory, $$) {
 	var modKey = 'about', 
 		modName = 'ABOUT', 
 		modId = 303;
