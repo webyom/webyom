@@ -2,7 +2,7 @@ define('./about-contact.html', [], function() {
 	function $encodeHtml(str) {
 		return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/`/g, '&#96;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
 	};
-	return function($data, $util) {
+	return function($data, $opt) {
 		$data = $data || {};
 		var _$out_= [];
 		var $print = function(str) {_$out_.push(str);};
