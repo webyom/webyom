@@ -147,7 +147,7 @@ define('./console', ['require', 'exports', 'module', 'global', '../core/core-bui
 			right: 0,
 			bottom: isIe6 ? Math.max(0, YOM.Element.getDocSize().height - YOM.Element.getViewRect().bottom) + 'px' : 0
 		}));
-		_el.container.innerHTML = _tmpl({}, {extPkgUrl: require.toUrl('./ext-pkg.js')});
+		_el.container.innerHTML = _tmpl({}, {extPkgUrl: require.toUrl('./ext-built.js')});
 		_el.output = $id('yomConsoleOutput');
 		_el.outputBox = $id('yomConsoleOutputBox');
 		_el.inputBox = $id('yomConsoleInputBox');

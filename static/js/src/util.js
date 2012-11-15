@@ -151,7 +151,7 @@ define(['require', 'yom/core/core-built'], function(require, $) {
 			topDialog && topDialog.close(opt);
 		};
 		
-		function alert(msg, opt) {
+		function $$alert(msg, opt) {
 			opt = opt || {};
 			opt.closeTimeout = opt.closeTimeout >= 0 ? opt.closeTimeout : 3000;
 			popup($extend({
@@ -197,7 +197,7 @@ define(['require', 'yom/core/core-built'], function(require, $) {
 		return {
 			popup: popup,
 			close: close,
-			alert: alert,
+			alert: $$alert,
 			confirm: confirm
 		};
 	})();
