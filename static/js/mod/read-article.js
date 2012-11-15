@@ -1,4 +1,4 @@
-define('./read-article.html', [], function() {
+define('./read-article.tpl.html', [], function() {
 	function $encodeHtml(str) {
 		return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/`/g, '&#96;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
 	};
@@ -39,12 +39,12 @@ define('./read-article.html', [], function() {
 	};
 });
 
-define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg', './read-article.html'], function(require, $, ajaxHistory, $$) {
+define(['require', 'yom/core/core-built', 'yom/history/history-built', 'main-pkg', './read-article.tpl.html'], function(require, $, ajaxHistory, $$) {
 	var modKey = 'read', 
 		modName = 'READ_ARTICLE', 
 		modId = 301;
 	
-	var _tmpl = require('./read-article.html');
+	var _tmpl = require('./read-article.tpl.html');
 	
 	var _cssList = ['/static/js/lib/prettify/prettify.css', '/static/css/form.css'];
 	var _sortable = null;
@@ -102,7 +102,7 @@ define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg', './read-article.ht
 	
 	Handler.prototype._makeSortable = function() {
 		var self = this;
-		require(['yom/dragdrop-pkg'], function(dragdrop) {
+		require(['yom/dragdrop/dragdrop-built'], function(dragdrop) {
 			if(self._unloaded) {
 				return
 			}

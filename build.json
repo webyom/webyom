@@ -1,24 +1,8 @@
 {
 	"builds": [
 		{
-			"input": "../js-lib/yom/src/core/core-pkg.js",
-			"output": "static/js/lib/yom/core-pkg.js"
-		},
-		{
-			"input": "../js-lib/yom/src/ext/ext-pkg.js",
-			"output": "static/js/lib/yom/ext-pkg.js"
-		},
-		{
-			"input": "../js-lib/yom/src/dragdrop/dragdrop-pkg.js",
-			"output": "static/js/lib/yom/dragdrop-pkg.js"
-		},
-		{
-			"input": "../js-lib/yom/widget/src/dialog/dialog.js",
-			"output": "static/js/lib/yom/widget/dialog.js"
-		},
-		{
-			"input": "../js-lib/yom/widget/src/tooltip/tooltip.js",
-			"output": "static/js/lib/yom/widget/tooltip.js"
+			"input": "../js-lib/yom",
+			"output": "static/js/lib/yom"
 		},
 		{
 			"input": "static/js/src/main-pkg.js",
@@ -55,37 +39,13 @@
 	],
 	"combines": [
 		{
-			"inputs": ["../js-lib/yom/src/require/require.js"],
-			"output": "static/js/lib/yom/require.js"
-		},
-		{
-			"inputs": ["../js-lib/yom/require-plugin/src/jsonp/jsonp.js"],
+			"inputs": ["../js-lib/yom/require-plugin/jsonp.js"],
 			"output": "static/js/lib/yom/require-plugin/jsonp.js"
-		},
-		{
-			"inputs": ["../js-lib/yom/src/history/history.js"],
-			"output": "static/js/lib/yom/history.js"
-		},
-		{
-			"inputs": ["../js-lib/yom/src/local-storage/local-storage.js"],
-			"output": "static/js/lib/yom/local-storage.js"
-		},
-		{
-			"inputs": ["../js-lib/yom/widget/src/mask/mask.js"],
-			"output": "static/js/lib/yom/widget/mask.js"
-		},
-		{
-			"inputs": ["../js-lib/yom/widget/src/mod-odl/mod-odl.js"],
-			"output": "static/js/lib/yom/widget/mod-odl.js"
-		},
-		{
-			"inputs": ["../js-lib/yom/widget/src/img-odl/img-odl.js"],
-			"output": "static/js/lib/yom/widget/img-odl.js"
 		},
 		{
 			"inputs": [
 				"static/js/src/require-config.js",
-				"../js-lib/yom/src/require/require.js"
+				"../js-lib/yom/require/require.js"
 			],
 			"output": "static/js/require.js"
 		},
@@ -101,11 +61,5 @@
 			"inputs": ["static/css/src/yuiEditor.css"],
 			"output": "static/css/yuiEditor.css"
 		}
-	],
-	"exclude": {
-		"./core-pkg": 1,
-		"../core-pkg": 1,
-		"./ext-pkg": 1,
-		"../ext-pkg": 1
-	}
+	]
 }

@@ -1,4 +1,4 @@
-define('./about-profile.html', [], function() {
+define('./about-profile.tpl.html', [], function() {
 	function $encodeHtml(str) {
 		return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/`/g, '&#96;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
 	};
@@ -13,12 +13,12 @@ define('./about-profile.html', [], function() {
 	};
 });
 
-define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg', './about-profile.html'], function(require, $, ajaxHistory, $$) {
+define(['require', 'yom/core/core-built', 'yom/history/history-built', 'main-pkg', './about-profile.tpl.html'], function(require, $, ajaxHistory, $$) {
 	var modKey = 'profile', 
 		modName = 'PROFILE', 
 		modId = 30300;
 	
-	var _tmpl = require('./about-profile.html');
+	var _tmpl = require('./about-profile.tpl.html');
 	
 	var _cssList = [];
 	

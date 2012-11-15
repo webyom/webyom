@@ -1,7 +1,7 @@
 /**
  * @namespace $$.util
  */
-define(['require', 'yom/core-pkg'], function(require, $) {
+define(['require', 'yom/core/core-built'], function(require, $) {
 	var util = {
 		_ID: 202
 	};
@@ -72,12 +72,12 @@ define(['require', 'yom/core-pkg'], function(require, $) {
 		};
 		
 		function _getTopDialog() {
-			var Dialog = requireAsyn('yom/widget/dialog');
+			var Dialog = requireAsyn('yom/widget/dialog/dialog-built');
 			return Dialog && Dialog.getInstanceById(_dialogIdList[0]);
 		};
 		
 		function _onPopup(e) {
-			var Dialog = requireAsyn('yom/widget/dialog');
+			var Dialog = requireAsyn('yom/widget/dialog/dialog-built');
 			var dialog = Dialog.getInstanceById(e.dialogId);
 			var topDialog = _getTopDialog();
 			if(topDialog) {
@@ -111,15 +111,15 @@ define(['require', 'yom/core-pkg'], function(require, $) {
 		};
 		
 		function _centralizeAll() {
-			var Dialog = requireAsyn('yom/widget/dialog');
+			var Dialog = requireAsyn('yom/widget/dialog/dialog-built');
 			Dialog.each(function(dialog) {
 				dialog.isFixed() && dialog.centralize();
 			});
 		};
 		
 		function _init() {
-			var Mask = requireAsyn('yom/widget/mask');
-			var Dialog = requireAsyn('yom/widget/dialog');
+			var Mask = requireAsyn('yom/widget/mask/mask-built');
+			var Dialog = requireAsyn('yom/widget/dialog/dialog-built');
 			_mask = new Mask();
 			_mask.addEventListener('click', function() {
 				var topDialog = _getTopDialog();
@@ -136,7 +136,7 @@ define(['require', 'yom/core-pkg'], function(require, $) {
 		function popup(opt, instGetter) {
 			opt = opt || {};
 			opt.fx = typeof opt.fx == 'undefined' ? 'slideDown' : opt.fx;
-			require(['yom/widget/mask', 'yom/widget/dialog'], function(Mask, Dialog) {
+			require(['yom/widget/mask/mask-built', 'yom/widget/dialog/dialog-built'], function(Mask, Dialog) {
 				_init();
 				(instGetter || $empty).call(null, new Dialog(opt).popup());
 			}, function(code) {

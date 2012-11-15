@@ -1,9 +1,9 @@
-define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg'], function(require, $, ajaxHistory, $$) {
+define(['require', 'yom/core/core-built', 'yom/history/history-built', 'main-pkg'], function(require, $, ajaxHistory, $$) {
 	var modKey = 'list', 
 		modName = 'ARTICLE_LIST', 
 		modId = 300;
 	
-	var _tmpl = require('./article-list.html');
+	var _tmpl = require('./article-list.tpl.html');
 	
 	var _cssList = ['/static/js/lib/prettify/prettify.css'];
 	

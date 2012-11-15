@@ -1,9 +1,9 @@
-define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg'], function(require, $, ajaxHistory, $$) {
+define(['require', 'yom/core/core-built', 'yom/history/history-built', 'main-pkg'], function(require, $, ajaxHistory, $$) {
 	var modKey = 'contact', 
 		modName = 'CONTACT', 
 		modId = 30302;
 	
-	var _tmpl = require('./about-contact.html');
+	var _tmpl = require('./about-contact.tpl.html');
 	
 	var _cssList = [];
 	

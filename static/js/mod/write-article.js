@@ -1,4 +1,4 @@
-define('./write-article.html', [], function() {
+define('./write-article.tpl.html', [], function() {
 	function $encodeHtml(str) {
 		return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/`/g, '&#96;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
 	};
@@ -13,12 +13,12 @@ define('./write-article.html', [], function() {
 	};
 });
 
-define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg', 'YUI#editor/editor-min', './write-article.html'], function(require, $, ajaxHistory, $$, Editor) {
+define(['require', 'yom/core/core-built', 'yom/history/history-built', 'main-pkg', 'YUI#editor/editor-min', './write-article.tpl.html'], function(require, $, ajaxHistory, $$, Editor) {
 	var modKey = 'write', 
 		modName = 'WRITE_ARTICLE', 
 		modId = 302;
 	
-	var _tmpl = require('./write-article.html');
+	var _tmpl = require('./write-article.tpl.html');
 	
 	var _cssList = [
 		'http://yui.yahooapis.com/2.7.0/build/assets/skins/sam/skin.css',

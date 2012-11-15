@@ -1,7 +1,7 @@
 /**
  * @class YOM.dragdrop.Draggable
  */
-define('./draggable', ['./core-pkg'], function(YOM) {
+define('./draggable', ['../core/core-built'], function(YOM) {
 	function Draggable(el, opts) {
 		Draggable.superClass.constructor.call(this, {
 			dragmousedown: new YOM.Observer(),
@@ -222,7 +222,7 @@ define('./draggable', ['./core-pkg'], function(YOM) {
 /**
  * @class YOM.dragdrop.Droppable
  */
-define('./droppable', ['./core-pkg', './draggable'], function(YOM, Draggable) {
+define('./droppable', ['../core/core-built', './draggable'], function(YOM, Draggable) {
 	YOM.dragdrop = YOM.dragdrop || {};
 	YOM.dragdrop.Draggable = Draggable;
 	
@@ -449,7 +449,7 @@ define('./droppable', ['./core-pkg', './draggable'], function(YOM, Draggable) {
 /**
  * @class YOM.dragdrop.Sortable
  */
-define('./sortable', ['./core-pkg', './droppable'], function(YOM, Droppable) {
+define('./sortable', ['../core/core-built', './droppable'], function(YOM, Droppable) {
 	YOM.dragdrop = YOM.dragdrop || {};
 	YOM.dragdrop.Droppable = Droppable;
 	
@@ -745,7 +745,7 @@ define('./sortable', ['./core-pkg', './droppable'], function(YOM, Droppable) {
 /**
  * @class YOM.dragdrop.Resizeable
  */
-define('./resizeable', ['./core-pkg', './draggable'], function(YOM, Draggable) {
+define('./resizeable', ['../core/core-built', './draggable'], function(YOM, Draggable) {
 	YOM.dragdrop = YOM.dragdrop || {};
 	YOM.dragdrop.Draggable = Draggable;
 	

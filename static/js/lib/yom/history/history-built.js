@@ -1,7 +1,7 @@
 /**
  * @namespace YOM.history
  */
-define(['./core-pkg'], function(YOM) {
+define(['../core/core-built'], function(YOM) {
 	var _ID = 127;
 	var _INTERVAL = 100;
 	

@@ -3,7 +3,7 @@
  */
 define(['require'], function(require) {
 	function _do(cb) {
-		require(['yom/local-storage'], function(ls) {
+		require(['yom/local-storage/local-storage-built'], function(ls) {
 			cb(ls);
 		});
 	};

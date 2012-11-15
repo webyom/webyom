@@ -1,7 +1,7 @@
 /**
  * @namespace $$.tooltip
  */
-define(['require', 'yom/core-pkg'], function(require, $) {
+define(['require', 'yom/core/core-built'], function(require, $) {
 	var _guideTooltip;
 	var _guidePool = [];
 	
@@ -75,7 +75,7 @@ define(['require', 'yom/core-pkg'], function(require, $) {
 				return;
 			}
 			toRef = setTimeout(function() {
-				require(['yom/widget/tooltip'], function(Tooltip) {
+				require(['yom/widget/tooltip/tooltip-built'], function(Tooltip) {
 					var opt = {};
 					txt = txt.replace((/^\[([^\]]+?)\]/), function(m, c) {
 						c = c.split(',');

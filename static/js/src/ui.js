@@ -1,7 +1,7 @@
 /**
  * @namespace $$.ui
  */
-define(['require', 'yom/core-pkg', './storage', './tooltip'], function(require, $, storage, tooltip) {
+define(['require', 'yom/core/core-built', './storage', './tooltip'], function(require, $, storage, tooltip) {
 	var _USER_NAME = window.$$userName;
 	var _TMPL = {
 		HEADER: [
@@ -66,7 +66,7 @@ define(['require', 'yom/core-pkg', './storage', './tooltip'], function(require, 
 			$('#sideReadingsContent').get().innerHTML = _TMPL['CONTENT']['SIDE_READINGS'];
 			$('#sideRecSites').get().innerHTML = _TMPL['CONTENT']['SIDE_REC_SITES'];
 		});
-		require(['yom/dragdrop-pkg'], function(dragdrop) {
+		require(['yom/dragdrop/dragdrop-built'], function(dragdrop) {
 			try {
 				_sortable && _sortable.destory();
 			} catch(e) {}

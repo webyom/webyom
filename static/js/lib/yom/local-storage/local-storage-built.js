@@ -1,7 +1,7 @@
 /**
  * @namespace YOM.localStorage
  */
-define(['require', './core-pkg'], function(require, YOM) {
+define(['require', '../core/core-built'], function(require, YOM) {
 	var _DB_NAME = 'WEBYOM_LOCAL_STORAGE';
 	var _PROXY = require.toUrl('./local-storage-proxy.html', true);
 	var _COOKIE_DOMAIN = 'webyom.org';

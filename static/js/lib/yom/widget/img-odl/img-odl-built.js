@@ -1,8 +1,8 @@
 /**
  * @fileoverview ImgOdl Widget
  */
-define(function(require) {
-	var YOM = require('../core-pkg');
+define([], function(require) {
+	var YOM = require('../../core/core-built');
 	
 	var _ID = 128005;
 	var _SRC_ATTR_NAME = 'data-init-src';

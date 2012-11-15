@@ -6,9 +6,6 @@ var require = require || {
 		'prettify': 'lib/prettify/prettify'
 	},
 	shim: {
-		'yom/inc/sizzle': {
-			exports: 'Sizzle'
-		},
 		'prettify': {
 			exports: 'prettyPrint'
 		}

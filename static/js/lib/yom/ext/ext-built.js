@@ -1,4 +1,4 @@
-define('./console.html', [], function() {
+define('./console.tpl.html', [], function() {
 	function $encodeHtml(str) {
 		return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/`/g, '&#96;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
 	};
@@ -16,7 +16,7 @@ define('./console.html', [], function() {
 /**
  * @class YOM.Chunker
  */
-define('./chunker', ['./core-pkg'], function(YOM) {
+define('./chunker', ['../core/core-built'], function(YOM) {
 	var Chunker = function(processer, opt) {
 		opt = opt || {};
 		this._bind = opt.bind;
@@ -92,8 +92,8 @@ define('./chunker', ['./core-pkg'], function(YOM) {
 /**
  * @namespace YOM.console
  */
-define('./console', ['require', 'exports', 'module', 'global', './core-pkg', './chunker', './console.html'], function(require, exports, module, global, YOM, Chunker) {
-	var _tmpl = require('./console.html');
+define('./console', ['require', 'exports', 'module', 'global', '../core/core-built', './chunker', './console.tpl.html'], function(require, exports, module, global, YOM, Chunker) {
+	var _tmpl = require('./console.tpl.html');
 	var _global = global;
 	var _on = 0;
 	var _el = {};
@@ -359,8 +359,8 @@ define('./console', ['require', 'exports', 'module', 'global', './core-pkg', './
 /**
  * @namespace
  */
-define(['require', 'exports', 'module', './console.html', './chunker', './console'], function(require) {
-	var consoleTmpl = require('./console.html');
+define(['require', 'exports', 'module', './console.tpl.html', './chunker', './console'], function(require) {
+	var consoleTmpl = require('./console.tpl.html');
 	
 	var ext = {
 		'Chunker': require('./chunker'),

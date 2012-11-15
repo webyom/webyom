@@ -1,4 +1,4 @@
-define('./tooltip.html', [], function() {
+define('./tooltip.tpl.html', [], function() {
 	function $encodeHtml(str) {
 		return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/`/g, '&#96;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
 	};
@@ -20,15 +20,15 @@ define('./tooltip.html', [], function() {
 /**
  * @namespace YOM.widget.Tooltip
  */
-define(['require', 'exports', 'module', '../core-pkg', './tooltip.html'], function(require) {
-	var YOM = require('../core-pkg');
+define(['require', 'exports', 'module', './tooltip.tpl.html'], function(require) {
+	var YOM = require('../../core/core-built');
 	
 	var _ID = 128003;
 	var _FX_DURATION = 300;
 	var _MIN_CLOSE_TIMEOUT = 1000;
 	var _DIRECTION_HASH = {L: 'L', R: 'R', T: 'T', B: 'B'};
 	
-	var _tmpl = require('./tooltip.html');
+	var _tmpl = require('./tooltip.tpl.html');
 	var _im = new YOM.InstanceManager();
 	
 	/**

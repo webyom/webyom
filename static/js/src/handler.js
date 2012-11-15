@@ -1,7 +1,7 @@
 /**
  * @namespace $$.Handler
  */
-define(['require', 'global', 'yom/core-pkg', 'yom/history', './config', './ui'], function(require, global, $, ajaxHistory, config, ui) {
+define(['require', 'global', 'yom/core/core-built', 'yom/history/history-built', './config', './ui'], function(require, global, $, ajaxHistory, config, ui) {
 	var $$ = {
 		config: config,
 		ui: ui
@@ -253,7 +253,7 @@ define(['require', 'global', 'yom/core-pkg', 'yom/history', './config', './ui'],
 		
 		(function() {
 			if(_OPTION['console'] == 'on') {
-				require(['yom/ext-pkg'], function($) {
+				require(['yom/ext/ext-built'], function($) {
 					$.console.turnOn();
 				});
 			}

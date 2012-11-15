@@ -1,8 +1,8 @@
 /**
  * @namespace YOM.widget.Mask
  */
-define(function(require) {
-	var YOM = require('../core-pkg');
+define([], function(require) {
+	var YOM = require('../../core/core-built');
 	
 	var _ID = 128001;
 	

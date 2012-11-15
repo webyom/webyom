@@ -1,4 +1,4 @@
-define('./about-work.html', [], function() {
+define('./about-work.tpl.html', [], function() {
 	function $encodeHtml(str) {
 		return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/`/g, '&#96;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
 	};
@@ -13,7 +13,7 @@ define('./about-work.html', [], function() {
 	};
 });
 
-define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg', './about-work.html'], function(require, $, ajaxHistory, $$, tmpl) {
+define(['require', 'yom/core/core-built', 'yom/history/history-built', 'main-pkg', './about-work.tpl.html'], function(require, $, ajaxHistory, $$, tmpl) {
 	var modKey = 'work', 
 		modName = 'WORK', 
 		modId = 30301;

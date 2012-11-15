@@ -1,4 +1,4 @@
-define('./dialog.html', [], function() {
+define('./dialog.tpl.html', [], function() {
 	function $encodeHtml(str) {
 		return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/`/g, '&#96;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
 	};
@@ -48,8 +48,8 @@ define('./dialog.html', [], function() {
 /**
  * @namespace YOM.widget.Dialog
  */
-define(['require', 'exports', 'module', '../core-pkg', './dialog.html'], function(require) {
-	var YOM = require('../core-pkg');
+define(['require', 'exports', 'module', './dialog.tpl.html'], function(require) {
+	var YOM = require('../../core/core-built');
 	
 	var _ID = 128002;
 	var _INIT_WIDTH = 60;
@@ -61,7 +61,7 @@ define(['require', 'exports', 'module', '../core-pkg', './dialog.html'], functio
 	var _FX_DURATION = 300;
 	var _MIN_CLOSE_TIMEOUT = 1000;
 	
-	var _tmpl = require('./dialog.html');
+	var _tmpl = require('./dialog.tpl.html');
 	var _im = new YOM.InstanceManager();
 	
 	/**
@@ -224,7 +224,7 @@ define(['require', 'exports', 'module', '../core-pkg', './dialog.html'], functio
 			if(!handles.size()) {
 				return;
 			}
-			require(['yom/dragdrop-pkg'], function(dragdrop) {
+			require(['yom/dragdrop/dragdrop-built'], function(dragdrop) {
 				self._draggable = new dragdrop.Draggable(self._el, {handles: handles, boundary: 'PAGE'});
 				self._draggable.addEventListener('dragstart', self._bound.dragstart);
 				self._draggable.addEventListener('dragstop', self._bound.dragstop);

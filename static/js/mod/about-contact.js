@@ -1,4 +1,4 @@
-define('./about-contact.html', [], function() {
+define('./about-contact.tpl.html', [], function() {
 	function $encodeHtml(str) {
 		return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/`/g, '&#96;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
 	};
@@ -13,12 +13,12 @@ define('./about-contact.html', [], function() {
 	};
 });
 
-define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg', './about-contact.html'], function(require, $, ajaxHistory, $$) {
+define(['require', 'yom/core/core-built', 'yom/history/history-built', 'main-pkg', './about-contact.tpl.html'], function(require, $, ajaxHistory, $$) {
 	var modKey = 'contact', 
 		modName = 'CONTACT', 
 		modId = 30302;
 	
-	var _tmpl = require('./about-contact.html');
+	var _tmpl = require('./about-contact.tpl.html');
 	
 	var _cssList = [];
 	

@@ -1,7 +1,7 @@
 /**
  * @namespace $$.config
  */
-define('./config', ['require', 'yom/core-pkg'], function(require, $) {
+define('./config', ['require', 'yom/core/core-built'], function(require, $) {
 	var _updater = {};
 	var _config = {
 		TITLE_POSTFIX: 'Webyom - Gary\'s Blog',
@@ -67,7 +67,7 @@ define('./config', ['require', 'yom/core-pkg'], function(require, $) {
  */
 define('./storage', ['require'], function(require) {
 	function _do(cb) {
-		require(['yom/local-storage'], function(ls) {
+		require(['yom/local-storage/local-storage-built'], function(ls) {
 			cb(ls);
 		});
 	};
@@ -133,7 +133,7 @@ define('./storage', ['require'], function(require) {
 /**
  * @namespace $$.tooltip
  */
-define('./tooltip', ['require', 'yom/core-pkg'], function(require, $) {
+define('./tooltip', ['require', 'yom/core/core-built'], function(require, $) {
 	var _guideTooltip;
 	var _guidePool = [];
 	
@@ -207,7 +207,7 @@ define('./tooltip', ['require', 'yom/core-pkg'], function(require, $) {
 				return;
 			}
 			toRef = setTimeout(function() {
-				require(['yom/widget/tooltip'], function(Tooltip) {
+				require(['yom/widget/tooltip/tooltip-built'], function(Tooltip) {
 					var opt = {};
 					txt = txt.replace((/^\[([^\]]+?)\]/), function(m, c) {
 						c = c.split(',');
@@ -256,7 +256,7 @@ define('./tooltip', ['require', 'yom/core-pkg'], function(require, $) {
 /**
  * @namespace $$.ui
  */
-define('./ui', ['require', 'yom/core-pkg', './storage', './tooltip'], function(require, $, storage, tooltip) {
+define('./ui', ['require', 'yom/core/core-built', './storage', './tooltip'], function(require, $, storage, tooltip) {
 	var _USER_NAME = window.$$userName;
 	var _TMPL = {
 		HEADER: [
@@ -321,7 +321,7 @@ define('./ui', ['require', 'yom/core-pkg', './storage', './tooltip'], function(r
 			$('#sideReadingsContent').get().innerHTML = _TMPL['CONTENT']['SIDE_READINGS'];
 			$('#sideRecSites').get().innerHTML = _TMPL['CONTENT']['SIDE_REC_SITES'];
 		});
-		require(['yom/dragdrop-pkg'], function(dragdrop) {
+		require(['yom/dragdrop/dragdrop-built'], function(dragdrop) {
 			try {
 				_sortable && _sortable.destory();
 			} catch(e) {}
@@ -437,7 +437,7 @@ define('./ui', ['require', 'yom/core-pkg', './storage', './tooltip'], function(r
 /**
  * @namespace $$.util
  */
-define('./util', ['require', 'yom/core-pkg'], function(require, $) {
+define('./util', ['require', 'yom/core/core-built'], function(require, $) {
 	var util = {
 		_ID: 202
 	};
@@ -508,12 +508,12 @@ define('./util', ['require', 'yom/core-pkg'], function(require, $) {
 		};
 		
 		function _getTopDialog() {
-			var Dialog = requireAsyn('yom/widget/dialog');
+			var Dialog = requireAsyn('yom/widget/dialog/dialog-built');
 			return Dialog && Dialog.getInstanceById(_dialogIdList[0]);
 		};
 		
 		function _onPopup(e) {
-			var Dialog = requireAsyn('yom/widget/dialog');
+			var Dialog = requireAsyn('yom/widget/dialog/dialog-built');
 			var dialog = Dialog.getInstanceById(e.dialogId);
 			var topDialog = _getTopDialog();
 			if(topDialog) {
@@ -547,15 +547,15 @@ define('./util', ['require', 'yom/core-pkg'], function(require, $) {
 		};
 		
 		function _centralizeAll() {
-			var Dialog = requireAsyn('yom/widget/dialog');
+			var Dialog = requireAsyn('yom/widget/dialog/dialog-built');
 			Dialog.each(function(dialog) {
 				dialog.isFixed() && dialog.centralize();
 			});
 		};
 		
 		function _init() {
-			var Mask = requireAsyn('yom/widget/mask');
-			var Dialog = requireAsyn('yom/widget/dialog');
+			var Mask = requireAsyn('yom/widget/mask/mask-built');
+			var Dialog = requireAsyn('yom/widget/dialog/dialog-built');
 			_mask = new Mask();
 			_mask.addEventListener('click', function() {
 				var topDialog = _getTopDialog();
@@ -572,7 +572,7 @@ define('./util', ['require', 'yom/core-pkg'], function(require, $) {
 		function popup(opt, instGetter) {
 			opt = opt || {};
 			opt.fx = typeof opt.fx == 'undefined' ? 'slideDown' : opt.fx;
-			require(['yom/widget/mask', 'yom/widget/dialog'], function(Mask, Dialog) {
+			require(['yom/widget/mask/mask-built', 'yom/widget/dialog/dialog-built'], function(Mask, Dialog) {
 				_init();
 				(instGetter || $empty).call(null, new Dialog(opt).popup());
 			}, function(code) {
@@ -657,7 +657,7 @@ function $$confirm(msg, opt) {
 /**
  * @namespace $$.Handler
  */
-define('./handler', ['require', 'global', 'yom/core-pkg', 'yom/history', './config', './ui'], function(require, global, $, ajaxHistory, config, ui) {
+define('./handler', ['require', 'global', 'yom/core/core-built', 'yom/history/history-built', './config', './ui'], function(require, global, $, ajaxHistory, config, ui) {
 	var $$ = {
 		config: config,
 		ui: ui
@@ -909,7 +909,7 @@ define('./handler', ['require', 'global', 'yom/core-pkg', 'yom/history', './conf
 		
 		(function() {
 			if(_OPTION['console'] == 'on') {
-				require(['yom/ext-pkg'], function($) {
+				require(['yom/ext/ext-built'], function($) {
 					$.console.turnOn();
 				});
 			}

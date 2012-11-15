@@ -1,9 +1,9 @@
-define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg', 'YUI#editor/editor-min'], function(require, $, ajaxHistory, $$, Editor) {
+define(['require', 'yom/core/core-built', 'yom/history/history-built', 'main-pkg', 'YUI#editor/editor-min'], function(require, $, ajaxHistory, $$, Editor) {
 	var modKey = 'write', 
 		modName = 'WRITE_ARTICLE', 
 		modId = 302;
 	
-	var _tmpl = require('./write-article.html');
+	var _tmpl = require('./write-article.tpl.html');
 	
 	var _cssList = [
 		'http://yui.yahooapis.com/2.7.0/build/assets/skins/sam/skin.css',

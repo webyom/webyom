@@ -8,10 +8,10 @@
 <script type="text/javascript">
 var require = parent.require.getConfig();
 </script>
-<script type="text/javascript" src="require.js"></script>
+<script type="text/javascript" src="../../../require.js"></script>
 <script type="text/javascript">
 var localStorageProxyPull;
-require(['yom/core-pkg', 'yom/local-storage'], function(YOM, ls) {
+require(['yom/core/core-built', 'yom/local-storage/local-storage-built'], function(YOM, ls) {
 	localStorageProxyPull = function() {
 		var queue = frameElement._queue;
 		if(!queue) {

@@ -1,4 +1,4 @@
-define(['require', 'yom/core-pkg', 'yom/history', 'main-pkg', './about-work.html'], function(require, $, ajaxHistory, $$, tmpl) {
+define(['require', 'yom/core/core-built', 'yom/history/history-built', 'main-pkg', './about-work.tpl.html'], function(require, $, ajaxHistory, $$, tmpl) {
 	var modKey = 'work', 
 		modName = 'WORK', 
 		modId = 30301;
