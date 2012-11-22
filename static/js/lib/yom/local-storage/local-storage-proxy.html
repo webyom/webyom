@@ -10,25 +10,25 @@ var require = parent.require.getConfig();
 </script>
 <script type="text/javascript" src="../../../require.js"></script>
 <script type="text/javascript">
-var localStorageProxyPull;
+var localStorageProxyPull
 require(['yom/core/core-built', 'yom/local-storage/local-storage-built'], function(YOM, ls) {
 	localStorageProxyPull = function() {
-		var queue = frameElement._queue;
+		var queue = frameElement._queue
 		if(!queue) {
-			return;
+			return
 		}
 		while(queue.length) {
-			(function(p) {
+			;(function(p) {
 				setTimeout(function() {
-					ls._do(p[0], null, p[1]);
-				}, 0);
-			})(queue.shift());
+					ls._do(p[0], null, p[1])
+				}, 0)
+			})(queue.shift())
 		}
-	};
-	frameElement._inited = 1;
-	localStorageProxyPull();
+	}
+	frameElement._inited = 1
+	localStorageProxyPull()
 });
-frameElement._loaded = 1;
+frameElement._loaded = 1
 </script>
 </body>
 </html>

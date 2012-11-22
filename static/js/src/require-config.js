@@ -55,22 +55,23 @@ var require = require || {
 		}
 	},
 	errCallback: function(code) {
-		var msg = 'Require error code: ' + code;
+		var msg = 'Require error code: ' + code
 		require(['main-pkg'], function($$) {
-			$$alert(msg);
+			$$alert(msg)
 		}, function() {
-			alert(msg);
-		});
+			alert(msg)
+		})
 	},
 	onLoadStart: function() {
 		require(['main-pkg'], function($$) {
-			$$.ui.processing.start();
-		});
+			$$.ui.processing.start()
+		})
 	},
 	onLoadEnd: function() {
 		require(['main-pkg'], function($$) {
-			$$.ui.processing.isAnyLoading() || $$.ui.processing.stop();
-		});
+			$$.ui.processing.isAnyLoading() || $$.ui.processing.stop()
+		})
 	},
 	waitSeconds: 30
-};
+}
+

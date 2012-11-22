@@ -8,37 +8,37 @@ define('./object', ['require', 'exports', 'module', './array'], function(require
 		PRIVATE_PROPERTY: {/*Do not assign this value to your reference in your code!*/},
 			
 		toString: function(obj) {
-			return Object.prototype.toString.call(obj);
+			return Object.prototype.toString.call(obj)
 		},
 		
 		isArray: function(obj) {
-			var array = require('./array');
-			return array.isArray(obj);
+			var array = require('./array')
+			return array.isArray(obj)
 		},
 		
 		isFunction: function(obj) {
-			return typeof obj == 'function';
+			return typeof obj == 'function'
 		},
 		
 		hasOwnProperty: function(obj, prop) {
-			return Object.prototype.hasOwnProperty.call(obj, prop);
+			return Object.prototype.hasOwnProperty.call(obj, prop)
 		},
 		
 		each: function(obj, fn, bind) {
-			var array = require('./array');
-			var val;
+			var array = require('./array')
+			var val
 			if(array.isArray(obj)) {
-				array.each(obj, fn, bind);
+				array.each(obj, fn, bind)
 			} else {
 				for(var p in obj) {
 					if(this.hasOwnProperty(obj, p)) {
 						try {
-							val = obj[p];
+							val = obj[p]
 						} catch(e) {
-							val = this.PRIVATE_PROPERTY;
+							val = this.PRIVATE_PROPERTY
 						}
 						if(fn.call(bind || obj, val, p, obj) === false) {
-							break;
+							break
 						}
 					}
 				}
@@ -46,93 +46,94 @@ define('./object', ['require', 'exports', 'module', './array'], function(require
 		},
 		
 		extend: function(origin, extend, check) {
-			origin = origin || {};
+			origin = origin || {}
 			for(var p in extend) {
 				if(this.hasOwnProperty(extend, p) && (!check || typeof origin[p] == 'undefined')) {
-					origin[p] = extend[p];
+					origin[p] = extend[p]
 				}
 			}
-			return origin;
+			return origin
 		},
 		
 		bind: function(obj, fn) {
-			var array = require('./array');
+			var array = require('./array')
 			if(fn.bind) {
-				return fn.bind(obj);
+				return fn.bind(obj)
 			} else {
 				return function() {
-					return fn.apply(obj, array.getArray(arguments));
-				};
+					return fn.apply(obj, array.getArray(arguments))
+				}
 			}
 		},
 
 		clone: function(obj, deep, _level) {
-			var array = require('./array');
-			var res = obj;
-			var i, j, p;
-			deep = deep || 0;
-			_level = _level || 0;
+			var array = require('./array')
+			var res = obj
+			var i, j, p
+			deep = deep || 0
+			_level = _level || 0
 			if(_level > deep) {
-				return res;
+				return res
 			}
 			if(typeof obj == 'object' && obj) {
 				if(array.isArray(obj)) {
-					res = [];
+					res = []
 					for(i = 0, l = obj.length; i < l; i++) {
-						res.push(obj[i]);
+						res.push(obj[i])
 					}
 				} else {
-					res = {};
+					res = {}
 					for(p in obj) {
 						if(this.hasOwnProperty(obj, p)) {
-							res[p] = deep ? this.clone(obj[p], deep, ++_level) : obj[p];
+							res[p] = deep ? this.clone(obj[p], deep, ++_level) : obj[p]
 						}
 					}
 				}
 			}
-			return res;
+			return res
 		},
 		
 		getClean: function(obj) {
-			var cleaned;
+			var cleaned
 			if(obj && obj.getClean) {
-				cleaned = obj.getClean();
+				cleaned = obj.getClean()
 			} else if(typeof obj == 'object') {
-				cleaned = {};
+				cleaned = {}
 				for(var p in obj) {
 					if(this.hasOwnProperty(obj, p)) {
-						cleaned[p] = obj[p];
+						cleaned[p] = obj[p]
 					}
 				}
 			} else {
-				cleaned = obj;
+				cleaned = obj
 			}
-			return cleaned;
+			return cleaned
 		},
 		
 		toQueryString: function(obj) {
-			var res = [];
+			var res = []
 			this.each(obj, function(val, key) {
-				var type = typeof val;
+				var type = typeof val
 				if(!(type == 'string' || type == 'number')) {
-					return;
+					return
 				}
-				res.push(key + '=' + encodeURIComponent(val));
-			});
-			return res.join('&');
+				res.push(key + '=' + encodeURIComponent(val))
+			})
+			return res.join('&')
 		},
 		
 		fromQueryString: function(str) {
-			var res = {};
-			var items = str.split('&');
+			var res = {}
+			var items = str.split('&')
 			this.each(items, function(item) {
-				item = item.split('=');
-				res[item[0]] = decodeURIComponent(item[1]);
-			});
-			return res;
+				item = item.split('=')
+				res[item[0]] = decodeURIComponent(item[1])
+			})
+			return res
 		}
-	};
-});
+	}
+})
+
 
 /**
  * @class YOM.Element
@@ -144,306 +145,306 @@ define('./element', ['./browser', './string', './object', './array', './event'],
 		'object': object,
 		'array': array,
 		'Event': Evt
-	};
+	}
 	
-	var _ID = 107;
+	var _ID = 107
 	
 	function _isElementNode(el) {
-		return el && (el.nodeType === 1 || el.nodeType === 9);
-	};
+		return el && (el.nodeType === 1 || el.nodeType === 9)
+	}
 	
 	function _hasClass(el, className) {
-		return new RegExp('(?:^|\\s+)' + className + '(?:$|\\s+)').test(el.className);
-	};
+		return new RegExp('(?:^|\\s+)' + className + '(?:$|\\s+)').test(el.className)
+	}
 	
 	function Item(el) {
-		this._el = el;
-		this._styleStorage = {};
-	};
+		this._el = el
+		this._styleStorage = {}
+	}
 	
 	YOM.object.extend(Item.prototype, {
 		get: function() {
-			return this._el;
+			return this._el
 		},
 		
 		setStyle: function(name, value) {
-			var el = this.get();
-			var computer = el.ownerDocument.defaultView;
-			computer = computer && computer.getComputedStyle;
+			var el = this.get()
+			var computer = el.ownerDocument.defaultView
+			computer = computer && computer.getComputedStyle
 			if(typeof name == 'object') {
 				YOM.object.each(name, function(val, key) {
-					new Item(el).setStyle(key, val);
-				});
+					new Item(el).setStyle(key, val)
+				})
 			} else {
 				if(!name) {
-					return this;
+					return this
 				}
-				name = YOM.string.toCamelCase(name);
+				name = YOM.string.toCamelCase(name)
 				switch(name) {
 				case 'opacity':
 					if(computer) {
-						el.style[name] = value;
+						el.style[name] = value
 					} else {
 						if(value == 1) {
-							el.style.filter = '';
+							el.style.filter = ''
 						} else {
-							el.style.filter = 'alpha(opacity=' + parseInt(value * 100) + ')';
+							el.style.filter = 'alpha(opacity=' + parseInt(value * 100) + ')'
 						}
 					}
-					break;
+					break
 				default:
-					el.style[name] = value;
+					el.style[name] = value
 				}
 			}
-			return this;
+			return this
 		},
 		
 		getStyle: function(name) {
-			name = YOM.string.toCamelCase(name);
-			var el = this.get();
-			var style = el.style[name];
-			var computer = el.ownerDocument.defaultView;
-			computer = computer && computer.getComputedStyle;
+			name = YOM.string.toCamelCase(name)
+			var el = this.get()
+			var style = el.style[name]
+			var computer = el.ownerDocument.defaultView
+			computer = computer && computer.getComputedStyle
 			if(style) {
-				return style;
+				return style
 			}
 			switch(name) {
 			case 'opacity':
 				if(computer) {
-					style = computer(el, null)[name];
+					style = computer(el, null)[name]
 				} else {
-					style = 100;
+					style = 100
 					try {
-						style = el.filters['DXImageTransform.Microsoft.Alpha'].opacity;
+						style = el.filters['DXImageTransform.Microsoft.Alpha'].opacity
 					} catch (e) {
 						try {
-							style = el.filters('alpha').opacity;
+							style = el.filters('alpha').opacity
 						} catch(e) {}
 					}
-					style = style / 100;
+					style = style / 100
 				}
-				break;
+				break
 			default:
 				if(computer) {
-					style = computer(el, null)[name];
+					style = computer(el, null)[name]
 				} else if(el.currentStyle) {
-					style = el.currentStyle[name];
+					style = el.currentStyle[name]
 				} else {
-					style = el.style[name];
+					style = el.style[name]
 				}
 			}
-			return style;
+			return style
 		},
 		
 		storeStyle: function(name) {
 			if(YOM.array.isArray(name)) {
 				YOM.object.each(name, function(nm) {
-					this.storeStyle(nm);
-				}, this);
+					this.storeStyle(nm)
+				}, this)
 			} else {
-				this._styleStorage[name] = this.getStyle(name);
+				this._styleStorage[name] = this.getStyle(name)
 			}
-			return this;
+			return this
 		},
 		
 		restoreStyle: function(name) {
 			if(YOM.array.isArray(name)) {
 				YOM.object.each(name, function(nm) {
-					this.restoreStyle(nm);
-				}, this);
+					this.restoreStyle(nm)
+				}, this)
 			} else {
 				if(typeof this._styleStorage[name] == 'undefined') {
-					return this;
+					return this
 				}
-				this.setStyle(name, this._styleStorage[name]);
+				this.setStyle(name, this._styleStorage[name])
 			}
-			return this;
+			return this
 		}
-	});
+	})
 	
 	function Elem(el) {
-		this._items = [];
+		this._items = []
 		if(el instanceof Elem) {
-			return el;
+			return el
 		} else if(YOM.array.isArray(el)) {
 			YOM.object.each(el, function(item) {
 				if(_isElementNode(item)) {
-					this._items.push(new Item(item));
+					this._items.push(new Item(item))
 				}
-			}, this);
+			}, this)
 		} else if(YOM.object.toString(el) == '[object NodeList]') {
 			YOM.object.each(YOM.array.getArray(el), function(item) {
-				this._items.push(new Item(item));
-			}, this);
+				this._items.push(new Item(item))
+			}, this)
 		} else if(_isElementNode(el)) {
-			this._items.push(new Item(el));
+			this._items.push(new Item(el))
 		} else if(el && el.length && el.item) {//StaticNodeList, IE8/Opera
 			for(var i = 0, l = el.length; i < l; i++) {
-				this._items.push(new Item(el.item(i)));
+				this._items.push(new Item(el.item(i)))
 			}
 		}
-		this._styleStorage = {};
-		return this;
-	};
+		this._styleStorage = {}
+		return this
+	}
 
 	YOM.object.extend(Elem.prototype, {
 		_getItem: function(i) {
 			if(typeof i == 'undefined') {
-				return this._items[0];
+				return this._items[0]
 			} else {
-				return this._items[i];
+				return this._items[i]
 			}
 		},
 		
 		get: function(i) {
-			var item = this._getItem(i);
-			return item && item.get();
+			var item = this._getItem(i)
+			return item && item.get()
 		},
 		
 		getAll: function() {
-			var res = [];
+			var res = []
 			this.each(function(el) {
-				res.push(el);
-			});
-			return res;
+				res.push(el)
+			})
+			return res
 		},
 		
 		find: function(sel) {
-			var res = [];
+			var res = []
 			this.each(function(el) {
-				var tmp;
+				var tmp
 				if(!_isElementNode(el)) {
-					return;
+					return
 				}
-				tmp = document.querySelectorAll ? el.querySelectorAll(sel) : Sizzle(sel, el);
+				tmp = document.querySelectorAll ? el.querySelectorAll(sel) : Sizzle(sel, el)
 				if(YOM.array.isArray(tmp)) {
-					res = res.concat(tmp);
+					res = res.concat(tmp)
 				} else if(YOM.object.toString(tmp) == '[object NodeList]') {
-					res = res.concat(YOM.array.getArray(tmp));
+					res = res.concat(YOM.array.getArray(tmp))
 				} else if(tmp.length && tmp.item) {//StaticNodeList, IE8/Opera
 					for(var i = 0, l = tmp.length; i < l; i++) {
-						res.push(tmp.item(i));
+						res.push(tmp.item(i))
 					}
 				}
-			});
-			return new Elem(res);
+			})
+			return new Elem(res)
 		},
 		
 		toQueryString: function() {
-			var res = [];
+			var res = []
 			this.find('input, select, textarea').each(function(el) {
 				if(!el.name || el.disabled || el.type == 'button' || el.type == 'submit' || el.type == 'reset' || el.type == 'file') {
-					return;
+					return
 				}
 				if(el.tagName.toLowerCase() == 'select') {
 					for(var i = 0, l = el.options.length; i < l; i++) {
 						if(el.options[i].selected) {
-							res.push(el.name + '=' + encodeURIComponent(el.options[i].value));
+							res.push(el.name + '=' + encodeURIComponent(el.options[i].value))
 						}
 					}
 				} else if(el.type != 'radio' && el.type != 'checkbox' || el.checked) {
-					res.push(el.name + '=' + encodeURIComponent(el.value));
+					res.push(el.name + '=' + encodeURIComponent(el.value))
 				}
-			});
-			return res.join('&');
+			})
+			return res.join('&')
 		},
 		
 		size: function() {
-			return this._items.length;
+			return this._items.length
 		},
 		
 		each: function(fn, bind) {
-			var item;
+			var item
 			for(var i = 0, l = this._items.length; i < l; i++) {
-				item = this._getItem(i);
+				item = this._getItem(i)
 				if(fn.call(bind || this, item.get(), i, item) === false) {
-					return this;
+					return this
 				}
 			}
-			return this;
+			return this
 		},
 		
 		hasClass: function(className) {
 			if(!this.size()) {
-				return false;
+				return false
 			}
-			var res = true;
+			var res = true
 			this.each(function(el) {
 				if(!_hasClass(el, className)) {
-					res = false;
-					return false;
+					res = false
+					return false
 				}
-				return true;
-			});
-			return res;
+				return true
+			})
+			return res
 		},
 		
 		addClass: function(className) {
 			this.each(function(el) {
 				if(!_hasClass(el, className)) {
-					el.className = el.className ? el.className + ' ' + className : className;
+					el.className = el.className ? el.className + ' ' + className : className
 				}
-			});
-			return this;
+			})
+			return this
 		},
 			
 		removeClass: function(className) {
 			this.each(function(el) {
-				el.className = el.className.replace(new RegExp('(?:^|\\s+)' + className, 'g'), '');
-			});
-			return this;
+				el.className = el.className.replace(new RegExp('(?:^|\\s+)' + className, 'g'), '')
+			})
+			return this
 		},
 		
 		toggleClass: function(className) {
 			this.each(function(el) {
 				if(_hasClass(el, className)) {
-					el.className = el.className.replace(new RegExp('(?:^|\\s+)' + className, 'g'), '');
+					el.className = el.className.replace(new RegExp('(?:^|\\s+)' + className, 'g'), '')
 				} else {
-					el.className = el.className ? el.className + ' ' + className : className;
+					el.className = el.className ? el.className + ' ' + className : className
 				}
-			});
-			return this;
+			})
+			return this
 		},
 		
 		setAttr: function(name, value) {
 			this.each(function(el) {
 				if(typeof name == 'object') {
 					YOM.object.each(name, function(val, key) {
-						new Elem(el).setAttr(key, val);
-					});
+						new Elem(el).setAttr(key, val)
+					})
 				} else {
 					if(!name) {
-						return;
+						return
 					}
 					if(name.indexOf('data-') === 0 && el.dataset) {
-						name = name.split('-');
-						name.shift();
-						new Elem(el).setDatasetVal(name.join('-'), value);
+						name = name.split('-')
+						name.shift()
+						new Elem(el).setDatasetVal(name.join('-'), value)
 					} else if(name == 'class' || name == 'className') {
-						el.className = value;
+						el.className = value
 					} else {
-						el.setAttribute(name, value);
+						el.setAttribute(name, value)
 					}
 				}
-			});
-			return this;
+			})
+			return this
 		},
 		
 		removeAttr: function(name) {
 			this.each(function(el) {
-				el.removeAttribute(name);
-			});
-			return this;
+				el.removeAttribute(name)
+			})
+			return this
 		},
 		
 		getAttr: function(name) {
-			var el = this.get();
+			var el = this.get()
 			if(name == 'class' || name == 'className') {
-				return el.className;
+				return el.className
 			} else if(el.nodeType !== 1 || el.tagName == 'HTML') {
-				return '';
+				return ''
 			} else {
-				return el.getAttribute(name);
+				return el.getAttribute(name)
 			}
 		},
 		
@@ -451,29 +452,29 @@ define('./element', ['./browser', './string', './object', './array', './event'],
 			this.each(function(el) {
 				if(typeof name == 'object') {
 					YOM.object.each(name, function(val, key) {
-						new Elem(el).setProp(key, val);
-					});
+						new Elem(el).setProp(key, val)
+					})
 				} else {
 					if(!name) {
-						return;
+						return
 					}
-					el[name] = val;
+					el[name] = val
 				}
-			});
-			return this;
+			})
+			return this
 		},
 		
 		getProp: function(name) {
-			var el = this.get();
-			return el[name];
+			var el = this.get()
+			return el[name]
 		},
 		
 		getDatasetVal: function(name) {
-			var el = this.get();
+			var el = this.get()
 			if(el.dataset) {
-				return el.dataset[YOM.string.toCamelCase(name)];
+				return el.dataset[YOM.string.toCamelCase(name)]
 			} else {
-				return this.getAttr('data-' + YOM.string.toJoinCase(name, '-'));
+				return this.getAttr('data-' + YOM.string.toJoinCase(name, '-'))
 			}
 		},
 		
@@ -481,137 +482,137 @@ define('./element', ['./browser', './string', './object', './array', './event'],
 			this.each(function(el) {
 				if(typeof name == 'object') {
 					YOM.object.each(name, function(val, key) {
-						new Elem(el).setDatasetVal(key, val);
-					});
+						new Elem(el).setDatasetVal(key, val)
+					})
 				} else {
 					if(el.dataset) {
-						el.dataset[YOM.string.toCamelCase(name)] = value;
+						el.dataset[YOM.string.toCamelCase(name)] = value
 					} else {
-						this.setAttr('data-' + YOM.string.toJoinCase(name, '-'), value);
+						this.setAttr('data-' + YOM.string.toJoinCase(name, '-'), value)
 					}
 				}
-			});
-			return this;
+			})
+			return this
 		},
 		
 		setVal: function(value) {
 			this.each(function(el) {
-				el.value = value;
-			});
-			return this;
+				el.value = value
+			})
+			return this
 		},
 		
 		getVal: function() {
-			return this.get().value;
+			return this.get().value
 		},
 		
 		setStyle: function(name, value) {
 			this.each(function(el, i, _item) {
-				_item.setStyle(name, value);
-			});
-			return this;
+				_item.setStyle(name, value)
+			})
+			return this
 		},
 		
 		getStyle: function(name) {
-			return this._getItem(0).getStyle(name);
+			return this._getItem(0).getStyle(name)
 		},
 		
 		storeStyle: function(name) {
 			this.each(function(el, i, _item) {
-				_item.storeStyle(name);
-			});
-			return this;
+				_item.storeStyle(name)
+			})
+			return this
 		},
 		
 		restoreStyle: function(name) {
 			this.each(function(el, i, _item) {
-				_item.restoreStyle(name);
-			});
-			return this;
+				_item.restoreStyle(name)
+			})
+			return this
 		},
 		
 		getScrolls: function() {
-			var el = this.get();
-			var parent = el.parentNode;
-			var res = {left: 0, top: 0};
+			var el = this.get()
+			var parent = el.parentNode
+			var res = {left: 0, top: 0}
 			while(parent && !Elem.isBody(parent)) {
-				res.left = parent.scrollLeft;
-				res.top = parent.scrollTop;
-				parent = parent.parentNode;
+				res.left = parent.scrollLeft
+				res.top = parent.scrollTop
+				parent = parent.parentNode
 			}
-			return res;
+			return res
 		},
 		
 		getScrollLeft: function() {
-			var el = this.get();
+			var el = this.get()
 			if(!el) {
-				return 0;
+				return 0
 			}
 			if(Elem.isBody(el)) {
-				return Math.max(document.documentElement.scrollLeft, document.body.scrollLeft);
+				return Math.max(document.documentElement.scrollLeft, document.body.scrollLeft)
 			} else {
-				return el.scrollLeft;
+				return el.scrollLeft
 			}
 		},
 		
 		getScrollTop: function() {
-			var el = this.get();
+			var el = this.get()
 			if(!el) {
-				return 0;
+				return 0
 			}
 			if(Elem.isBody(el)) {
-				return Math.max(document.documentElement.scrollTop, document.body.scrollTop);
+				return Math.max(document.documentElement.scrollTop, document.body.scrollTop)
 			} else {
-				return el.scrollTop;
+				return el.scrollTop
 			}
 		},
 		
 		scrollLeftBy: function(x, interval) {
-			var el = this.get();
+			var el = this.get()
 			if(!x || !el) {
-				return this;
+				return this
 			}
-			this.scrollLeftTo(this.getScrollLeft() + x, interval);
-			return this;
+			this.scrollLeftTo(this.getScrollLeft() + x, interval)
+			return this
 		},
 		
 		scrollTopBy: function(y, interval) {
-			var el = this.get();
+			var el = this.get()
 			if(!y || !el) {
-				return this;
+				return this
 			}
-			this.scrollTopTo(this.getScrollTop() + y, interval);
-			return this;
+			this.scrollTopTo(this.getScrollTop() + y, interval)
+			return this
 		},
 		
 		scrollLeftTo: function(x, interval, transition) {
-			var el = this.get();
+			var el = this.get()
 			if(!el || el.scrollLeft == x) {
-				return this;
+				return this
 			}
 			if(x instanceof Elem) {
-				this.scrollLeftTo(x.getRect(this).left, interval, transition);
-				return this;
+				this.scrollLeftTo(x.getRect(this).left, interval, transition)
+				return this
 			}
-			var rect = this.getRect();
-			var viewRect = Elem.getViewRect();
-			var scrollWidth, clientWidth;
-			var isBody = Elem.isBody(el);
+			var rect = this.getRect()
+			var viewRect = Elem.getViewRect()
+			var scrollWidth, clientWidth
+			var isBody = Elem.isBody(el)
 			if(isBody) {
-				scrollWidth = rect.width;
-				clientWidth = viewRect.width;
+				scrollWidth = rect.width
+				clientWidth = viewRect.width
 			} else {
-				scrollWidth = el.scrollWidth;
-				clientWidth = el.clientWidth;
+				scrollWidth = el.scrollWidth
+				clientWidth = el.clientWidth
 			}
 			if(scrollWidth <= clientWidth) {
-				return this;
+				return this
 			}
-			x = x < 0 ? 0 : (x > scrollWidth - clientWidth ? scrollWidth - clientWidth : x);
-			var tweenObj = isBody ? new Elem(YOM.browser.chrome ? document.body : document.documentElement) : new Elem(el);
+			x = x < 0 ? 0 : (x > scrollWidth - clientWidth ? scrollWidth - clientWidth : x)
+			var tweenObj = isBody ? new Elem(YOM.browser.chrome ? document.body : document.documentElement) : new Elem(el)
 			if(interval === 0) {
-				tweenObj.setProp('scrollLeft', x);
-				return this;
+				tweenObj.setProp('scrollLeft', x)
+				return this
 			}
 			tweenObj.tween(interval || 1000, {
 				transition: transition || 'easeOut',
@@ -625,38 +626,38 @@ define('./element', ['./browser', './string', './object', './array', './event'],
 						scrollLeft: x
 					}
 				}
-			});
-			return this;
+			})
+			return this
 		},
 		
 		scrollTopTo: function(y, interval, transition) {
-			var el = this.get();
+			var el = this.get()
 			if(!el || el.scrollTop == y) {
-				return this;
+				return this
 			}
 			if(y instanceof Elem) {
-				this.scrollTopTo(y.getRect(this).top, interval, transition);
-				return this;
+				this.scrollTopTo(y.getRect(this).top, interval, transition)
+				return this
 			}
-			var rect = this.getRect();
-			var viewRect = Elem.getViewRect();
-			var scrollHeight, clientHeight;
-			var isBody = Elem.isBody(el);
+			var rect = this.getRect()
+			var viewRect = Elem.getViewRect()
+			var scrollHeight, clientHeight
+			var isBody = Elem.isBody(el)
 			if(isBody) {
-				scrollHeight = rect.height;
-				clientHeight = viewRect.height;
+				scrollHeight = rect.height
+				clientHeight = viewRect.height
 			} else {
-				scrollHeight = el.scrollHeight;
-				clientHeight = el.clientHeight;
+				scrollHeight = el.scrollHeight
+				clientHeight = el.clientHeight
 			}
 			if(scrollHeight <= clientHeight) {
-				return this;
+				return this
 			}
-			y = y < 0 ? 0 : (y > scrollHeight - clientHeight ? scrollHeight - clientHeight : y);
-			var tweenObj = isBody ? new Elem(YOM.browser.chrome ? document.body : document.documentElement) : new Elem(el);
+			y = y < 0 ? 0 : (y > scrollHeight - clientHeight ? scrollHeight - clientHeight : y)
+			var tweenObj = isBody ? new Elem(YOM.browser.chrome ? document.body : document.documentElement) : new Elem(el)
 			if(interval === 0) {
-				tweenObj.setProp('scrollTop', y);
-				return this;
+				tweenObj.setProp('scrollTop', y)
+				return this
 			}
 			tweenObj.tween(interval || 1000, {
 				transition: transition || 'easeOut',
@@ -670,42 +671,42 @@ define('./element', ['./browser', './string', './object', './array', './event'],
 						scrollTop: y
 					}
 				}
-			});
-			return this;
+			})
+			return this
 		},
 		
 		getOffsetParent: function() {
-			var el = this.get();
+			var el = this.get()
 			if(!el || Elem.isBody(el)) {
-				return null;
+				return null
 			}
-			return el.offsetParent && new Elem(el.offsetParent);
+			return el.offsetParent && new Elem(el.offsetParent)
 		},
 		
 		getRect: function(relative) {
-			var el, rect, docScrolls, elScrolls, res;
-			el = this.get();
+			var el, rect, docScrolls, elScrolls, res
+			el = this.get()
 			if(Elem.isBody(el)) {
-				var bodySize = Elem.getDocSize(el.ownerDocument);
+				var bodySize = Elem.getDocSize(el.ownerDocument)
 				res = {
 					top: 0, left: 0,
 					width: bodySize.width,
 					height: bodySize.height
-				};
-				res.right = res.width;
-				res.bottom = res.height;
-				return res;
+				}
+				res.right = res.width
+				res.bottom = res.height
+				return res
 			}
-			rect = el.getBoundingClientRect && el.getBoundingClientRect();
-			relative = relative ? Elem.query(relative).getRect() : {top: 0, left: 0};
-			docScrolls = Elem.getViewRect(el.ownerDocument);
-			elScrolls = this.getScrolls();
+			rect = el.getBoundingClientRect && el.getBoundingClientRect()
+			relative = relative ? Elem.query(relative).getRect() : {top: 0, left: 0}
+			docScrolls = Elem.getViewRect(el.ownerDocument)
+			elScrolls = this.getScrolls()
 			if(rect) {
 				if(YOM.browser.ie && !YOM.browser.isQuirksMode() && (YOM.browser.v <= 7 || document.documentMode <= 7)) {
-					rect.left -= 2;
-					rect.top -= 2;
-					rect.right -= 2;
-					rect.bottom -= 2;
+					rect.left -= 2
+					rect.top -= 2
+					rect.right -= 2
+					rect.bottom -= 2
 				}
 				res = {
 					top: rect.top + docScrolls.top - relative.top,
@@ -714,7 +715,7 @@ define('./element', ['./browser', './string', './object', './array', './event'],
 					right: rect.right + docScrolls.left - relative.left,
 					width: rect.width || Math.max(el.clientWidth, el.offsetWidth),
 					height: rect.height || Math.max(el.clientHeight, el.offsetHeight)
-				};
+				}
 			} else {
 				res = {
 					top: el.offsetTop - elScrolls.top - relative.top,
@@ -723,279 +724,279 @@ define('./element', ['./browser', './string', './object', './array', './event'],
 					right: 0,
 					width: Math.max(el.clientWidth, el.offsetWidth),
 					height: Math.max(el.clientHeight, el.offsetHeight)
-				};
-				while(el.offsetParent) {
-					el = el.offsetParent;
-					res.top += el.offsetTop + (parseInt(new Elem(el).getStyle('borderTopWidth')) || 0);
-					res.left += el.offsetLeft + (parseInt(new Elem(el).getStyle('borderLeftWidth')) || 0);
 				}
-				res.bottom = res.top + res.height - relative.top;
-				res.right = res.left + res.width - relative.left;
+				while(el.offsetParent) {
+					el = el.offsetParent
+					res.top += el.offsetTop + (parseInt(new Elem(el).getStyle('borderTopWidth')) || 0)
+					res.left += el.offsetLeft + (parseInt(new Elem(el).getStyle('borderLeftWidth')) || 0)
+				}
+				res.bottom = res.top + res.height - relative.top
+				res.right = res.left + res.width - relative.left
 			}
-			return res;
+			return res
 		},
 		
 		setHtml: function(html) {
-			this.get().innerHTML = html;
-			return this;
+			this.get().innerHTML = html
+			return this
 		},
 		
 		removeChild: function(el) {
 			if(!(el instanceof Elem)) {
-				el = this.find(el);
+				el = this.find(el)
 			}
 			el.each(function(child) {
-				child.parentNode.removeChild(child);
-			});
-			return this;
+				child.parentNode.removeChild(child)
+			})
+			return this
 		},
 		
 		empty: function() {
-			this.setHtml('');
-			return this;
+			this.setHtml('')
+			return this
 		},
 		
 		remove: function() {
-			var el = this.get();
+			var el = this.get()
 			if(!el || Elem.isBody(el)) {
-				return null;
+				return null
 			}
-			return new Elem(el.parentNode.removeChild(el));
+			return new Elem(el.parentNode.removeChild(el))
 		},
 		
 		first: function() {
-			var res = null;
-			var el = this.get();
+			var res = null
+			var el = this.get()
 			if(!el) {
-				return res;
+				return res
 			}
 			new Elem(el.childNode || el.children).each(function(item) {
 				if(_isElementNode(item)) {
-					res = item;
-					return false;
+					res = item
+					return false
 				}
-				return true;
-			});
-			return res;
+				return true
+			})
+			return res
 		},
 		
 		next: function() {
-			var el = this.get();
+			var el = this.get()
 			if(!el) {
-				return null;
+				return null
 			}
 			return el.nextElementSibling || Elem.searchChain(el, 'nextSibling', function(el) {
-				return _isElementNode(el);
-			});
+				return _isElementNode(el)
+			})
 		},
 		
 		previous: function() {
-			var el = this.get();
+			var el = this.get()
 			if(!el) {
-				return null;
+				return null
 			}
 			return el.previousElementSibling || Elem.searchChain(el, 'previousSibling', function(el) {
-				return _isElementNode(el);
-			});
+				return _isElementNode(el)
+			})
 		},
 		
 		head: function(tar) {
-			var firstChild = this.first();
+			var firstChild = this.first()
 			if(firstChild) {
-				return new Elem(this.get().insertBefore(tar, firstChild));
+				return new Elem(this.get().insertBefore(tar, firstChild))
 			} else {
-				return this.append(tar);
+				return this.append(tar)
 			}
 		},
 		
 		headTo: function(tar) {
-			tar = Elem.query(tar);
-			var firstChild = tar.first();
+			tar = Elem.query(tar)
+			var firstChild = tar.first()
 			if(firstChild) {
-				return new Elem(tar.get().insertBefore(this.get(), firstChild));
+				return new Elem(tar.get().insertBefore(this.get(), firstChild))
 			} else {
-				return tar.append(this.get());
+				return tar.append(this.get())
 			}
 		},
 		
 		append: function(el) {
 			if(_isElementNode(el)) {
-				return new Elem(this.get().appendChild(el));
+				return new Elem(this.get().appendChild(el))
 			} else if(el instanceof Elem) {
-				return new Elem(this.get().appendChild(el.get()));
+				return new Elem(this.get().appendChild(el.get()))
 			}
-			return null;
+			return null
 		},
 		
 		appendTo: function(parent) {
-			var child = this.get();
+			var child = this.get()
 			if(!child) {
-				return null;
+				return null
 			}
 			if(_isElementNode(parent)) {
-				return new Elem(parent.appendChild(child));
+				return new Elem(parent.appendChild(child))
 			} else if(parent instanceof Elem) {
-				return new Elem(parent.append(child));
+				return new Elem(parent.append(child))
 			}
-			return null;
+			return null
 		},
 		
 		before: function(target) {
-			var el = this.get();
-			target = Elem.query(target).get();
+			var el = this.get()
+			target = Elem.query(target).get()
 			if(!el || !target || Elem.isBody(target)) {
-				return this;
+				return this
 			}
-			target.parentNode.insertBefore(el, target);
-			return this;
+			target.parentNode.insertBefore(el, target)
+			return this
 		},
 		
 		after: function(target) {
-			var el = this.get();
-			target = Elem.query(target).get();
+			var el = this.get()
+			target = Elem.query(target).get()
 			if(!el || !target || Elem.isBody(target)) {
-				return this;
+				return this
 			}
 			if(target.nextSibling) {
-				target.parentNode.insertBefore(el, target.nextSibling);
+				target.parentNode.insertBefore(el, target.nextSibling)
 			} else {
-				target.parentNode.appendChild(el);
+				target.parentNode.appendChild(el)
 			}
-			return this;
+			return this
 		},
 		
 		clone: function(bool) {
-			var el = this.get();
+			var el = this.get()
 			if(el) {
-				return new Elem(el.cloneNode(bool));
+				return new Elem(el.cloneNode(bool))
 			}
-			return null;
+			return null
 		},
 		
 		show: function() {
 			if(!this.size()) {
-				return this;
+				return this
 			}
-			var _display = this.getDatasetVal('yom-display');
-			this.setStyle('display', _display == undefined ? 'block' : _display);
-			return this;
+			var _display = this.getDatasetVal('yom-display')
+			this.setStyle('display', _display == undefined ? 'block' : _display)
+			return this
 		},
 		
 		hide: function() {
 			if(!this.size()) {
-				return this;
+				return this
 			}
-			var _display = this.getStyle('display');
+			var _display = this.getStyle('display')
 			if(_display != 'none' && this.getDatasetVal('yom-display') == undefined) {
-				this.setDatasetVal('yom-display', _display);
+				this.setDatasetVal('yom-display', _display)
 			}
-			this.setStyle('display', 'none');
-			return this;
+			this.setStyle('display', 'none')
+			return this
 		},
 		
 		toggle: function(callback) {
 			this.each(function(el) {
-				el = new Elem(el);
+				el = new Elem(el)
 				if(el.getStyle('display') == 'none') {
-					el.show();
-					callback && callback.call(el, 'SHOW');
+					el.show()
+					callback && callback.call(el, 'SHOW')
 				} else {
-					el.hide();
-					callback && callback.call(el, 'HIDE');
+					el.hide()
+					callback && callback.call(el, 'HIDE')
 				}
-			});
-			return this;
+			})
+			return this
 		},
 		
 		addEventListener: function(eType, listener, bind) {
 			this.each(function(el) {
-				YOM.Event.addListener(el, eType, listener, bind || el);
-			});
-			return this;
+				YOM.Event.addListener(el, eType, listener, bind || el)
+			})
+			return this
 		},
 		
 		removeEventListener: function(eType, listener) {
 			this.each(function(el) {
-				YOM.Event.removeListener(el, eType, listener);
-			});
-			return this;
+				YOM.Event.removeListener(el, eType, listener)
+			})
+			return this
 		},
 		
 		concat: function(els) {
-			return new Elem(this.getAll().concat(new Elem(els).getAll()));
+			return new Elem(this.getAll().concat(new Elem(els).getAll()))
 		},
 		
 		removeItem: function(el) {
 			YOM.array.remove(this._items, function(item, i) {
 				if(typeof el == 'function') {
-					return el(item.get(), i);
+					return el(item.get(), i)
 				} else if(typeof el == 'number') {
 					if(el == i) {
-						return -1;
+						return -1
 					} else {
-						return 0;
+						return 0
 					}
 				} else {
-					return el == item.el;
+					return el == item.el
 				}
-			});
-			return this;
+			})
+			return this
 		}
-	});
+	})
 	
-	Elem.head = document.head || document.getElementsByTagName('head')[0] || document.documentElement;
+	Elem.head = document.head || document.getElementsByTagName('head')[0] || document.documentElement
 	
 	Elem.query = function(sel, context) {
-		var res;
+		var res
 		if(sel instanceof Elem) {
-			return sel;
+			return sel
 		} else if(typeof sel == 'string') {
 			if(context) {
-				context = new Elem(typeof context == 'string' ? (document.querySelectorAll ? document.querySelectorAll(context) : Sizzle(context)) : context);
-				res = context.find(sel);
+				context = new Elem(typeof context == 'string' ? (document.querySelectorAll ? document.querySelectorAll(context) : Sizzle(context)) : context)
+				res = context.find(sel)
 			} else {
-				res = new Elem(document.querySelectorAll ? document.querySelectorAll(sel) : Sizzle(sel));
+				res = new Elem(document.querySelectorAll ? document.querySelectorAll(sel) : Sizzle(sel))
 			}
 		} else {
-			res = new Elem(sel);
+			res = new Elem(sel)
 		}
-		return res;
-	};
+		return res
+	}
 	
 	Elem.isBody = function(el) {
-		el = Elem.query(el).get();
+		el = Elem.query(el).get()
 		if(!el) {
-			return false;
+			return false
 		}
-		return el.tagName == 'BODY' || el.tagName == 'HTML';
-	};
+		return el.tagName == 'BODY' || el.tagName == 'HTML'
+	}
 
 	Elem.create = function(name, attrs, style) {
-		var el = new Elem(document.createElement(name));
-		attrs && el.setAttr(attrs);
-		style && el.setStyle(style);
-		return el.get();
-	};
+		var el = new Elem(document.createElement(name))
+		attrs && el.setAttr(attrs)
+		style && el.setStyle(style)
+		return el.get()
+	}
 	
 	Elem.contains = function(a, b) {
-		return (a.contains) ? (a != b && a.contains(b)) : !!(a.compareDocumentPosition(b) & 16);
-	};
+		return (a.contains) ? (a != b && a.contains(b)) : !!(a.compareDocumentPosition(b) & 16)
+	}
 	
 	Elem.searchChain = function(el, prop, validator) {
-		var res;
+		var res
 		while(el && el.nodeType) {
-			res = el[prop];
+			res = el[prop]
 			if(res && (!validator || validator(res))) {
-				return res;
+				return res
 			}
-			el = res;
+			el = res
 		}
-		return null;
-	};
+		return null
+	}
 	
 	Elem.getViewRect = function(ownerDoc) {
-		var res;
-		var doc = ownerDoc || document;
+		var res
+		var doc = ownerDoc || document
 		res = {
 			top: !ownerDoc && window.pageYOffset > 0 ? window.pageYOffset : Math.max(doc.documentElement.scrollTop, doc.body.scrollTop),
 			left: !ownerDoc && window.pageXOffset > 0 ? window.pageXOffset : Math.max(doc.documentElement.scrollLeft, doc.body.scrollLeft),
@@ -1003,58 +1004,59 @@ define('./element', ['./browser', './string', './object', './array', './event'],
 			right: 0,
 			width: doc.documentElement.clientWidth || doc.body.clientWidth,
 			height: doc.documentElement.clientHeight || doc.body.clientHeight
-		};
-		res.bottom = res.top + res.height;
-		res.right = res.left + res.width;
-		return res;
-	};
+		}
+		res.bottom = res.top + res.height
+		res.right = res.left + res.width
+		return res
+	}
 
 	Elem.getFrameRect = function(maxBubble) {
-		var res, rect;
-		var win = window;
-		var frame = win.frameElement;
-		var bubbleLeft = maxBubble;
+		var res, rect
+		var win = window
+		var frame = win.frameElement
+		var bubbleLeft = maxBubble
 		if(!frame) {
-			return new Elem(document.body).getRect();
+			return new Elem(document.body).getRect()
 		}
-		res = new Elem(frame).getRect();
-		win = win.parent;
-		frame = win.frameElement;
+		res = new Elem(frame).getRect()
+		win = win.parent
+		frame = win.frameElement
 		while(frame && (!maxBubble || --bubbleLeft > 0)) {
-			rect = new Elem(frame).getRect();
-			res.left += rect.left;
-			res.right += rect.left;
-			res.top += rect.top;
-			res.bottom += rect.top;
-			win = win.parent;
-			frame = win.frameElement;
+			rect = new Elem(frame).getRect()
+			res.left += rect.left
+			res.right += rect.left
+			res.top += rect.top
+			res.bottom += rect.top
+			win = win.parent
+			frame = win.frameElement
 		}
-		return res;
-	};
+		return res
+	}
 	
 	Elem.getDocSize = function(doc) {
-		var w, h;
-		doc = doc || document;
+		var w, h
+		doc = doc || document
 		if(YOM.browser.isQuirksMode()) {
 			if(YOM.browser.chrome || YOM.browser.safari || YOM.browser.firefox) {
-				w = Math.max(doc.documentElement.scrollWidth, doc.body.scrollWidth);
-				h = Math.max(doc.documentElement.scrollHeight, doc.body.scrollHeight);
+				w = Math.max(doc.documentElement.scrollWidth, doc.body.scrollWidth)
+				h = Math.max(doc.documentElement.scrollHeight, doc.body.scrollHeight)
 			} else {
-				w = doc.body.scrollWidth || doc.documentElement.scrollWidth;
-				h = doc.body.scrollHeight || doc.documentElement.scrollHeight;
+				w = doc.body.scrollWidth || doc.documentElement.scrollWidth
+				h = doc.body.scrollHeight || doc.documentElement.scrollHeight
 			}
 		} else {
-			w = doc.documentElement.scrollWidth || doc.body.scrollWidth;
-			h = doc.documentElement.scrollHeight || doc.body.scrollHeight;
+			w = doc.documentElement.scrollWidth || doc.body.scrollWidth
+			h = doc.documentElement.scrollHeight || doc.body.scrollHeight
 		}
 		return {
 			width: w,
 			height: h
-		};
-	};
+		}
+	}
 	
-	return Elem;
-});
+	return Elem
+})
+
 
 
 /**
@@ -1107,12 +1109,13 @@ ID LIST:
  * @namespace YOM.config
  */
 define('./config', [], function() {
-	var t = document.domain.split('.'), l = t.length;
+	var t = document.domain.split('.'), l = t.length
 	return {
 		debug: location.href.indexOf('yom-debug=1') > 0,
 		domain: t.slice(l - 2, l).join('.')
-	};
-});
+	}
+})
+
 
 
 /**
@@ -1131,45 +1134,46 @@ YOM.Xhr
 define('./error', [], function() {
 	var YomError = function(code, opt) {
 		if(typeof opt == 'string') {
-			opt = {message: opt};
+			opt = {message: opt}
 		}
-		this.opt = opt || {};
+		this.opt = opt || {}
 		if(code instanceof YomError) {
-			this.name = code.name;
-			this.code = code.code;
-			this.message = code.message;
+			this.name = code.name
+			this.code = code.code
+			this.message = code.message
 		} else if(code instanceof Error || Object.prototype.toString.call(code) == '[object Error]') {
-			this.name = code.name;
-			this.code = 0;
-			this.message = code.message;
+			this.name = code.name
+			this.code = 0
+			this.message = code.message
 		} else {
-			this.name = this.opt.name || 'YOM Error';
-			this.code = +code;
-			this.message = this.opt.message || '';
+			this.name = this.opt.name || 'YOM Error'
+			this.code = +code
+			this.message = this.opt.message || ''
 		}
-	};
+	}
 	
-	YomError._ID = 101;
+	YomError._ID = 101
 	
 	YomError.getCode = function(id, code) {
 		if(code < 10) {
-			code = '0' + code;
+			code = '0' + code
 		}
-		return parseInt(id + '' + code);
-	};
+		return parseInt(id + '' + code)
+	}
 	
 	YomError.prototype.toString = function() {
-		return this.name + ': ' + this.message + (this.code ? ' [' + this.code + ']' : '');
-	};
+		return this.name + ': ' + this.message + (this.code ? ' [' + this.code + ']' : '')
+	}
 	
-	return YomError;
-});
+	return YomError
+})
+
 
 /**
  * @namespace YOM.browser
  */
 define('./browser', [], function() {
-	var _ua = navigator.userAgent.toLowerCase();
+	var _ua = navigator.userAgent.toLowerCase()
 	
 	return {
 		_ID: 104,
@@ -1184,10 +1188,11 @@ define('./browser', [], function() {
 		android: (/android/).test(_ua),
 		
 		isQuirksMode: function() {
-			return document.compatMode != 'CSS1Compat';
+			return document.compatMode != 'CSS1Compat'
 		}
-	};
-});
+	}
+})
+
 
 
 /**
@@ -1197,51 +1202,52 @@ define('./string', [], {
 	_ID: 117,
 	
 	getByteLength: function(str) {
-		return str.replace(/[^\x00-\xff]/g, 'xx').length;
+		return str.replace(/[^\x00-\xff]/g, 'xx').length
 	},
 	
 	headByByte: function(str, len, postFix) {
 		if(this.getByteLength(str) <= len) {
-			return str;
+			return str
 		}
-		postFix = postFix || '';
-		var l;
+		postFix = postFix || ''
+		var l
 		if(postFix) {
-			l = len = len - this.getByteLength(postFix);
+			l = len = len - this.getByteLength(postFix)
 		} else {
-			l = len;
+			l = len
 		}
 		do {
-			str = str.slice(0, l--);
-		} while(this.getByteLength(str) > len);
-		return str + postFix;
+			str = str.slice(0, l--)
+		} while(this.getByteLength(str) > len)
+		return str + postFix
 	},
 	
 	encodeHtml: function(str) {
-		return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\x60/g, '&#96;').replace(/\x27/g, '&#39;').replace(/\x22/g, '&quot;');
+		return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\x60/g, '&#96;').replace(/\x27/g, '&#39;').replace(/\x22/g, '&quot;')
 	},
 	
 	decodeHtml: function(str) {
-		return (str + '').replace(/&quot;/g, '\x22').replace(/&#0*39;/g, '\x27').replace(/&#0*96;/g, '\x60').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&');
+		return (str + '').replace(/&quot;/g, '\x22').replace(/&#0*39;/g, '\x27').replace(/&#0*96;/g, '\x60').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&')
 	},
 	
 	trim: function(str) {
 		if(str.trim) {
-			return str.trim();
+			return str.trim()
 		} else {
-			return str.replace(/^\s+|\s+$/, '');
+			return str.replace(/^\s+|\s+$/, '')
 		}
 	},
 	
 	toCamelCase: function(str) {
-		return str.replace(/[-_]+(\w)([^-_]*)/g, function($1, $2, $3) {return $2.toUpperCase() + $3.toLowerCase();});
+		return str.replace(/[-_]+(\w)([^-_]*)/g, function($1, $2, $3) {return $2.toUpperCase() + $3.toLowerCase()})
 	},
 	
 	toJoinCase: function(str, joiner) {
-		joiner = joiner || '-';
-		return str.replace(/[A-Z]/g, function($1) {return joiner + $1.toLowerCase();}).replace(new RegExp("^" + joiner), '');
+		joiner = joiner || '-'
+		return str.replace(/[A-Z]/g, function($1) {return joiner + $1.toLowerCase()}).replace(new RegExp("^" + joiner), '')
 	}
-});
+})
+
 
 /**
  * @namespace YOM.array
@@ -1251,53 +1257,54 @@ define('./array', ['require', './object'], function(require) {
 		_ID: 103,
 		
 		isArray: Array.isArray || function(obj) {
-			var object = require('./object');
-			return object.toString(obj) == '[object Array]';
+			var object = require('./object')
+			return object.toString(obj) == '[object Array]'
 		},
 	
 		each: function(arr, fn, bind) {
 			for(var i = 0, l = arr.length; i < l; i++) {
 				if(fn.call(bind || arr, arr[i], i, arr) === false) {
-					break;
+					break
 				}
 			}
 		},
 		
 		remove: function(arr, item) {
-			var isFn = typeof item == 'function';
-			var flag;
+			var isFn = typeof item == 'function'
+			var flag
 			for(var i = arr.length - 1; i >= 0; i--) {
-				flag = isFn && item(arr[i], i, arr);
+				flag = isFn && item(arr[i], i, arr)
 				if(arr[i] == item || flag) {
-					arr.splice(i, 1);
+					arr.splice(i, 1)
 					if(flag === -1) {
-						break;
+						break
 					}
 				}
 			}
-			return arr;
+			return arr
 		},
 		
 		getArray: function(obj) {
-			return Array.prototype.slice.call(obj);
+			return Array.prototype.slice.call(obj)
 		},
 		
 		filter: function(arr, fn) {
-			var object = require('./object');
+			var object = require('./object')
 			if(typeof arr.filter == 'function') {
-				return arr.filter(fn);
+				return arr.filter(fn)
 			} else {
-				var res = [];
+				var res = []
 				object.each(arr, function(item, i) {
 					if(fn(item, i, arr)) {
-						res.push(item);
+						res.push(item)
 					}
-				});
-				return res;
+				})
+				return res
 			}
 		}
-	};
-});
+	}
+})
+
 
 /**
  * @class YOM.Class
@@ -1307,44 +1314,44 @@ define('./class', ['./error', './object', './array'], function(Err, object, arra
 		'Error': Err,
 		'object': object,
 		'array': array
-	};
+	}
 	
-	var Class = function() {};
+	var Class = function() {}
 
-	var _ID = 102;
+	var _ID = 102
 	
 	Class.extend = function(subClass, superClass) {
 		if(arguments.length < 2) {
-			throw new YOM.Error(YOM.Error.getCode(_ID, 1));
+			throw new YOM.Error(YOM.Error.getCode(_ID, 1))
 		}
-		var F = function() {};
-		F.prototype = superClass.prototype;
-		subClass.prototype = new F();
-		subClass.prototype.constructor = subClass;
-		subClass.superClass = superClass.prototype;
+		var F = function() {}
+		F.prototype = superClass.prototype
+		subClass.prototype = new F()
+		subClass.prototype.constructor = subClass
+		subClass.superClass = superClass.prototype
 		if(superClass.prototype.constructor == Object.prototype.constructor) {
-			superClass.prototype.constructor = superClass;
+			superClass.prototype.constructor = superClass
 		}
-		return subClass;
-	};
+		return subClass
+	}
 	
 	Class.genericize = function(obj, props, opt) {
-		opt = opt || {};
+		opt = opt || {}
 		if(!YOM.array.isArray(props)) {
-			props = [props];
+			props = [props]
 		}
 		YOM.object.each(props, function(prop) {
 			if((!opt.check || !obj[prop]) && YOM.object.isFunction(obj.prototype[prop])) {
 				obj[prop] = function(){
-					var args = YOM.array.getArray(arguments);
-					return obj.prototype[prop].apply(opt.bind || args.shift(), args);
-				};
+					var args = YOM.array.getArray(arguments)
+					return obj.prototype[prop].apply(opt.bind || args.shift(), args)
+				}
 			}
-		});
-	};
+		})
+	}
 	
-	return Class;
-});
+	return Class
+})
 
 
 
@@ -1353,23 +1360,23 @@ define('./class', ['./error', './object', './array'], function(Err, object, arra
  */
 define('./hash-array', [], function() {
 	var HashArray = function() {
-		this._items = [];
-		this._k2i = {};
-		this._i2k = [];
+		this._items = []
+		this._k2i = {}
+		this._i2k = []
 		for(var i = 0, l = arguments.length; i < l; i += 2) {
 			if(this._isValidKey(arguments[i])) {
-				this._items.push(arguments[i + 1]);
-				this._i2k.push(arguments[i]);
-				this._k2i[arguments[i]] = this.size() - 1;
+				this._items.push(arguments[i + 1])
+				this._i2k.push(arguments[i])
+				this._k2i[arguments[i]] = this.size() - 1
 			}
 		}
-	};
+	}
 	
-	HashArray._ID = 123;
+	HashArray._ID = 123
 	
 	HashArray.prototype = {
 		_isValidKey: function(key) {
-			return key && typeof key == 'string';
+			return key && typeof key == 'string'
 		},
 		
 		size: function() {
@@ -1378,20 +1385,20 @@ define('./hash-array', [], function() {
 		
 		get: function(key) {
 			if(typeof key == 'string') {
-				return this._items[this._k2i[key]];
+				return this._items[this._k2i[key]]
 			} else {
-				return this._items[key];
+				return this._items[key]
 			}
 		},
 		
 		set: function(key, val) {
 			if(this._isValidKey(key)) {
 				if(this._k2i[key] >= 0) {
-					this._items[this._k2i[key]] = val;
+					this._items[this._k2i[key]] = val
 				}
 			} else if(typeof key == 'number') {
 				if(key < this._items.length) {
-					this._items[key] = val;
+					this._items[key] = val
 				}
 			}
 		},
@@ -1399,146 +1406,147 @@ define('./hash-array', [], function() {
 		remove: function(key) {
 			if(this._isValidKey(key)) {
 				if(this._k2i[key] >= 0) {
-					return this.splice(this._k2i[key], 1);
+					return this.splice(this._k2i[key], 1)
 				}
 			} else if(typeof key == 'number') {
 				if(key < this._items.length) {
-					return this.splice(key, 1);
+					return this.splice(key, 1)
 				}
 			}
-			return null;
+			return null
 		},
 		
 		hasKey: function(key) {
-			return this._k2i[key] >= 0;
+			return this._k2i[key] >= 0
 		},
 		
 		hasValue: function(val) {
-			var has = false;
+			var has = false
 			this.each(function(v) {
 				if(val === v) {
-					has = true;
-					return false;
+					has = true
+					return false
 				}
-				return true;
-			});
-			return has;
+				return true
+			})
+			return has
 		},
 		
 		each: function(cb) {
 			for(var i = 0, l = this._items.length; i < l; i++) {
 				if(cb(this._items[i], i, this._i2k[i]) ===  false) {
-					break;
+					break
 				}
 			}
 		},
 		
 		push: function(key, val) {
 			if(!this._isValidKey(key)) {
-				return;
+				return
 			}
-			var i = this._items.length;
-			this._items.push(val);
-			this._i2k.push(key);
-			this._k2i[key] = i;
+			var i = this._items.length
+			this._items.push(val)
+			this._i2k.push(key)
+			this._k2i[key] = i
 		},
 		
 		pop: function() {
-			var dk = this._i2k.pop();
-			var dv = this._items.pop();
-			delete this._k2i[dk];
-			return dk ? new HashArray(dk, dv) : undefined;
+			var dk = this._i2k.pop()
+			var dv = this._items.pop()
+			delete this._k2i[dk]
+			return dk ? new HashArray(dk, dv) : undefined
 		},
 		
 		unshift: function(key, val) {
 			if(!this._isValidKey(key)) {
-				return;
+				return
 			}
-			this._items.unshift(val);
-			this._i2k.unshift(key);
+			this._items.unshift(val)
+			this._i2k.unshift(key)
 			for(var k in this._k2i) {
 				if(this._k2i.hasOwnProperty(k)) {
-					this._k2i[k]++;
+					this._k2i[k]++
 				}
 			}
-			this._k2i[key] = 0;
+			this._k2i[key] = 0
 		},
 		
 		shift: function() {
-			var dk = this._i2k.shift();
-			var dv = this._items.shift();
+			var dk = this._i2k.shift()
+			var dv = this._items.shift()
 			for(var k in this._k2i) {
 				if(this._k2i.hasOwnProperty(k)) {
 					if(dk == k) {
-						delete this._k2i[k];
+						delete this._k2i[k]
 					} else {
-						this._k2i[k]--;
+						this._k2i[k]--
 					}
 				}
 			}
-			return dk ? new HashArray(dk, dv) : undefined;
+			return dk ? new HashArray(dk, dv) : undefined
 		},
 		
 		slice: function(s, e) {
-			var ks, vs, res;
-			ks = this._i2k.slice(s, e);
-			vs = this._items.slice(s, e);
-			res = new HashArray();
+			var ks, vs, res
+			ks = this._i2k.slice(s, e)
+			vs = this._items.slice(s, e)
+			res = new HashArray()
 			for(i = 0, l = ks.length; i < l; i++) {
-				res.push(ks[i], vs[i]);
+				res.push(ks[i], vs[i])
 			}
-			return res;
+			return res
 		},
 		
 		splice: function(s, c) {
-			var dks, dvs, i, l, res;
-			var ks = [], vs = [];
+			var dks, dvs, i, l, res
+			var ks = [], vs = []
 			for(i = 2, l = arguments.length; i < l; i += 2) {
 				if(this._isValidKey(arguments[i])) {
-					ks.push(arguments[i]);
-					vs.push(arguments[i + 1]);
+					ks.push(arguments[i])
+					vs.push(arguments[i + 1])
 				}
 			}
-			dks = Array.prototype.splice.apply(this._i2k, [s, c].concat(ks));
-			dvs = Array.prototype.splice.apply(this._items, [s, c].concat(vs));
-			res = new HashArray();
+			dks = Array.prototype.splice.apply(this._i2k, [s, c].concat(ks))
+			dvs = Array.prototype.splice.apply(this._items, [s, c].concat(vs))
+			res = new HashArray()
 			for(i = 0, l = dks.length; i < l; i++) {
 				if(this._k2i.hasOwnProperty(dks[i])) {
-					delete this._k2i[dks[i]];
+					delete this._k2i[dks[i]]
 				}
-				res.push(dks[i], dvs[i]);
+				res.push(dks[i], dvs[i])
 			}
 			for(i = s, l = this._i2k.length; i < l; i++) {
-				this._k2i[this._i2k[i]] = i;
+				this._k2i[this._i2k[i]] = i
 			}
-			return res;
+			return res
 		},
 		
 		concat: function(ha) {
-			var res, i, l;
-			var ks = [], vs = [];
+			var res, i, l
+			var ks = [], vs = []
 			if(!(ha instanceof HashArray)) {
-				return this;
+				return this
 			}
-			res = new HashArray();
+			res = new HashArray()
 			for(i = 0, l = this.size(); i < l; i++) {
-				res.push(this._i2k[i], this._items[i]);
+				res.push(this._i2k[i], this._items[i])
 			}
 			for(i = 0, l = ha.size(); i < l; i++) {
-				res.push(ha._i2k[i], ha._items[i]);
+				res.push(ha._i2k[i], ha._items[i])
 			}
-			return res;
+			return res
 		},
 		
 		join: function(s) {
-			return this._items.join(s);
+			return this._items.join(s)
 		},
 		
 		constructor: HashArray
-	};
+	}
 	
-	return HashArray;
-});
+	return HashArray
+})
+
 
 
 /**
@@ -1548,68 +1556,69 @@ define('./instance-manager', ['./object', './array'], function(object, array) {
 	var YOM = {
 		'object': object,
 		'array': array
-	};
+	}
 		
 	var InstanceManager = function() {
-		this._init();
-	};
+		this._init()
+	}
 	
-	InstanceManager._ID = 124;
+	InstanceManager._ID = 124
 	
 	InstanceManager.prototype = {
 		_init: function() {
-			this._pool = [];
+			this._pool = []
 		},
 		
 		add: function(inst) {
-			var id = $getUniqueId();
-			this._pool.push({id: id, inst: inst});
-			return id;
+			var id = $getUniqueId()
+			this._pool.push({id: id, inst: inst})
+			return id
 		},
 		
 		get: function(id) {
-			var res;
+			var res
 			YOM.object.each(this._pool, function(item) {
 				if(item.id == id) {
-					res = item.inst;
-					return false;
+					res = item.inst
+					return false
 				}
-				return true;
-			});
-			return res;
+				return true
+			})
+			return res
 		},
 		
 		remove: function(id) {
 			YOM.array.remove(this._pool, function(item) {
 				if(item.id == id) {
-					return -1;
+					return -1
 				}
-				return 0;
-			});
+				return 0
+			})
 		},
 		
 		count: function() {
-			return this._pool.length;
+			return this._pool.length
 		},
 		
 		each: function(cb, bind) {
 			YOM.object.each(this._pool, function(item) {
 				if(item) {
-					return cb.call(bind, item.inst, item.id);
+					return cb.call(bind, item.inst, item.id)
 				}
-				return true;
-			});
+				return true
+			})
 		},
 		
 		clear: function() {
-			this._init();
+			this._init()
 		},
 		
 		constructor: InstanceManager
-	};
+	}
 	
-	return InstanceManager;
-});
+	return InstanceManager
+})
+
 
 
 // This source code is free for use in the public domain.
@@ -1852,8 +1861,8 @@ var jsonParse = (function () {
   };
 })();
 
-return jsonParse;
-});
+return jsonParse
+})
 
 /**
  * @namespace YOM.json
@@ -1864,11 +1873,11 @@ define('./json', ['./error', './object', './array', './json-sans-eval'], functio
 		'object': object,
 		'array': array,
 		'jsonParse': jsonParse
-	};
+	}
 	
-	var _ID = 126;
+	var _ID = 126
 	
-	var _escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+	var _escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g
 	var _meta = {
 		'\b': '\\b',
 		'\t': '\\t',
@@ -1877,92 +1886,93 @@ define('./json', ['./error', './object', './array', './json-sans-eval'], functio
 		'\r': '\\r',
 		'"' : '\\"',
 		'\\': '\\\\'
-	};
+	}
 	
 	function _quote(str) {
-		_escapable.lastIndex = 0;
+		_escapable.lastIndex = 0
 		return _escapable.test(str) ? '"' + str.replace(_escapable, function(c) {
-			return _meta[c] || '\\u' + ('0000' + c.charCodeAt(0).toString(16)).slice(-4);
-		}) + '"' : '"' + str + '"';
-	};
+			return _meta[c] || '\\u' + ('0000' + c.charCodeAt(0).toString(16)).slice(-4)
+		}) + '"' : '"' + str + '"'
+	}
 	
 	return {
 		parse: function(str) {
-			return YOM.jsonParse(str);
+			return YOM.jsonParse(str)
 		},
 		
 		stringify: function(obj, prettify, objIndentLevel) {
-			var self = this;
-			var res, tmp, indent, newLine;
+			var self = this
+			var res, tmp, indent, newLine
 			if(prettify) {
-				objIndentLevel = objIndentLevel || 1;
-				newLine = '\n';
+				objIndentLevel = objIndentLevel || 1
+				newLine = '\n'
 			} else {
-				objIndentLevel = 0;
-				newLine = '';
+				objIndentLevel = 0
+				newLine = ''
 			}
 			switch(typeof obj) {
 			case 'string':
-				res = _quote(obj);
-				break;
+				res = _quote(obj)
+				break
 			case 'boolean':
-				res = obj.toString();
-				break;
+				res = obj.toString()
+				break
 			case 'number':
 				if(isNaN(obj)) {
-					throw new YOM.Error(YOM.Error.getCode(_ID, 1), 'NaN not supported.');
+					throw new YOM.Error(YOM.Error.getCode(_ID, 1), 'NaN not supported.')
 				} else if(!isFinite(obj)) {
-					throw new YOM.Error(YOM.Error.getCode(_ID, 2), 'Infinite number not supported.');
+					throw new YOM.Error(YOM.Error.getCode(_ID, 2), 'Infinite number not supported.')
 				} else {
-					res = obj.toString();
+					res = obj.toString()
 				}
-				break;
+				break
 			case 'object':
 				if(!obj) {
-					res = 'null';
-					break;
+					res = 'null'
+					break
 				}
-				tmp = [];
+				tmp = []
 				if(obj.__YOM_JSON_STRINGIFY_MARKED__) {
-					throw new YOM.Error(YOM.Error.getCode(_ID, 1), 'YOM.json.stringify can not deal with circular reference.');
+					throw new YOM.Error(YOM.Error.getCode(_ID, 1), 'YOM.json.stringify can not deal with circular reference.')
 				}
-				obj.__YOM_JSON_STRINGIFY_MARKED__ = 1;
+				obj.__YOM_JSON_STRINGIFY_MARKED__ = 1
 				if(YOM.array.isArray(obj)) {
 					YOM.object.each(obj, function(val) {
-						var s = self.stringify(val, prettify, objIndentLevel);
-						s && tmp.push(s);
-					});
-					res = '[' + tmp.join(', ') + ']';
+						var s = self.stringify(val, prettify, objIndentLevel)
+						s && tmp.push(s)
+					})
+					res = '[' + tmp.join(', ') + ']'
 				} else {
-					indent = [];
+					indent = []
 					for(var i = 0; i < objIndentLevel; i++) {
-						indent.push('    ');
+						indent.push('    ')
 					}
 					YOM.object.each(obj, function(val, key) {
 						if(key == '__YOM_JSON_STRINGIFY_MARKED__' || val === YOM.object.PRIVATE_PROPERTY) {
-							return;
+							return
 						}
 						if(YOM.object.hasOwnProperty(obj, key)) {
-							var s = self.stringify(val, prettify, objIndentLevel + 1);
-							s && tmp.push(indent.join('') + _quote(key) + ': ' + s);
+							var s = self.stringify(val, prettify, objIndentLevel + 1)
+							s && tmp.push(indent.join('') + _quote(key) + ': ' + s)
 						}
-					});
-					indent.pop();
+					})
+					indent.pop()
 					if(tmp.length) {
-						res = '{' + newLine + tmp.join(', ' + newLine) + newLine + indent.join('') + '}';
+						res = '{' + newLine + tmp.join(', ' + newLine) + newLine + indent.join('') + '}'
 					} else {
-						res = '{}';
+						res = '{}'
 					}
 				}
-				delete obj.__YOM_JSON_STRINGIFY_MARKED__;
-				break;
+				delete obj.__YOM_JSON_STRINGIFY_MARKED__
+				break
 			default:
-				throw new YOM.Error(YOM.Error.getCode(_ID, 3), typeof obj + ' type not supported.');
+				throw new YOM.Error(YOM.Error.getCode(_ID, 3), typeof obj + ' type not supported.')
 			}
-			return res;
+			return res
 		}
-	};
-});
+	}
+})
+
 
 
 /**
@@ -1970,56 +1980,57 @@ define('./json', ['./error', './object', './array', './json-sans-eval'], functio
  */
 define('./observer', ['./object'], function(object) {
 	var Observer = function () {
-		this._subscribers = [];
-	};
+		this._subscribers = []
+	}
 	
 	Observer.prototype = {
 		subscribe: function(subscriber, bind) {
-			subscriber = bind ? object.bind(bind, subscriber) : subscriber;
+			subscriber = bind ? object.bind(bind, subscriber) : subscriber
 			for(var i = 0, l = this._subscribers.length; i < l; i++) {
 				if(subscriber == this._subscribers[i]) {
-					return null;
+					return null
 				}
 			}
-			this._subscribers.push(subscriber);
-			return subscriber;
+			this._subscribers.push(subscriber)
+			return subscriber
 		},
 		
 		remove: function(subscriber) {
-			var res = [];
+			var res = []
 			if(subscriber) {
 				for(var i = this._subscribers.length - 1; i >= 0; i--) {
 					if(subscriber == this._subscribers[i]) {
-						res = res.concat(this._subscribers.splice(i, 1));
+						res = res.concat(this._subscribers.splice(i, 1))
 					}
 				}
 			} else {
-				res = this._subscribers;
-				this._subscribers = [];
+				res = this._subscribers
+				this._subscribers = []
 			}
-			return res;
+			return res
 		},
 		
 		dispatch: function(e, bind) {
-			var res, tmp, subscriber;
+			var res, tmp, subscriber
 			for(var i = this._subscribers.length - 1; i >= 0; i--) {
-				subscriber = this._subscribers[i];
+				subscriber = this._subscribers[i]
 				if(!subscriber) {
-					continue;				
+					continue			
 				}
-				tmp = subscriber.call(bind, e);
-				res = tmp === false || res === false ? false : tmp;
+				tmp = subscriber.call(bind, e)
+				res = tmp === false || res === false ? false : tmp
 			}
-			return res;
+			return res
 		},
 		
 		constructor: Observer
-	};
+	}
 	
-	Observer._ID = 111;
+	Observer._ID = 111
 	
-	return Observer;
-});
+	return Observer
+})
+
 
 /**
  * @class YOM.Event
@@ -2029,174 +2040,175 @@ define('./event', ['./error', './object', './observer'], function(Err, object, O
 		'Error': Err,
 		'object': object,
 		'Observer': Observer
-	};
+	}
 	
-	var _ID = 108;
+	var _ID = 108
 	
-	var _elRefCount = 0;
+	var _elRefCount = 0
 	_customizedEventHash = {
 		
-	};
+	}
 	
 	function _getObserver(instance, type) {
 		if(!instance instanceof Evt) {
-			throw new YOM.Error(YOM.Error.getCode(_ID, 1));
+			throw new YOM.Error(YOM.Error.getCode(_ID, 1))
 		}
-		instance._observers = instance._observers || {};
-		instance._observers[type] = instance._observers[type] || new YOM.Observer();
-		return instance._observers[type];
-	};
+		instance._observers = instance._observers || {}
+		instance._observers[type] = instance._observers[type] || new YOM.Observer()
+		return instance._observers[type]
+	}
 	
 	function _getObservers(instance) {
 		if(!instance instanceof Evt) {
-			throw new YOM.Error(YOM.Error.getCode(_ID, 1));
+			throw new YOM.Error(YOM.Error.getCode(_ID, 1))
 		}
-		instance._observers = instance._observers || {};
-		return instance._observers;
-	};
+		instance._observers = instance._observers || {}
+		return instance._observers
+	}
 	
 	function Evt(observers) {
-		this._observers = YOM.object.getClean(observers) || {};
-	};
+		this._observers = YOM.object.getClean(observers) || {}
+	}
 	
 	Evt.prototype = {
 		addObservers: function(newObservers) {
-			var observers = _getObservers(this);
-			newObservers = YOM.object.getClean(newObservers);
+			var observers = _getObservers(this)
+			newObservers = YOM.object.getClean(newObservers)
 			for(var type in newObservers) {
 				if(newObservers[type] instanceof YOM.Observer) {
-					observers[type] = newObservers[type];
+					observers[type] = newObservers[type]
 				}
 			}
 		},
 		
 		addEventListener: function(type, listener, bind) {
-			var observer = _getObserver(this, type);
+			var observer = _getObserver(this, type)
 			if(!observer) {
-				throw new YOM.Error(YOM.Error.getCode(_ID, 1));
+				throw new YOM.Error(YOM.Error.getCode(_ID, 1))
 			}
-			return observer.subscribe(listener, bind);
+			return observer.subscribe(listener, bind)
 		},
 		
 		removeEventListener: function(type, listener) {
-			var observer = _getObserver(this, type);
+			var observer = _getObserver(this, type)
 			if(!observer) {
-				throw new YOM.Error(YOM.Error.getCode(_ID, 2));
+				throw new YOM.Error(YOM.Error.getCode(_ID, 2))
 			}
-			return observer.remove(listener);
+			return observer.remove(listener)
 		},
 		
 		dispatchEvent: function(e, asyn) {
 			if(typeof e == 'string') {
-				e = {type: e};
+				e = {type: e}
 			}
-			var self = this;
-			var observer = _getObserver(this, e.type);
+			var self = this
+			var observer = _getObserver(this, e.type)
 			if(!observer) {
-				throw new YOM.Error(YOM.Error.getCode(_ID, 3));
+				throw new YOM.Error(YOM.Error.getCode(_ID, 3))
 			}
 			if(asyn) {
 				setTimeout(function() {
-					observer.dispatch.call(observer, e, self);
-				}, 0);
-				return undefined;
+					observer.dispatch.call(observer, e, self)
+				}, 0)
+				return undefined
 			} else {
-				return observer.dispatch.call(observer, e, self);
+				return observer.dispatch.call(observer, e, self)
 			}
 		},
 		
 		createEvent: function(type, opt) {
-			var e = YOM.object.clone(opt) || {};
-			e.type = type;
-			return e;
+			var e = YOM.object.clone(opt) || {}
+			e.type = type
+			return e
 		},
 		
 		constructor: Evt
-	};
+	}
 	
 	Evt.addListener = function(el, eType, listener, bind) {
-		var cEvent, cEventHandler;
-		eType = eType.toLowerCase();
-		listener = bind ? YOM.object.bind(bind, listener) : listener;
-		cEvent = _customizedEventHash[eType];
+		var cEvent, cEventHandler
+		eType = eType.toLowerCase()
+		listener = bind ? YOM.object.bind(bind, listener) : listener
+		cEvent = _customizedEventHash[eType]
 		if(cEvent) {
-			el.elEventRef = el.elEventRef || ++_elRefCount;
-			cEventHandler = cEvent.elEventRefHandlerHash[el.elEventRef];
+			el.elEventRef = el.elEventRef || ++_elRefCount
+			cEventHandler = cEvent.elEventRefHandlerHash[el.elEventRef]
 			if(!cEventHandler) {
-				cEventHandler = cEvent.elEventRefHandlerHash[el.elEventRef] = new cEvent.Handler(el);
+				cEventHandler = cEvent.elEventRefHandlerHash[el.elEventRef] = new cEvent.Handler(el)
 			}
-			cEventHandler.addListener(listener);
+			cEventHandler.addListener(listener)
 		} else if(el.addEventListener) {
-			el.addEventListener(eType, listener, false);
+			el.addEventListener(eType, listener, false)
 		} else {
-			el.attachEvent('on' + eType, listener);
+			el.attachEvent('on' + eType, listener)
 		}
-		return listener;
-	};
+		return listener
+	}
 	
 	Evt.removeListener = function(el, eType, listener) {
-		var cEvent, cEventHandler;
-		eType = eType.toLowerCase();
-		cEvent = _customizedEventHash[eType];
+		var cEvent, cEventHandler
+		eType = eType.toLowerCase()
+		cEvent = _customizedEventHash[eType]
 		if(cEvent) {
-			cEventHandler = cEvent.elEventRefHandlerHash[el.elEventRef];
+			cEventHandler = cEvent.elEventRefHandlerHash[el.elEventRef]
 			if(cEventHandler) {
-				cEventHandler.removeListener(listener);
+				cEventHandler.removeListener(listener)
 			}
 		} else if(el.removeEventListener) {
-			el.removeEventListener(eType, listener, false);
+			el.removeEventListener(eType, listener, false)
 		} else {
-			el.detachEvent('on' + eType, listener);
+			el.detachEvent('on' + eType, listener)
 		}
-	};
+	}
 	
 	Evt.addCustomizedEvent = function(type, Handler) {
 		_customizedEventHash[type] = {
 			Handler: Handler,
 			elEventRefHandlerHash: {}
-		};
-	};
+		}
+	}
 	
 	Evt.removeCustomizedEventHandler = function(type, ref) {
-		var cEvent = _customizedEventHash[type];
+		var cEvent = _customizedEventHash[type]
 		if(cEvent) {
-			cEvent.elEventRefHandlerHash[ref] = null;
+			cEvent.elEventRefHandlerHash[ref] = null
 		}
-	};
+	}
 	
 	Evt.cancelBubble = function(e) {
 		if(e.stopPropagation) {
-			e.stopPropagation();
+			e.stopPropagation()
 		} else {
-			e.cancelBubble = true;
+			e.cancelBubble = true
 		}
-	};
+	}
 	
 	Evt.preventDefault = function(e) {
 		if(e.preventDefault) {
-			e.preventDefault();
+			e.preventDefault()
 		} else {
-			e.returnValue = false;
+			e.returnValue = false
 		}
-	};
+	}
 	
 	Evt.getTarget = function(e) {
-		return e.target || e.srcElement;
-	};
+		return e.target || e.srcElement
+	}
 	
 	Evt.getPageX = function(e) {
-		return e.pageX != undefined ? e.pageX : e.clientX + Math.max(document.documentElement.scrollLeft, document.body.scrollLeft);
-	};
+		return e.pageX != undefined ? e.pageX : e.clientX + Math.max(document.documentElement.scrollLeft, document.body.scrollLeft)
+	}
 	
 	Evt.getPageY = function(e) {
-		return e.pageY != undefined ? e.pageY : e.clientY + Math.max(document.documentElement.scrollTop, document.body.scrollTop);
-	};
+		return e.pageY != undefined ? e.pageY : e.clientY + Math.max(document.documentElement.scrollTop, document.body.scrollTop)
+	}
 	
-	return Evt;
-});
+	return Evt
+})
+
 
 define('./sizzle', [], function() {
-(function(){function y(a,b,c,d,f,e){f=a=="previousSibling"&&!e;for(var h=0,j=d.length;h<j;h++){var g=d[h];if(g){if(f&&g.nodeType===1){g.sizcache=c;g.sizset=h}g=g[a];for(var l=false;g;){if(g.sizcache===c){l=d[g.sizset];break}if(g.nodeType===1&&!e){g.sizcache=c;g.sizset=h}if(g.nodeName===b){l=g;break}g=g[a]}d[h]=l}}}function z(a,b,c,d,f,e){f=a=="previousSibling"&&!e;for(var h=0,j=d.length;h<j;h++){var g=d[h];if(g){if(f&&g.nodeType===1){g.sizcache=c;g.sizset=h}g=g[a];for(var l=false;g;){if(g.sizcache===
+;(function(){function y(a,b,c,d,f,e){f=a=="previousSibling"&&!e;for(var h=0,j=d.length;h<j;h++){var g=d[h];if(g){if(f&&g.nodeType===1){g.sizcache=c;g.sizset=h}g=g[a];for(var l=false;g;){if(g.sizcache===c){l=d[g.sizset];break}if(g.nodeType===1&&!e){g.sizcache=c;g.sizset=h}if(g.nodeName===b){l=g;break}g=g[a]}d[h]=l}}}function z(a,b,c,d,f,e){f=a=="previousSibling"&&!e;for(var h=0,j=d.length;h<j;h++){var g=d[h];if(g){if(f&&g.nodeType===1){g.sizcache=c;g.sizset=h}g=g[a];for(var l=false;g;){if(g.sizcache===
 c){l=d[g.sizset];break}if(g.nodeType===1){if(!e){g.sizcache=c;g.sizset=h}if(typeof b!=="string"){if(g===b){l=true;break}}else if(k.filter(b,[g]).length>0){l=g;break}}g=g[a]}d[h]=l}}}var v=/((?:\((?:\([^()]+\)|[^()]+)+\)|\[(?:\[[^[\]]*\]|['"][^'"]*['"]|[^[\]'"]+)+\]|\\.|[^ >+~,(\[\\]+)+|[>+~])(\s*,\s*)?/g,w=0,A=Object.prototype.toString,n=false,k=function(a,b,c,d){c=c||[];var f=b=b||document;if(b.nodeType!==1&&b.nodeType!==9)return[];if(!a||typeof a!=="string")return c;var e=[],h,j,g,l,o=true,p=s(b);
 for(v.lastIndex=0;(h=v.exec(a))!==null;){e.push(h[1]);if(h[2]){l=RegExp.rightContext;break}}if(e.length>1&&D.exec(a))if(e.length===2&&i.relative[e[0]])j=B(e[0]+e[1],b);else for(j=i.relative[e[0]]?[b]:k(e.shift(),b);e.length;){a=e.shift();if(i.relative[a])a+=e.shift();j=B(a,j)}else{if(!d&&e.length>1&&b.nodeType===9&&!p&&i.match.ID.test(e[0])&&!i.match.ID.test(e[e.length-1])){h=k.find(e.shift(),b,p);b=h.expr?k.filter(h.expr,h.set)[0]:h.set[0]}if(b){h=d?{expr:e.pop(),set:q(d)}:k.find(e.pop(),e.length===
 1&&(e[0]==="~"||e[0]==="+")&&b.parentNode?b.parentNode:b,p);j=h.expr?k.filter(h.expr,h.set):h.set;if(e.length>0)g=q(j);else o=false;for(;e.length;){var m=e.pop();h=m;if(i.relative[m])h=e.pop();else m="";if(h==null)h=b;i.relative[m](g,h,p)}}else g=[]}g||(g=j);if(!g)throw"Syntax error, unrecognized expression: "+(m||a);if(A.call(g)==="[object Array]")if(o)if(b&&b.nodeType===1)for(a=0;g[a]!=null;a++){if(g[a]&&(g[a]===true||g[a].nodeType===1&&E(b,g[a])))c.push(j[a])}else for(a=0;g[a]!=null;a++)g[a]&&
@@ -2220,8 +2232,9 @@ d[1]?[f]:undefined:[]};i.filter.ID=function(d,f){var e=typeof d.getAttributeNode
 if(a.firstChild&&typeof a.firstChild.getAttribute!=="undefined"&&a.firstChild.getAttribute("href")!=="#")i.attrHandle.href=function(b){return b.getAttribute("href",2)};a=null})();document.querySelectorAll&&function(){var a=k,b=document.createElement("div");b.innerHTML="<p class='TEST'></p>";if(!(b.querySelectorAll&&b.querySelectorAll(".TEST").length===0)){k=function(d,f,e,h){f=f||document;if(!h&&f.nodeType===9&&!s(f))try{return q(f.querySelectorAll(d),e)}catch(j){}return a(d,f,e,h)};for(var c in a)k[c]=
 a[c];b=null}}();document.getElementsByClassName&&document.documentElement.getElementsByClassName&&function(){var a=document.createElement("div");a.innerHTML="<div class='test e'></div><div class='test'></div>";if(a.getElementsByClassName("e").length!==0){a.lastChild.className="e";if(a.getElementsByClassName("e").length!==1){i.order.splice(1,0,"CLASS");i.find.CLASS=function(b,c,d){if(typeof c.getElementsByClassName!=="undefined"&&!d)return c.getElementsByClassName(b[1])};a=null}}}();var E=document.compareDocumentPosition?
 function(a,b){return a.compareDocumentPosition(b)&16}:function(a,b){return a!==b&&(a.contains?a.contains(b):true)},s=function(a){return a.nodeType===9&&a.documentElement.nodeName!=="HTML"||!!a.ownerDocument&&a.ownerDocument.documentElement.nodeName!=="HTML"},B=function(a,b){for(var c=[],d="",f,e=b.nodeType?[b]:b;f=i.match.PSEUDO.exec(a);){d+=f[0];a=a.replace(i.match.PSEUDO,"")}a=i.relative[a]?a+"*":a;f=0;for(var h=e.length;f<h;f++)k(a,e[f],c);return k.filter(d,c)};window.Sizzle=k})();
-return Sizzle;
-});
+return Sizzle
+})
+
 
 
 /**
@@ -2229,7 +2242,7 @@ return Sizzle;
  * @namespace YOM.transition
  */
 define('./transition', [], function() {
-	var _BACK_CONST = 1.70158;
+	var _BACK_CONST = 1.70158
 	return {
 		css: {
 			linear: 'linear',
@@ -2240,21 +2253,21 @@ define('./transition', [], function() {
 		},
 		
 		linear: function(t) {
-			return t;
+			return t
 		},
 		
 		/**
 		 * Begins slowly and accelerates towards end. (quadratic)
 		 */
 		easeIn: function (t) {
-			return t * t;
+			return t * t
 		},
 	
 		/**
 		 * Begins quickly and decelerates towards end.  (quadratic)
 		 */
 		easeOut: function (t) {
-			return ( 2 - t) * t;
+			return ( 2 - t) * t
 		},
 		
 		/**
@@ -2263,21 +2276,21 @@ define('./transition', [], function() {
 		easeInOut: function (t) {
 			return (t *= 2) < 1 ?
 				0.5 * t * t :
-				0.5 * (1 - (--t) * (t - 2));
+				0.5 * (1 - (--t) * (t - 2))
 		},
 		
 		/**
 		 * Begins slowly and accelerates towards end. (quartic)
 		 */
 		easeInStrong: function (t) {
-			return t * t * t * t;
+			return t * t * t * t
 		},
 		
 		/**
 		 * Begins quickly and decelerates towards end.  (quartic)
 		 */
 		easeOutStrong: function (t) {
-			return 1 - (--t) * t * t * t;
+			return 1 - (--t) * t * t * t
 		},
 		
 		/**
@@ -2286,54 +2299,54 @@ define('./transition', [], function() {
 		easeInOutStrong: function (t) {
 			return (t *= 2) < 1 ?
 				0.5 * t * t * t * t :
-				0.5 * (2 - (t -= 2) * t * t * t);
+				0.5 * (2 - (t -= 2) * t * t * t)
 		},
 		
 		/**
 		 * Snap in elastic effect.
 		 */
 		elasticIn: function (t) {
-			var p = 0.3, s = p / 4;
-			if (t === 0 || t === 1) return t;
-			return -(Math.pow(2, 10 * (t -= 1)) * Math.sin((t - s) * (2 * Math.PI) / p));
+			var p = 0.3, s = p / 4
+			if (t === 0 || t === 1) return t
+			return -(Math.pow(2, 10 * (t -= 1)) * Math.sin((t - s) * (2 * Math.PI) / p))
 		},
 		
 		/**
 		 * Snap out elastic effect.
 		 */
 		elasticOut: function (t) {
-			var p = 0.3, s = p / 4;
-			if (t === 0 || t === 1) return t;
-			return Math.pow(2, -10 * t) * Math.sin((t - s) * (2 * Math.PI) / p) + 1;
+			var p = 0.3, s = p / 4
+			if (t === 0 || t === 1) return t
+			return Math.pow(2, -10 * t) * Math.sin((t - s) * (2 * Math.PI) / p) + 1
 		},
 		
 		/**
 		 * Snap both elastic effect.
 		 */
 		elasticInOut: function (t) {
-			var p = 0.45, s = p / 4;
-			if (t === 0 || (t *= 2) === 2) return t / 2;
+			var p = 0.45, s = p / 4
+			if (t === 0 || (t *= 2) === 2) return t / 2
 			if (t < 1) {
 				return -0.5 * (Math.pow(2, 10 * (t -= 1)) *
-				Math.sin((t - s) * (2 * Math.PI) / p));
+				Math.sin((t - s) * (2 * Math.PI) / p))
 			}
 			return Math.pow(2, -10 * (t -= 1)) *
-			Math.sin((t - s) * (2 * Math.PI) / p) * 0.5 + 1;
+			Math.sin((t - s) * (2 * Math.PI) / p) * 0.5 + 1
 		},
 	
 		/**
 		 * Backtracks slightly, then reverses direction and moves to end.
 		 */
 		backIn: function (t) {
-			if (t === 1) t -= 0.001;
-			return t * t * ((_BACK_CONST + 1) * t - _BACK_CONST);
+			if (t === 1) t -= 0.001
+			return t * t * ((_BACK_CONST + 1) * t - _BACK_CONST)
 		},
 		
 		/**
 		 * Overshoots end, then reverses and comes back to end.
 		 */
 		backOut: function (t) {
-			return (t -= 1) * t * ((_BACK_CONST + 1) * t + _BACK_CONST) + 1;
+			return (t -= 1) * t * ((_BACK_CONST + 1) * t + _BACK_CONST) + 1
 		},
 		
 		/**
@@ -2342,36 +2355,36 @@ define('./transition', [], function() {
 		 */
 		backInOut: function (t) {
 			if ((t *= 2 ) < 1) {
-				return 0.5 * (t * t * (((_BACK_CONST *= (1.525)) + 1) * t - _BACK_CONST));
+				return 0.5 * (t * t * (((_BACK_CONST *= (1.525)) + 1) * t - _BACK_CONST))
 			}
-			return 0.5 * ((t -= 2) * t * (((_BACK_CONST *= (1.525)) + 1) * t + _BACK_CONST) + 2);
+			return 0.5 * ((t -= 2) * t * (((_BACK_CONST *= (1.525)) + 1) * t + _BACK_CONST) + 2)
 		},
 		
 		/**
 		 * Bounce off of start.
 		 */
 		bounceIn: function (t) {
-			return 1 - Easing.bounceOut(1 - t);
+			return 1 - Easing.bounceOut(1 - t)
 		},
 		
 		/**
 		 * Bounces off end.
 		 */
 		bounceOut: function (t) {
-			var s = 7.5625, r;
+			var s = 7.5625, r
 			if (t < (1 / 2.75)) {
-				r = s * t * t;
+				r = s * t * t
 			}
 			else if (t < (2 / 2.75)) {
-				r =  s * (t -= (1.5 / 2.75)) * t + 0.75;
+				r =  s * (t -= (1.5 / 2.75)) * t + 0.75
 			}
 			else if (t < (2.5 / 2.75)) {
-				r =  s * (t -= (2.25 / 2.75)) * t + 0.9375;
+				r =  s * (t -= (2.25 / 2.75)) * t + 0.9375
 			}
 			else {
-				r =  s * (t -= (2.625 / 2.75)) * t + 0.984375;
+				r =  s * (t -= (2.625 / 2.75)) * t + 0.984375
 			}
-			return r;
+			return r
 		},
 		
 		/**
@@ -2379,12 +2392,13 @@ define('./transition', [], function() {
 		 */
 		bounceInOut: function (t) {
 			if (t < 0.5) {
-				return Easing.bounceIn(t * 2) * 0.5;
+				return Easing.bounceIn(t * 2) * 0.5
 			}
-			return Easing.bounceOut(t * 2 - 1) * 0.5 + 0.5;
+			return Easing.bounceOut(t * 2 - 1) * 0.5 + 0.5
 		}
-	};
-});
+	}
+})
+
 
 
 /**
@@ -2398,21 +2412,21 @@ define('./tween', ['./browser', './object', './instance-manager', './element', '
 		'InstanceManager': InstanceManager,
 		'Element': Elem,
 		'transition': transition
-	};
+	}
 	
-	var _ID = 120;
+	var _ID = 120
 	var _STATUS = {
 		INIT: 0,
 		TWEENING: 1,
 		STOPPED: 2
-	};
+	}
 	var _STYLE_PROPS = [
 		'backgroundColor', 'borderBottomColor', 'borderBottomWidth', 'borderBottomStyle', 'borderLeftColor', 'borderLeftWidth', 'borderLeftStyle', 'borderRightColor', 'borderRightWidth', 'borderRightStyle', 'borderSpacing', 'borderTopColor', 'borderTopWidth', 'borderTopStyle', 'bottom', 'color', 'font', 'fontFamily', 'fontSize', 'fontWeight', 'height', 'left', 'letterSpacing', 'lineHeight', 'marginBottom', 'marginLeft', 'marginRight', 'marginTop', 'maxHeight', 'maxWidth', 'minHeight', 'minWidth', 'opacity', 'outlineColor', 'outlineOffset', 'outlineWidth', 'paddingBottom', 'paddingLeft', 'paddingRight', 'paddingTop', 'right', 'textIndent', 'top', 'width', 'wordSpacing', 'zIndex', 'position'
-	];
-	var _FPS = 60;
+	]
+	var _FPS = 60
 	
-	var _im = new YOM.InstanceManager();
-	var _parserEl = null;
+	var _im = new YOM.InstanceManager()
+	var _parserEl = null
 	
 	var _requestAnimationFrame = window.requestAnimationFrame
 	|| window.webkitRequestAnimationFrame
@@ -2420,7 +2434,7 @@ define('./tween', ['./browser', './object', './instance-manager', './element', '
 	|| window.oRequestAnimationFrame
 	|| window.msRequestAnimationFrame
 	|| function(callback) {
-		return setTimeout(callback, 1000 / _FPS);
+		return setTimeout(callback, 1000 / _FPS)
 	}
 	
 	var _cancelAnimationFrame = window.cancelAnimationFrame
@@ -2429,341 +2443,342 @@ define('./tween', ['./browser', './object', './instance-manager', './element', '
 	|| window.oCancelAnimationFrame
 	|| window.msCancelAnimationFrame
 	|| function(timer) {
-		clearTimeout(timer);
-	};
+		clearTimeout(timer)
+	}
 	
 	function _getParserEl() {
 		if(!_parserEl) {
-			_parserEl = YOM.Element.create('div');
+			_parserEl = YOM.Element.create('div')
 		}
-		return _parserEl;
-	};
+		return _parserEl
+	}
 	
 	function _getRgbVal(str) {
-		var res;
-		str += '';
+		var res
+		str += ''
 		if(str.indexOf('rgb') === 0) {
-			res = str.match(/\d+/g);
+			res = str.match(/\d+/g)
 		} else if(str.indexOf('#') === 0) {
 			if(str.length === 4) {
-				str = '#' + str.slice(1, 2) + str.slice(1, 2) + str.slice(2, 3) + str.slice(2, 3) + str.slice(3, 4) + str.slice(3, 4);
+				str = '#' + str.slice(1, 2) + str.slice(1, 2) + str.slice(2, 3) + str.slice(2, 3) + str.slice(3, 4) + str.slice(3, 4)
 			}
-			res = [parseInt(str.slice(1, 3), 16) || 0, parseInt(str.slice(3, 5), 16) || 0, parseInt(str.slice(5, 7), 16) || 0];
+			res = [parseInt(str.slice(1, 3), 16) || 0, parseInt(str.slice(3, 5), 16) || 0, parseInt(str.slice(5, 7), 16) || 0]
 		}
-		return res || [];
-	};
+		return res || []
+	}
 	
 	function _calColorVal(source, target, percent) {
-		var srcTmp = _getRgbVal(source);
-		var tarTmp = _getRgbVal(target);
+		var srcTmp = _getRgbVal(source)
+		var tarTmp = _getRgbVal(target)
 		if(!tarTmp.length) {
-			return target;
+			return target
 		}
-		var tmp = [];
+		var tmp = []
 		for(var i = 0; i < 4; i++) {
-			srcTmp[i] = parseInt(srcTmp[i]) || 0;
-			tarTmp[i] = parseInt(tarTmp[i]) || 0;
-			tmp[i] = parseInt(srcTmp[i] + (tarTmp[i] - srcTmp[i]) * percent);
-			tmp[i] = tmp[i] < 0 ? 0 : tmp[i] > 255 ? 255 : tmp[i];
+			srcTmp[i] = parseInt(srcTmp[i]) || 0
+			tarTmp[i] = parseInt(tarTmp[i]) || 0
+			tmp[i] = parseInt(srcTmp[i] + (tarTmp[i] - srcTmp[i]) * percent)
+			tmp[i] = tmp[i] < 0 ? 0 : tmp[i] > 255 ? 255 : tmp[i]
 		}
 		if(target.indexOf('rgba') === 0) {
-			return 'rgba(' + tmp.join(',') + ')';
+			return 'rgba(' + tmp.join(',') + ')'
 		} else {
-			tmp.pop();
-			return 'rgb(' + tmp.join(',') + ')';
+			tmp.pop()
+			return 'rgb(' + tmp.join(',') + ')'
 		}
-	};
+	}
 	
 	function _calNumVal(origin, target, percent) {
-		return origin + (target - origin) * percent;
-	};
+		return origin + (target - origin) * percent
+	}
 	
 	function _calStrVal(origin, target, percent) {
-		return percent === 1 ? target : origin;
-	};
+		return percent === 1 ? target : origin
+	}
 	
 	function _parsePropVal(val) {
-		var v, u;
-		val = val + '';
-		v = parseFloat(val);
-		u = val.replace(/^[-\d\.]+/, '');
-		return isNaN(v) ? {v: val, u: '', f: (/^#|rgb/).test(val) ? _calColorVal : _calStrVal} : {v: v, u: u, f: _calNumVal};
-	};
+		var v, u
+		val = val + ''
+		v = parseFloat(val)
+		u = val.replace(/^[-\d\.]+/, '')
+		return isNaN(v) ? {v: val, u: '', f: (/^#|rgb/).test(val) ? _calColorVal : _calStrVal} : {v: v, u: u, f: _calNumVal}
+	}
 	
 	function _getStyle(style) {
-		var res = {};
-		var parserEl;
+		var res = {}
+		var parserEl
 		if(!style) {
-			return res;
+			return res
 		}
 		if(typeof style == 'string') {
-			parserEl = _getParserEl();
-			parserEl.innerHTML = '<div style="' + style + '"></div>';
-			style = parserEl.firstChild.style;
+			parserEl = _getParserEl()
+			parserEl.innerHTML = '<div style="' + style + '"></div>'
+			style = parserEl.firstChild.style
 		}
 		YOM.object.each(_STYLE_PROPS, function(prop) {
-			var val = style[prop];
+			var val = style[prop]
 			if(val || val === 0) {
-				res[prop] = _parsePropVal(val);
+				res[prop] = _parsePropVal(val)
 			}
-		});
-		return res;
-	};
+		})
+		return res
+	}
 	
 	function _getOriginStyle(el, target, origin) {
-		var res = {};
-		origin = _getStyle(origin);
+		var res = {}
+		origin = _getStyle(origin)
 		YOM.object.each(target, function(propVal, propName) {
-			var val;
+			var val
 			if(origin[propName]) {
-				res[propName] = origin[propName];
+				res[propName] = origin[propName]
 			} else {
-				val = el.getStyle(propName);
+				val = el.getStyle(propName)
 				if(val || val === 0) {
-					res[propName] = _parsePropVal(val);
+					res[propName] = _parsePropVal(val)
 				} else {
-					res[propName] = propVal;
+					res[propName] = propVal
 				}
 			}
-		});
-		return res;
-	};
+		})
+		return res
+	}
 	
 	function _getProp(prop) {
-		var res = {};
+		var res = {}
 		YOM.object.each(prop, function(propVal, propName) {
-			res[propName] = _parsePropVal(propVal);
-		});
-		return res;
-	};
+			res[propName] = _parsePropVal(propVal)
+		})
+		return res
+	}
 	
 	function _getOriginProp(el, target, origin) {
-		var res = {};
-		origin = _getProp(origin);
+		var res = {}
+		origin = _getProp(origin)
 		YOM.object.each(target, function(propVal, propName) {
-			var val;
+			var val
 			if(origin[propName]) {
-				res[propName] = origin[propName];
+				res[propName] = origin[propName]
 			} else {
-				val = el.getProp(propName);
+				val = el.getProp(propName)
 				if(val != undefined) {
-					res[propName] = _parsePropVal(val);
+					res[propName] = _parsePropVal(val)
 				} else {
-					res[propName] = propVal;
+					res[propName] = propVal
 				}
 			}
-		});
-		return res;
-	};
+		})
+		return res
+	}
 	
 	function Tween(el, duration, opt) {
 		if(!(this instanceof Tween)) {
-			return new Tween(el, duration, opt);
+			return new Tween(el, duration, opt)
 		}
-		opt = opt || {};
-		opt.origin = opt.origin || {};
-		opt.target = opt.target || {};
-		this._opt = opt;
-		this._el = YOM.Element.query(el);
-		this._duration = duration;
-		this._css = opt.css && !opt.target.prop && Tween.getCssTransitionName();
-		this._targetStyle = _getStyle(opt.target.style);
-		this._originStyle = _getOriginStyle(this._el, this._targetStyle, opt.origin.style);
-		this._targetProp = _getProp(opt.target.prop);
-		this._originProp = _getOriginProp(this._el, this._targetProp, opt.origin.prop);
-		this._transition = YOM.transition[opt.transition] || opt.transition || YOM.transition['easeOut'];
-		this._complete = opt.complete || $empty;
-		this._timer = null;
-		this._startTime = null;
-		this._status = _STATUS.INIT;
-		this._id = _im.add(this);
-		return this;
-	};
+		opt = opt || {}
+		opt.origin = opt.origin || {}
+		opt.target = opt.target || {}
+		this._opt = opt
+		this._el = YOM.Element.query(el)
+		this._duration = duration
+		this._css = opt.css && !opt.target.prop && Tween.getCssTransitionName()
+		this._targetStyle = _getStyle(opt.target.style)
+		this._originStyle = _getOriginStyle(this._el, this._targetStyle, opt.origin.style)
+		this._targetProp = _getProp(opt.target.prop)
+		this._originProp = _getOriginProp(this._el, this._targetProp, opt.origin.prop)
+		this._transition = YOM.transition[opt.transition] || opt.transition || YOM.transition['easeOut']
+		this._complete = opt.complete || $empty
+		this._timer = null
+		this._startTime = null
+		this._status = _STATUS.INIT
+		this._id = _im.add(this)
+		return this
+	}
 	
-	Tween._im = _im;
+	Tween._im = _im
 	
 	Tween.getCssTransitionName = function() {
-		var el = new YOM.Element(_getParserEl());
-		var name = 'transition';
-		var isSupport = el.getStyle(name) != undefined;
+		var el = new YOM.Element(_getParserEl())
+		var name = 'transition'
+		var isSupport = el.getStyle(name) != undefined
 		if(!isSupport) {
 			if(YOM.browser.chrome || YOM.browser.safari || YOM.browser.ipad || YOM.browser.iphone || YOM.browser.android) {
-				name = '-webkit-transition';
+				name = '-webkit-transition'
 			} else if(YOM.browser.firefox) {
-				name = '-moz-transition';
+				name = '-moz-transition'
 			} else if(YOM.browser.opera) {
-				name = '-o-transition';
+				name = '-o-transition'
 			} else if(YOM.browser.ie) {
-				name = '-ms-transition';
+				name = '-ms-transition'
 			} else {
-				name = '';
+				name = ''
 			}
 			if(name) {
-				isSupport = el.getStyle(name) != undefined;
+				isSupport = el.getStyle(name) != undefined
 				if(!isSupport) {
-					name = '';
+					name = ''
 				}
 			}
 		}
 		Tween.getCssTransitionName = function() {
-			return name;
-		};
-		return name;
-	};
+			return name
+		}
+		return name
+	}
 	
 	Tween.setTimer = function(setter, duration, callback, transition) {
-		transition = YOM.transition[transition] || transition || YOM.transition['linear'];
-		var start = $now();
-		var end = start + duration;
+		transition = YOM.transition[transition] || transition || YOM.transition['linear']
+		var start = $now()
+		var end = start + duration
 		setter(_requestAnimationFrame(function() {
-			var now = $now();
-			var percent = now >= end ? 1 : (now - start) / duration;
-			percent = Math.min(transition(percent), 1);
-			callback(percent);
+			var now = $now()
+			var percent = now >= end ? 1 : (now - start) / duration
+			percent = Math.min(transition(percent), 1)
+			callback(percent)
 			if(percent < 1) {
-				setter(_requestAnimationFrame(arguments.callee));
+				setter(_requestAnimationFrame(arguments.callee))
 			}
-		}));
-	};
+		}))
+	}
 
 	Tween.stopAllTween = function(el) {
 		YOM.Element.query(el).each(function(el) {
-			var tweenObj = _im.get(new YOM.Element(el).getDatasetVal('yom-tween-oid'));
-			tweenObj && tweenObj.stop();
-		});
-	};
+			var tweenObj = _im.get(new YOM.Element(el).getDatasetVal('yom-tween-oid'))
+			tweenObj && tweenObj.stop()
+		})
+	}
 	
-	Tween.cancelTimer = _cancelAnimationFrame;
+	Tween.cancelTimer = _cancelAnimationFrame
 	
 	Tween.prototype._stopAllTween = function() {
-		Tween.stopAllTween(this._el);
-	};
+		Tween.stopAllTween(this._el)
+	}
 	
 	Tween.prototype._removeTweeningEl = function() {
 		this._el.removeItem(function(el) {
-			var tweenObj = _im.get(new YOM.Element(el).getDatasetVal('yom-tween-oid'));
-			return tweenObj && tweenObj.isTweening();
-		});
-	};
+			var tweenObj = _im.get(new YOM.Element(el).getDatasetVal('yom-tween-oid'))
+			return tweenObj && tweenObj.isTweening()
+		})
+	}
 	
 	Tween.prototype._cssTween = function() {
-		var self = this;
-		var originStyle = this._originStyle;
-		var targetStyle = this._targetStyle;
-		var timingFunction = YOM.transition.css[this._opt.transition] || YOM.transition.css['easeOut'];
-		var tVal;
+		var self = this
+		var originStyle = this._originStyle
+		var targetStyle = this._targetStyle
+		var timingFunction = YOM.transition.css[this._opt.transition] || YOM.transition.css['easeOut']
+		var tVal
 		for(prop in originStyle) {
-			tVal = originStyle[prop];
-			this._el.setStyle(prop, tVal.v + tVal.u);
+			tVal = originStyle[prop]
+			this._el.setStyle(prop, tVal.v + tVal.u)
 		}
 		this._el.each(function(el) {
-			el.clientLeft;//force reflow
-		});
-		this._el.storeStyle(this._css + '-duration');
-		this._el.storeStyle(this._css + '-timing-function');
-		this._el.setStyle(this._css + '-duration', this._duration + 'ms');
-		this._el.setStyle(this._css + '-timing-function', timingFunction);
+			el.clientLeft//force reflow
+		})
+		this._el.storeStyle(this._css + '-duration')
+		this._el.storeStyle(this._css + '-timing-function')
+		this._el.setStyle(this._css + '-duration', this._duration + 'ms')
+		this._el.setStyle(this._css + '-timing-function', timingFunction)
 		for(prop in targetStyle) {
-			tVal = targetStyle[prop];
-			this._el.setStyle(prop, tVal.v + tVal.u);
+			tVal = targetStyle[prop]
+			this._el.setStyle(prop, tVal.v + tVal.u)
 		}
 		this._timer = setTimeout(function() {
-			self.stop(true);
-		}, this._duration);
-	};
+			self.stop(true)
+		}, this._duration)
+	}
 	
 	Tween.prototype.isTweening = function() {
-		return this._status == _STATUS.TWEENING;
-	};
+		return this._status == _STATUS.TWEENING
+	}
 	
 	Tween.prototype.play = function() {
 		if(this._status != _STATUS.INIT) {
-			return 1;
+			return 1
 		}
 		if(this._opt.prior) {
-			this._stopAllTween();
+			this._stopAllTween()
 		} else {
-			this._removeTweeningEl();
+			this._removeTweeningEl()
 		}
 		if(!this._el.size()) {
-			return 2;
+			return 2
 		}
-		this._status = _STATUS.TWEENING;
-		this._el.setDatasetVal('yom-tween-oid', this._id);
-		var self = this;
-		var targetStyle = this._targetStyle;
-		var originStyle = this._originStyle;
-		var targetProp = this._targetProp;
-		var originProp = this._originProp;
-		var prop, oVal, tVal;
-		this._startTime = $now();
+		this._status = _STATUS.TWEENING
+		this._el.setDatasetVal('yom-tween-oid', this._id)
+		var self = this
+		var targetStyle = this._targetStyle
+		var originStyle = this._originStyle
+		var targetProp = this._targetProp
+		var originProp = this._originProp
+		var prop, oVal, tVal
+		this._startTime = $now()
 		if(this._css) {
-			this._cssTween();
+			this._cssTween()
 		} else {
-			Tween.setTimer(function(timer) {self._timer = timer;}, this._duration, function(percent) {
+			Tween.setTimer(function(timer) {self._timer = timer}, this._duration, function(percent) {
 				if(self._status == _STATUS.STOPPED) {
-					return;
+					return
 				}
 				for(prop in targetStyle) {
-					tVal = targetStyle[prop];
-					oVal = originStyle[prop];
+					tVal = targetStyle[prop]
+					oVal = originStyle[prop]
 					if(oVal.u != tVal.u) {
-						oVal.v = 0;
+						oVal.v = 0
 					}
-					self._el.setStyle(prop, tVal.f(oVal.v, tVal.v, percent) + tVal.u);
+					self._el.setStyle(prop, tVal.f(oVal.v, tVal.v, percent) + tVal.u)
 				}
 				for(prop in targetProp) {
-					tVal = targetProp[prop];
-					oVal = originProp[prop];
+					tVal = targetProp[prop]
+					oVal = originProp[prop]
 					if(oVal.u != tVal.u) {
-						oVal.v = 0;
+						oVal.v = 0
 					}
-					self._el.setProp(prop, tVal.f(oVal.v, tVal.v, percent) + tVal.u);
+					self._el.setProp(prop, tVal.f(oVal.v, tVal.v, percent) + tVal.u)
 				}
 				if(percent === 1) {
-					self.stop(true);
+					self.stop(true)
 				}
-			}, this._transition);
+			}, this._transition)
 		}
-		return 0;
-	};
+		return 0
+	}
 	
 	Tween.prototype.stop = function(_finished) {
 		if(this._status == _STATUS.STOPPED) {
-			return;
+			return
 		}
-		var el = this._el;
-		var status = this._status;
-		var tVal, oVal, percent;
+		var el = this._el
+		var status = this._status
+		var tVal, oVal, percent
 		if(this._css) {
-			clearTimeout(this._timer);
-			this._el.restoreStyle(this._css + '-duration');
-			this._el.restoreStyle(this._css + '-timing-function');
+			clearTimeout(this._timer)
+			this._el.restoreStyle(this._css + '-duration')
+			this._el.restoreStyle(this._css + '-timing-function')
 			if(!_finished) {
-				percent = ($now() - this._startTime) / this._duration;
-				percent = Math.min(this._transition(percent), 1);
+				percent = ($now() - this._startTime) / this._duration
+				percent = Math.min(this._transition(percent), 1)
 				for(prop in this._targetStyle) {
-					tVal = this._targetStyle[prop];
-					oVal = this._originStyle[prop];
+					tVal = this._targetStyle[prop]
+					oVal = this._originStyle[prop]
 					if(oVal.u != tVal.u) {
-						oVal.v = 0;
+						oVal.v = 0
 					}
-					this._el.setStyle(prop, tVal.f(oVal.v, tVal.v, percent) + tVal.u);
+					this._el.setStyle(prop, tVal.f(oVal.v, tVal.v, percent) + tVal.u)
 				}
 			}
 		} else {
-			_cancelAnimationFrame(this._timer);
+			_cancelAnimationFrame(this._timer)
 		}
-		this._el = null;
-		this._status = _STATUS.STOPPED;
-		_im.remove(this._id);
+		this._el = null
+		this._status = _STATUS.STOPPED
+		_im.remove(this._id)
 		if(status != _STATUS.INIT && this._complete) {
-			this._complete(el);
+			this._complete(el)
 		}
-	};
+	}
 	
-	return Tween;
-});
+	return Tween
+})
+
 
 
 /**
@@ -2772,30 +2787,31 @@ define('./tween', ['./browser', './object', './instance-manager', './element', '
 define('./cookie', ['./config'], function(config) {
 	var YOM = {
 		'config': config
-	};
+	}
 	
 	return {
 		_ID: 105,
 		
 		set: function(name, value, domain, path, hour) {
-			var expire;
+			var expire
 			if(hour) {
-				expire = new Date();
-				expire.setTime(expire.getTime() + 3600000 * hour);
+				expire = new Date()
+				expire.setTime(expire.getTime() + 3600000 * hour)
 			}
-			document.cookie = (name + '=' + value + '; ') + (expire ? ('expires=' + expire.toGMTString() + '; ') : '') + ('path=' + (path || '/') + '; ') + ('domain=' + (domain || YOM.config.domain) + ';');
+			document.cookie = (name + '=' + value + '; ') + (expire ? ('expires=' + expire.toGMTString() + '; ') : '') + ('path=' + (path || '/') + '; ') + ('domain=' + (domain || YOM.config.domain) + ';')
 		},
 		
 		get: function(name) {
-			var r = new RegExp('(?:^|;\\s*)' + name + '=([^;]*)'), m = document.cookie.match(r);
-			return m && m[1] || '';
+			var r = new RegExp('(?:^|;\\s*)' + name + '=([^;]*)'), m = document.cookie.match(r)
+			return m && m[1] || ''
 		},
 		
 		del: function(name, domain, path) {
-			document.cookie = name + '=; expires=Mon, 26 Jul 1997 05:00:00 GMT; ' + ('path=' + (path || '/') + '; ') + ('domain=' + (domain || YOM.config.domain) + ';');
+			document.cookie = name + '=; expires=Mon, 26 Jul 1997 05:00:00 GMT; ' + ('path=' + (path || '/') + '; ') + ('domain=' + (domain || YOM.config.domain) + ';')
 		}
-	};
-});
+	}
+})
+
 
 
 /**
@@ -2810,164 +2826,165 @@ define('./xhr', ['./config', './error', './class', './object', './instance-manag
 		'InstanceManager': InstanceManager,
 		'Observer': Observer,
 		'Event': Evt
-	};
+	}
 	
-	var _ID = 116;
+	var _ID = 116
 	var _STATUS = {
 		INIT: 0,
 		LOADING: 1,
 		LOADED: 2,
 		ABORTED: 3
-	};
+	}
 	
-	var _loading_count = 0;
-	var _im = new YOM.InstanceManager();
+	var _loading_count = 0
+	var _im = new YOM.InstanceManager()
 	
  	function Xhr(url, opt) {
-		opt = opt || {};
-		this._opt = opt;
-		this._method = (opt.method == 'GET' ? 'GET' : 'POST');
-		this._param = typeof opt.param == 'object' ? YOM.object.toQueryString(opt.param) : opt.param;
-		this._formData = opt.formData;
-		this._charset = opt.charset;
-		this._url = url + (opt.method == 'GET' && this._param ? '?' + this._param : '');
-		this._status = _STATUS.INIT;
-		this._onload = opt.load || $empty;
-		this._onabort = opt.abort || $empty;
-		this._onerror = opt.error || $empty;
-		this._oncomplete = opt.complete || $empty;
-		this._bind = opt.bind;
-		this._xhr = null;
-		this._gid = opt.gid;//group id
-		this._id = _im.add(this);
-	};
+		opt = opt || {}
+		this._opt = opt
+		this._method = (opt.method == 'GET' ? 'GET' : 'POST')
+		this._param = typeof opt.param == 'object' ? YOM.object.toQueryString(opt.param) : opt.param
+		this._formData = opt.formData
+		this._charset = opt.charset
+		this._url = url + (opt.method == 'GET' && this._param ? '?' + this._param : '')
+		this._status = _STATUS.INIT
+		this._onload = opt.load || $empty
+		this._onabort = opt.abort || $empty
+		this._onerror = opt.error || $empty
+		this._oncomplete = opt.complete || $empty
+		this._bind = opt.bind
+		this._xhr = null
+		this._gid = opt.gid//group id
+		this._id = _im.add(this)
+	}
 	
-	YOM.Class.extend(Xhr, YOM.Event);
-	YOM.Class.genericize(Xhr, ['addObservers', 'addEventListener', 'removeEventListener', 'dispatchEvent', 'createEvent'], {bind: Xhr});
+	YOM.Class.extend(Xhr, YOM.Event)
+	YOM.Class.genericize(Xhr, ['addObservers', 'addEventListener', 'removeEventListener', 'dispatchEvent', 'createEvent'], {bind: Xhr})
 	Xhr.addObservers({
 		start: new YOM.Observer(),
 		complete: new YOM.Observer(),
 		allcomplete: new YOM.Observer()
-	});
+	})
 	
-	Xhr._im = _im;
+	Xhr._im = _im
 	
 	Xhr.RET = {
 		SUCC: 0,
 		ABORTED: -1,
 		ERROR: 1	
-	};
+	}
 	
 	Xhr.abortAll = function(gid) {
-		var noGid = typeof gid == 'undefined';
+		var noGid = typeof gid == 'undefined'
 		_im.each(function(inst) {
 			if(noGid || inst.getGid() == gid) {
-				inst.abort();
+				inst.abort()
 			}
-		});
-	};
+		})
+	}
 	
 	Xhr.isUrlLoading = function(url, fullMatch) {
-		var res = false;
+		var res = false
 		if(!url) {
-			return res;
+			return res
 		}
 		_im.each(function(inst) {
 			if(fullMatch && url == inst._url || inst._url.indexOf(url) === 0) {
-				res = true;
-				return false;
+				res = true
+				return false
 			}
-			return true;
-		});
-		return res;
-	};
+			return true
+		})
+		return res
+	}
 	
 	Xhr.isAnyLoading = function() {
-		return _loading_count > 0;
-	};
+		return _loading_count > 0
+	}
 	
 	_onReadyStateChange = function() {
 		if(this._xhr.readyState !== 4 || this._status == _STATUS.ABORTED) {
-			return;
+			return
 		}
-		this._status = _STATUS.LOADED;
+		this._status = _STATUS.LOADED
 		if(this._xhr.status >= 200 && this._xhr.status < 300) {
-			this._complete(Xhr.RET.SUCC);
-			this._onload.call(this._bind, this._xhr.responseText, this._xhr.responseXML);
+			this._complete(Xhr.RET.SUCC)
+			this._onload.call(this._bind, this._xhr.responseText, this._xhr.responseXML)
 		} else {
-			this._complete(Xhr.RET.ERROR);
-			this._onerror.call(this._bind, new YOM.Error(YOM.Error.getCode(_ID, 1), 'Xhr request failed.'));
+			this._complete(Xhr.RET.ERROR)
+			this._onerror.call(this._bind, new YOM.Error(YOM.Error.getCode(_ID, 1), 'Xhr request failed.'))
 		}
-	};
+	}
 	
 	Xhr.prototype._complete = function(ret) {
-		this._opt.silent || _loading_count > 0 && _loading_count--;
-		_im.remove(this.getId());
+		this._opt.silent || _loading_count > 0 && _loading_count--
+		_im.remove(this.getId())
 		try {
-			_loading_count === 0 && Xhr.dispatchEvent(Xhr.createEvent('allcomplete', {url: this._url, method: this._method, opt: this._opt, ret: ret}));
-			Xhr.dispatchEvent(Xhr.createEvent('complete', {url: this._url, method: this._method, opt: this._opt, ret: ret}));
+			_loading_count === 0 && Xhr.dispatchEvent(Xhr.createEvent('allcomplete', {url: this._url, method: this._method, opt: this._opt, ret: ret}))
+			Xhr.dispatchEvent(Xhr.createEvent('complete', {url: this._url, method: this._method, opt: this._opt, ret: ret}))
 		} catch(e) {
 			if(YOM.config.debug) {
-				throw new YOM.Error(YOM.Error.getCode(_ID, 2));
+				throw new YOM.Error(YOM.Error.getCode(_ID, 2))
 			}
 		}
-		this._oncomplete.call(this._bind, ret);
-	};
+		this._oncomplete.call(this._bind, ret)
+	}
 	
 	Xhr.prototype.getId = function() {
-		return this._id;
-	};
+		return this._id
+	}
 	
 	Xhr.prototype.getGid = function() {
-		return this._gid;
-	};
+		return this._gid
+	}
 	
 	Xhr.prototype.send = function() {
 		if(this._status != _STATUS.INIT) {
-			return 1;
+			return 1
 		}
 		try {
-			this._xhr = new XMLHttpRequest();
+			this._xhr = new XMLHttpRequest()
 		} catch(e) {
-			this._xhr = new ActiveXObject('MSXML2.XMLHTTP');
+			this._xhr = new ActiveXObject('MSXML2.XMLHTTP')
 		}
-		this._xhr.open(this._method, this._url, this._opt.isAsync === false ? false : true);
+		this._xhr.open(this._method, this._url, this._opt.isAsync === false ? false : true)
 		if(this._method == 'GET') {
 			if(this._opt.noCache) {
-				this._xhr.setRequestHeader('If-Modified-Since', 'Sun, 27 Mar 1983 00:00:00 GMT');
-				this._xhr.setRequestHeader('Cache-Control', 'no-cache');
+				this._xhr.setRequestHeader('If-Modified-Since', 'Sun, 27 Mar 1983 00:00:00 GMT')
+				this._xhr.setRequestHeader('Cache-Control', 'no-cache')
 			}
 		} else if(!this._formData) {
-			this._xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded' + (this._charset ? '; charset=' + this._charset : ''));
+			this._xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded' + (this._charset ? '; charset=' + this._charset : ''))
 		}
 		if(this._opt.withCredentials) {
-			this._xhr.withCredentials = true;
+			this._xhr.withCredentials = true
 		}
-		this._xhr.onreadystatechange = YOM.object.bind(this, _onReadyStateChange);
-		this._status = _STATUS.LOADING;
-		this._opt.silent || _loading_count++;
-		this._xhr.send(this._method == 'POST' ? (this._formData || this._param) : null);
-		Xhr.dispatchEvent(Xhr.createEvent('start', {url: this._url, method: this._method, opt: this._opt}));
-		return 0;
-	};
+		this._xhr.onreadystatechange = YOM.object.bind(this, _onReadyStateChange)
+		this._status = _STATUS.LOADING
+		this._opt.silent || _loading_count++
+		this._xhr.send(this._method == 'POST' ? (this._formData || this._param) : null)
+		Xhr.dispatchEvent(Xhr.createEvent('start', {url: this._url, method: this._method, opt: this._opt}))
+		return 0
+	}
 	
 	Xhr.prototype.abort = function () {
 		if(this._status != _STATUS.LOADING) {
-			return 1;
+			return 1
 		}
-		this._xhr.abort();
-		this._status = _STATUS.ABORTED;
-		this._complete(Xhr.RET.ABORTED);
-		this._onabort.call(this._bind);
-		return 0;
-	};
+		this._xhr.abort()
+		this._status = _STATUS.ABORTED
+		this._complete(Xhr.RET.ABORTED)
+		this._onabort.call(this._bind)
+		return 0
+	}
 	
 	Xhr.prototype.getXhrObj = function () {
-		return this._xhr;
-	};
+		return this._xhr
+	}
 	
-	return Xhr;
-});
+	return Xhr
+})
+
 
 
 /**
@@ -2984,181 +3001,182 @@ define('./cross-domain-poster', ['require', './config', './error', './object', '
 		'Observer': Observer,
 		'Event': Evt,
 		'Element': Elem
-	};
+	}
 	
-	var _ID = 125;
+	var _ID = 125
 	var _STATUS = {
 		INIT: 0,
 		LOADING: 1,
 		LOADED: 2,
 		ABORTED: 3
-	};
-	var _PROXY = require.toUrl('./cdp-proxy.html', true);
-	var _CROSS_SITE_PROXY = require.toUrl('./cdp-cs-proxy.html', true);
+	}
+	var _PROXY = require.toUrl('./cdp-proxy.html', true)
+	var _CROSS_SITE_PROXY = require.toUrl('./cdp-cs-proxy.html', true)
 	
-	var _sameSiteTester = new RegExp(':\\/\\/(?:[^\\.]+\\.)*' + YOM.config.domain + '\\/');
-	var _im = new YOM.InstanceManager();
-	var _loading_count = 0;
+	var _sameSiteTester = new RegExp(':\\/\\/(?:[^\\.]+\\.)*' + YOM.config.domain + '\\/')
+	var _im = new YOM.InstanceManager()
+	var _loading_count = 0
 	
 	var CrossDomainPoster = function(url, opt) {
-		opt = opt || {};
-		this._opt = opt;
-		this._url = url;
-		this._charset = (opt.charset || 'utf-8').toLowerCase();
-		this._data = opt.data || {};
-		this._onload = opt.load || $empty;
-		this._onerror = opt.error || $empty;
-		this._oncomplete = opt.complete || $empty;
-		this._onabort = opt.abort || $empty;
-		this._bind = opt.bind;
-		this._crossSite = !_sameSiteTester.test(url);//cross top level domain
-		this._proxy = opt.proxy || _PROXY;
-		this._crossSiteProxy = opt.crossSiteProxy || _CROSS_SITE_PROXY;
-		this._proxyParamName = opt.proxyParamName || '_response_url_';
-		this._frameEl = null;
-		this._frameOnLoadListener = null;
-		this._status = _STATUS.INIT;
-		this._id = _im.add(this);
-	};
+		opt = opt || {}
+		this._opt = opt
+		this._url = url
+		this._charset = (opt.charset || 'utf-8').toLowerCase()
+		this._data = opt.data || {}
+		this._onload = opt.load || $empty
+		this._onerror = opt.error || $empty
+		this._oncomplete = opt.complete || $empty
+		this._onabort = opt.abort || $empty
+		this._bind = opt.bind
+		this._crossSite = !_sameSiteTester.test(url)//cross top level domain
+		this._proxy = opt.proxy || _PROXY
+		this._crossSiteProxy = opt.crossSiteProxy || _CROSS_SITE_PROXY
+		this._proxyParamName = opt.proxyParamName || '_response_url_'
+		this._frameEl = null
+		this._frameOnLoadListener = null
+		this._status = _STATUS.INIT
+		this._id = _im.add(this)
+	}
 	
-	YOM.Class.extend(CrossDomainPoster, YOM.Event);
-	YOM.Class.genericize(CrossDomainPoster, ['addObservers', 'addEventListener', 'removeEventListener', 'dispatchEvent', 'createEvent'], {bind: CrossDomainPoster});
+	YOM.Class.extend(CrossDomainPoster, YOM.Event)
+	YOM.Class.genericize(CrossDomainPoster, ['addObservers', 'addEventListener', 'removeEventListener', 'dispatchEvent', 'createEvent'], {bind: CrossDomainPoster})
 	CrossDomainPoster.addObservers({
 		start: new YOM.Observer(),
 		complete: new YOM.Observer(),
 		allcomplete: new YOM.Observer()
-	});
+	})
 	
-	CrossDomainPoster._im = _im;
+	CrossDomainPoster._im = _im
 	
 	CrossDomainPoster.RET = {
 		SUCC: 0,
 		ABORTED: -1,
 		ERROR: 1	
-	};
+	}
 	
 	CrossDomainPoster.isUrlLoading = function(url, fullMatch) {
-		var res = false;
+		var res = false
 		if(!url) {
-			return res;
+			return res
 		}
 		_im.each(function(inst) {
 			if(fullMatch && url == inst._url || inst._url.indexOf(url) === 0) {
-				res = true;
-				return false;
+				res = true
+				return false
 			}
-			return true;
-		});
-		return res;
-	};
+			return true
+		})
+		return res
+	}
 	
 	CrossDomainPoster.isAnyLoading = function() {
-		return _loading_count > 0;
-	};
+		return _loading_count > 0
+	}
 	
 	CrossDomainPoster.getInstance = function(id) {
-		return _im.get(id);
-	};
+		return _im.get(id)
+	}
 	
 	CrossDomainPoster.prototype._complete = function(ret) {
-		_loading_count > 0 && _loading_count--;
-		this._clear();
+		_loading_count > 0 && _loading_count--
+		this._clear()
 		try {
-			_loading_count === 0 && CrossDomainPoster.dispatchEvent(CrossDomainPoster.createEvent('allcomplete', {url: this._url, opt: this._opt}));
-			CrossDomainPoster.dispatchEvent(CrossDomainPoster.createEvent('complete', {url: this._url, opt: this._opt, ret: ret}));
+			_loading_count === 0 && CrossDomainPoster.dispatchEvent(CrossDomainPoster.createEvent('allcomplete', {url: this._url, opt: this._opt}))
+			CrossDomainPoster.dispatchEvent(CrossDomainPoster.createEvent('complete', {url: this._url, opt: this._opt, ret: ret}))
 		} catch(e) {
 			if(YOM.config.debug) {
-				throw new YOM.Error(YOM.Error.getCode(_ID, 1));
+				throw new YOM.Error(YOM.Error.getCode(_ID, 1))
 			}
 		}
-		this._oncomplete.call(this._bind, ret);
-	};
+		this._oncomplete.call(this._bind, ret)
+	}
 	
 	CrossDomainPoster.prototype._frameOnLoad = function() {
 		if(this._crossSite) {
 			if(this._status != _STATUS.LOADING) {
-				return;
+				return
 			}
-			this._status = _STATUS.LOADED;
-			var data;
-			var parseError = false;
+			this._status = _STATUS.LOADED
+			var data
+			var parseError = false
 			try {
-				data = YOM.json.parse(this._frameEl.contentWindow.name);
+				data = YOM.json.parse(this._frameEl.contentWindow.name)
 			} catch(e) {
-				parseError = true;
+				parseError = true
 			}
 			if(parseError) {
-				this._complete(CrossDomainPoster.RET.ERROR);
-				this._onerror.call(this._bind);
+				this._complete(CrossDomainPoster.RET.ERROR)
+				this._onerror.call(this._bind)
 				if(YOM.config.debug) {
-					throw new YOM.Error(YOM.Error.getCode(_ID, 1));
+					throw new YOM.Error(YOM.Error.getCode(_ID, 1))
 				}
 			} else {
-				this._complete(CrossDomainPoster.RET.SUCC);
-				this._onload.call(this._bind, data);
+				this._complete(CrossDomainPoster.RET.SUCC)
+				this._onload.call(this._bind, data)
 			}
 		} else {
 			if(this._frameEl) {
-				this._complete(CrossDomainPoster.RET.ERROR);
-				this._onerror.call(this._bind);
+				this._complete(CrossDomainPoster.RET.ERROR)
+				this._onerror.call(this._bind)
 			}
 		}
-	};
+	}
 	
 	CrossDomainPoster.prototype._clear = function() {
 		if(!this._frameEl) {
-			return;
+			return
 		}
-		var frameEl = this._frameEl;
-		this._frameEl = null;
-		YOM.Event.removeListener(frameEl, 'load', this._frameOnLoadListener);
+		var frameEl = this._frameEl
+		this._frameEl = null
+		YOM.Event.removeListener(frameEl, 'load', this._frameOnLoadListener)
 		//Chrome will not tirgger the exception throwed in callback after frame element removed
 		//so delay to remove it
 		setTimeout(function() {
-			document.body.removeChild(frameEl);
-		}, 0);
-		_im.remove(this.getId());
-	};
+			document.body.removeChild(frameEl)
+		}, 0)
+		_im.remove(this.getId())
+	}
 		
 	CrossDomainPoster.prototype.getId = function() {
-		return this._id;
-	};
+		return this._id
+	}
 		
 	CrossDomainPoster.prototype.post = function() {
 		if(this._status != _STATUS.INIT) {
-			return 1;
+			return 1
 		}
-		this._frameEl = YOM.Element.create('iframe', {src: this._proxy}, {display: 'none'});
-		this._frameEl.instanceId = this.getId();
+		this._frameEl = YOM.Element.create('iframe', {src: this._proxy}, {display: 'none'})
+		this._frameEl.instanceId = this.getId()
 		this._frameEl.callback = YOM.object.bind(this, function(o) {
 			if(this._status != _STATUS.LOADING) {
-				return;
+				return
 			}
-			this._status = _STATUS.LOADED;
-			this._complete(CrossDomainPoster.RET.SUCC);
-			this._onload.call(this._bind, o);
-		});
-		this._frameOnLoadListener = YOM.object.bind(this, this._frameOnLoad);
-		YOM.Event.addListener(this._frameEl, 'load', this._frameOnLoadListener);
-		this._frameEl = document.body.appendChild(this._frameEl);
-		this._status = _STATUS.LOADING;
-		_loading_count++;
-		CrossDomainPoster.dispatchEvent(CrossDomainPoster.createEvent('start', {url: this._url, opt: this._opt}));
-		return 0;
-	};
+			this._status = _STATUS.LOADED
+			this._complete(CrossDomainPoster.RET.SUCC)
+			this._onload.call(this._bind, o)
+		})
+		this._frameOnLoadListener = YOM.object.bind(this, this._frameOnLoad)
+		YOM.Event.addListener(this._frameEl, 'load', this._frameOnLoadListener)
+		this._frameEl = document.body.appendChild(this._frameEl)
+		this._status = _STATUS.LOADING
+		_loading_count++
+		CrossDomainPoster.dispatchEvent(CrossDomainPoster.createEvent('start', {url: this._url, opt: this._opt}))
+		return 0
+	}
 	
 	CrossDomainPoster.prototype.abort = function() {
 		if(this._status != _STATUS.LOADING) {
-			return 1;
+			return 1
 		}
-		this._status = _STATUS.ABORTED;
-		this._complete(CrossDomainPoster.RET.ABORTED);
-		this._onabort.call(this._bind);
-		return 0;
-	};
+		this._status = _STATUS.ABORTED
+		this._complete(CrossDomainPoster.RET.ABORTED)
+		this._onabort.call(this._bind)
+		return 0
+	}
 	
-	return CrossDomainPoster;
-});
+	return CrossDomainPoster
+})
+
 
 
 /**
@@ -3167,7 +3185,7 @@ define('./cross-domain-poster', ['require', './config', './error', './object', '
 define('./pos', ['./object'], function(object) {
 	var YOM = {
 		'object': object
-	};
+	}
 	
 	return {
 		_ID: 112,
@@ -3176,14 +3194,14 @@ define('./pos', ['./object'], function(object) {
 			if(navigator.geolocation && navigator.geolocation.getCurrentPosition) {
 				navigator.geolocation.getCurrentPosition(function (position) {
 					if(YOM.object.isFunction(onSuccess)) {
-						onSuccess.call(position, position.coords.latitude, position.coords.longitude);
+						onSuccess.call(position, position.coords.latitude, position.coords.longitude)
 					}
-				}, onFail);
+				}, onFail)
 			} else {
 				onFail({
 					code: 0,
 					message: 'Not Supported'
-				});
+				})
 			}
 		},
 		
@@ -3191,25 +3209,26 @@ define('./pos', ['./object'], function(object) {
 			if(navigator.geolocation && navigator.geolocation.watchPosition) {
 				return navigator.geolocation.watchPosition(function (position) {
 					if(YOM.object.isFunction(onSuccess)) {
-						onSuccess.call(position, position.coords.latitude, position.coords.longitude);
+						onSuccess.call(position, position.coords.latitude, position.coords.longitude)
 					}
-				}, onFail);
+				}, onFail)
 			} else {
 				onFail({
 					code: 0,
 					message: 'Not Supported'
-				});
-				return null;
+				})
+				return null
 			}
 		},
 		
 		clearWatch: function(watchHandler) {
 			if(watchHandler && navigator.geolocation && navigator.geolocation.clearWatch) {
-				navigator.geolocation.clearWatch(watchHandler);
+				navigator.geolocation.clearWatch(watchHandler)
 			}
 		}
-	};
-});
+	}
+})
+
 
 /**
  * @namespace YOM.util
@@ -3217,78 +3236,79 @@ define('./pos', ['./object'], function(object) {
 define('./util', ['./object'], function(object) {
 	var YOM = {
 		'object': object
-	};
+	}
 	
 	return {
 		_ID: 115,
 		
 		getUrlParam: function(name, loc) {
-			loc = loc || window.location;
-			var r = new RegExp('(\\?|#|&)' + name + '=(.*?)(&|#|$)');
-			var m = (loc.href || '').match(r);
-			return (m ? m[2] : '');
+			loc = loc || window.location
+			var r = new RegExp('(\\?|#|&)' + name + '=(.*?)(&|#|$)')
+			var m = (loc.href || '').match(r)
+			return (m ? m[2] : '')
 		},
 		
 		getUrlParams: function(loc) {
-			loc = loc || window.location;
-			var raw = loc.search, res = {}, p, i;
+			loc = loc || window.location
+			var raw = loc.search, res = {}, p, i
 			if(raw) {
-				raw = raw.slice(1);
-				raw = raw.split('&');
+				raw = raw.slice(1)
+				raw = raw.split('&')
 				for(i = 0, l = raw.length; i < l; i++) {
-					p = raw[i].split('=');
-					res[p[0]] = p[1] || '';
+					p = raw[i].split('=')
+					res[p[0]] = p[1] || ''
 				}
 			}
-			raw = loc.hash;
+			raw = loc.hash
 			if(raw) {
-				raw = raw.slice(1);
-				raw = raw.split('&');
+				raw = raw.slice(1)
+				raw = raw.split('&')
 				for(i = 0, l = raw.length; i < l; i++) {
-					p = raw[i].split('=');
-					res[p[0]] = res[p[0]] || p[1] || '';
+					p = raw[i].split('=')
+					res[p[0]] = res[p[0]] || p[1] || ''
 				}
 			}
-			return res;
+			return res
 		},
 		
 		appendQueryString: function(url, param, isHashMode) {
 			if(typeof param == 'object') {
-				param = YOM.object.toQueryString(param);
+				param = YOM.object.toQueryString(param)
 			} else if(typeof param == 'string') {
-				param = param.replace(/^&/, '');
+				param = param.replace(/^&/, '')
 			} else {
-				param = '';
+				param = ''
 			}
 			if(!param) {
-				return url;
+				return url
 			}
 			if(isHashMode) {
 				if(url.indexOf('#') == -1) {
-					url += '#' + param;
+					url += '#' + param
 				} else {
-					url += '&' + param;
+					url += '&' + param
 				}
 			} else {
 				if(url.indexOf('#') == -1) {
 					if(url.indexOf('?') == -1) {
-						url += '?' + param;
+						url += '?' + param
 					} else {
-						url += '&' + param;
+						url += '&' + param
 					}
 				} else {
-					var tmp = url.split('#');
+					var tmp = url.split('#')
 					if(tmp[0].indexOf('?') == -1) {
-						url = tmp[0] + '?' + param + '#' + (tmp[1] || '');
+						url = tmp[0] + '?' + param + '#' + (tmp[1] || '')
 					} else {
-						url = tmp[0] + '&' + param + '#' + (tmp[1] || '');
+						url = tmp[0] + '&' + param + '#' + (tmp[1] || '')
 					}
 				}
 			}
-			return url;
+			return url
 		}
-	};
-});
+	}
+})
+
 
 
 /**
@@ -3307,285 +3327,286 @@ define('./js-loader', ['global', './config', './error', './browser', './object',
 		'Event': Evt,
 		'Element': Elem,
 		'util': util
-	};
+	}
 	
-	var _TIMEOUT = 60000;
+	var _TIMEOUT = 60000
 	var _STATUS = {
 		INIT: 0,
 		LOADING: 1,
 		LOADED: 2,
 		ABORTED: 3,
 		TIMEOUT: 4
-	};
+	}
 	
-	var _callbackHolder = {};
-	var _interactiveMode = false;
-	var _scriptBeingInserted = null;
-	var _loading_count = 0;
-	var _im = new YOM.InstanceManager();
+	var _callbackHolder = {}
+	var _interactiveMode = false
+	var _scriptBeingInserted = null
+	var _loading_count = 0
+	var _im = new YOM.InstanceManager()
 	
 	function _getInteractiveScript() {
-		var script, scripts;
-		scripts = document.getElementsByTagName('script');
+		var script, scripts
+		scripts = document.getElementsByTagName('script')
 		for(var i = 0; i < scripts.length; i++) {
-			script = scripts[i];
+			script = scripts[i]
 			if(script.readyState == 'interactive') {
-				return script;
+				return script
 			}
 		}
-		return script;
-	};
+		return script
+	}
 	
 	var CallbackHolder = function(name) {
-		this._name = name;
-		this._callbackArgs = CallbackHolder.NOT_CALLBACKED;
-		global[name] = YOM.object.bind(this, this._callback);
-	};
+		this._name = name
+		this._callbackArgs = CallbackHolder.NOT_CALLBACKED
+		global[name] = YOM.object.bind(this, this._callback)
+	}
 	
-	CallbackHolder.NOT_CALLBACKED = new Object();
+	CallbackHolder.NOT_CALLBACKED = new Object()
 	
 	CallbackHolder.prototype._callback = function() {
-		var script, loaderId, loader;
+		var script, loaderId, loader
 		if(_interactiveMode) {
-			script = _scriptBeingInserted || _getInteractiveScript();
+			script = _scriptBeingInserted || _getInteractiveScript()
 			if(script) {
-				loaderId = script.getAttribute('data-yom-jsloader-id');
+				loaderId = script.getAttribute('data-yom-jsloader-id')
 				if(loaderId) {
-					loader = _im.get(loaderId);
-					loader && loader.callback.apply(loader, arguments);
+					loader = _im.get(loaderId)
+					loader && loader.callback.apply(loader, arguments)
 				}
 			}
 		} else {
-			this._callbackArgs = arguments;
+			this._callbackArgs = arguments
 		}
-	};
+	}
 	
 	CallbackHolder.prototype.getCallbackArgs = function() {
-		var res = this._callbackArgs;
-		this._callbackArgs = CallbackHolder.NOT_CALLBACKED;
-		return res;
-	};
+		var res = this._callbackArgs
+		this._callbackArgs = CallbackHolder.NOT_CALLBACKED
+		return res
+	}
 	
 	var JsLoader = function(src, opt) {
-		opt = opt || {};
-		this._rawSrc = src;
-		this._src = YOM.util.appendQueryString(src, opt.param);
-		this._opt = opt;
-		this._charset = opt.charset;
+		opt = opt || {}
+		this._rawSrc = src
+		this._src = YOM.util.appendQueryString(src, opt.param)
+		this._opt = opt
+		this._charset = opt.charset
 		this._callback = function() {
-			this._callbacked = true;
-			opt.callback && opt.callback.apply(this._bind || this, YOM.array.getArray(arguments));
-		};
-		this._callbackName = opt.callbackName || '$JsLoaderCallback';
-		this._onload = opt.load || $empty;
-		this._onabort = opt.abort || $empty;
-		this._onerror = opt.error;
-		this._oncomplete = opt.complete || $empty;
-		this._bind = opt.bind;
-		this._random = opt.random;
-		this._jsEl = null;
-		this._status = _STATUS.INIT;
-		this._callbacked = false;
-		this._gid = opt.gid;//group id
+			this._callbacked = true
+			opt.callback && opt.callback.apply(this._bind || this, YOM.array.getArray(arguments))
+		}
+		this._callbackName = opt.callbackName || '$JsLoaderCallback'
+		this._onload = opt.load || $empty
+		this._onabort = opt.abort || $empty
+		this._onerror = opt.error
+		this._oncomplete = opt.complete || $empty
+		this._bind = opt.bind
+		this._random = opt.random
+		this._jsEl = null
+		this._status = _STATUS.INIT
+		this._callbacked = false
+		this._gid = opt.gid//group id
 		this._bound = {
 			onloadHandler: YOM.object.bind(this, this._onloadHandler),
 			onerrorHandler: YOM.object.bind(this, this._onerrorHandler),
 			ieOnloadHandler: YOM.object.bind(this, this._ieOnloadHandler)
-		};
-		this._id = _im.add(this);
-	};
+		}
+		this._id = _im.add(this)
+	}
 	
-	JsLoader._ID = 109;
+	JsLoader._ID = 109
 	
-	JsLoader._im = _im;
+	JsLoader._im = _im
 	
-	YOM.Class.extend(JsLoader, YOM.Event);
-	YOM.Class.genericize(JsLoader, ['addObservers', 'addEventListener', 'removeEventListener', 'dispatchEvent', 'createEvent'], {bind: JsLoader});
+	YOM.Class.extend(JsLoader, YOM.Event)
+	YOM.Class.genericize(JsLoader, ['addObservers', 'addEventListener', 'removeEventListener', 'dispatchEvent', 'createEvent'], {bind: JsLoader})
 	JsLoader.addObservers({
 		start: new YOM.Observer(),
 		complete: new YOM.Observer(),
 		allcomplete: new YOM.Observer()
-	});
+	})
 	
 	JsLoader.RET = {
 		SUCC: 0,
 		ABORTED: -1,
 		ERROR: 1,
 		TIMEOUT: 2
-	};
+	}
 	
 	JsLoader.abortAll = function(gid) {
-		var noGid = typeof gid == 'undefined';
+		var noGid = typeof gid == 'undefined'
 		_im.each(function(inst) {
-			inst.abort();
+			inst.abort()
 			if(noGid || inst.getGid() == gid) {
-				inst.abort();
+				inst.abort()
 			}
-		});
-	};
+		})
+	}
 	
 	JsLoader.isUrlLoading = function(url, fullMatch) {
-		var res = false;
+		var res = false
 		if(!url) {
-			return res;
+			return res
 		}
 		_im.each(function(inst) {
 			if(fullMatch && url == inst._src || inst._src.indexOf(url) === 0) {
-				res = true;
-				return false;
+				res = true
+				return false
 			}
-			return true;
-		});
-		return res;
-	};
+			return true
+		})
+		return res
+	}
 	
 	JsLoader.isAnyLoading = function() {
-		return _loading_count > 0;
-	};
+		return _loading_count > 0
+	}
 	
 	JsLoader.prototype._clear = function() {
-		_im.remove(this.getId());
+		_im.remove(this.getId())
 		if(!this._jsEl) {
-			return;
+			return
 		}
 		if(this._jsEl.addEventListener) {
-			this._jsEl.removeEventListener('load', this._bound.onloadHandler, false);
-			this._jsEl.removeEventListener('error', this._bound.onerrorHandler, false);
+			this._jsEl.removeEventListener('load', this._bound.onloadHandler, false)
+			this._jsEl.removeEventListener('error', this._bound.onerrorHandler, false)
 		} else {
-			this._jsEl.detachEvent('onreadystatechange', this._bound.ieOnloadHandler);
+			this._jsEl.detachEvent('onreadystatechange', this._bound.ieOnloadHandler)
 		}
-		this._jsEl.parentNode.removeChild(this._jsEl);
-		this._jsEl = null;
-	};
+		this._jsEl.parentNode.removeChild(this._jsEl)
+		this._jsEl = null
+	}
 	
 	JsLoader.prototype._dealError = function(code) {
 		if(this._onerror) {
-			this._onerror.call(this._bind, code);
+			this._onerror.call(this._bind, code)
 		} else {
-			throw new YOM.Error(code);
+			throw new YOM.Error(code)
 		}
-	};
+	}
 	
 	JsLoader.prototype._complete = function(ret) {
-		this._opt.silent || _loading_count > 0 && _loading_count--;
-		this._clear();
+		this._opt.silent || _loading_count > 0 && _loading_count--
+		this._clear()
 		try {
-			_loading_count === 0 && JsLoader.dispatchEvent(JsLoader.createEvent('allcomplete', {src: this._src, opt: this._opt, ret: ret}));
-			JsLoader.dispatchEvent(JsLoader.createEvent('complete', {src: this._src, opt: this._opt, ret: ret}));
+			_loading_count === 0 && JsLoader.dispatchEvent(JsLoader.createEvent('allcomplete', {src: this._src, opt: this._opt, ret: ret}))
+			JsLoader.dispatchEvent(JsLoader.createEvent('complete', {src: this._src, opt: this._opt, ret: ret}))
 		} catch(e) {
 			if(YOM.config.debug) {
-				throw new YOM.Error(YOM.Error.getCode(JsLoader._ID, 2));
+				throw new YOM.Error(YOM.Error.getCode(JsLoader._ID, 2))
 			}
 		}
-		this._oncomplete.call(this._bind, ret);
-	};
+		this._oncomplete.call(this._bind, ret)
+	}
 	
 	JsLoader.prototype.callback = function() {
-		this._callbacked = true;
-		this._opt.callback && this._opt.callback.apply(this._bind || this, YOM.array.getArray(arguments));
-	};
+		this._callbacked = true
+		this._opt.callback && this._opt.callback.apply(this._bind || this, YOM.array.getArray(arguments))
+	}
 	
 	JsLoader.prototype.getId = function() {
-		return this._id;
-	};
+		return this._id
+	}
 	
 	JsLoader.prototype.getGid = function() {
-		return this._gid;
-	};
+		return this._gid
+	}
 	
 	JsLoader.prototype._onloadHandler = function() {
-		var callbackArgs;
+		var callbackArgs
 		if(this._status != _STATUS.LOADING) {
-			return;
+			return
 		}
-		this._status = _STATUS.LOADED;
-		this._complete(JsLoader.RET.SUCC);
+		this._status = _STATUS.LOADED
+		this._complete(JsLoader.RET.SUCC)
 		if(this._callbackName) {
-			callbackArgs = _callbackHolder[this._callbackName].getCallbackArgs();
+			callbackArgs = _callbackHolder[this._callbackName].getCallbackArgs()
 			if(callbackArgs == CallbackHolder.NOT_CALLBACKED) {
-				this._dealError(YOM.Error.getCode(JsLoader._ID, 1));
-				return;
+				this._dealError(YOM.Error.getCode(JsLoader._ID, 1))
+				return
 			}
-			this.callback.apply(this, YOM.array.getArray(callbackArgs));
+			this.callback.apply(this, YOM.array.getArray(callbackArgs))
 		}
-		this._onload.call(this._bind);
-	};
+		this._onload.call(this._bind)
+	}
 	
 	JsLoader.prototype._onerrorHandler = function() {
 		if(this._status != _STATUS.LOADING) {
-			return;
+			return
 		}
-		this._status = _STATUS.LOADED;
-		this._complete(JsLoader.RET.ERROR);
-		this._dealError(YOM.Error.getCode(JsLoader._ID, 0));
-	};
+		this._status = _STATUS.LOADED
+		this._complete(JsLoader.RET.ERROR)
+		this._dealError(YOM.Error.getCode(JsLoader._ID, 0))
+	}
 	
 	JsLoader.prototype._ieOnloadHandler = function() {
 		if(this._jsEl && (this._jsEl.readyState == 'loaded' || this._jsEl.readyState == 'complete')) {
 			if(this._status != _STATUS.LOADING) {
-				return;
+				return
 			}
-			this._status = _STATUS.LOADED;
-			this._complete(JsLoader.RET.SUCC);
+			this._status = _STATUS.LOADED
+			this._complete(JsLoader.RET.SUCC)
 			if(this._callbackName && !this._callbacked) {
-				this._dealError(YOM.Error.getCode(JsLoader._ID, 1));
+				this._dealError(YOM.Error.getCode(JsLoader._ID, 1))
 			}
-			this._onload.call(this._bind);
+			this._onload.call(this._bind)
 		}
-	};
+	}
 	
 	JsLoader.prototype.load = function() {
 		if(this._status != _STATUS.INIT) {
-			return 1;
+			return 1
 		}
-		var self = this;
+		var self = this
 		if(this._callbackName) {
-			_callbackHolder[this._callbackName] = _callbackHolder[this._callbackName] || new CallbackHolder(this._callbackName);
+			_callbackHolder[this._callbackName] = _callbackHolder[this._callbackName] || new CallbackHolder(this._callbackName)
 		}
-		this._jsEl = document.createElement('script');
+		this._jsEl = document.createElement('script')
 		if(this._jsEl.attachEvent && !YOM.browser.opera) {
-			_interactiveMode = true;
-			this._jsEl.attachEvent('onreadystatechange', this._bound.ieOnloadHandler);
+			_interactiveMode = true
+			this._jsEl.attachEvent('onreadystatechange', this._bound.ieOnloadHandler)
 		} else {
-			this._jsEl.addEventListener('load', this._bound.onloadHandler, false);
-			this._jsEl.addEventListener('error', this._bound.onerrorHandler, false);
+			this._jsEl.addEventListener('load', this._bound.onloadHandler, false)
+			this._jsEl.addEventListener('error', this._bound.onerrorHandler, false)
 		}
 		if(this._charset) {
-			this._jsEl.charset = this._charset;
+			this._jsEl.charset = this._charset
 		}
-		this._jsEl.type = 'text/javascript';
-		this._jsEl.async = 'async';
-		this._jsEl.src = this._src;
-		this._jsEl.setAttribute('data-yom-jsloader-id', this.getId());
-		this._status = _STATUS.LOADING;
-		this._opt.silent || _loading_count++;
-		_scriptBeingInserted = this._jsEl;
-		this._jsEl = YOM.Element.head.insertBefore(this._jsEl, YOM.Element.head.firstChild);
-		_scriptBeingInserted = null;
+		this._jsEl.type = 'text/javascript'
+		this._jsEl.async = 'async'
+		this._jsEl.src = this._src
+		this._jsEl.setAttribute('data-yom-jsloader-id', this.getId())
+		this._status = _STATUS.LOADING
+		this._opt.silent || _loading_count++
+		_scriptBeingInserted = this._jsEl
+		this._jsEl = YOM.Element.head.insertBefore(this._jsEl, YOM.Element.head.firstChild)
+		_scriptBeingInserted = null
 		setTimeout(function() {
 			if(self._status != _STATUS.LOADING) {
-				return;
+				return
 			}
-			self._status = _STATUS.TIMEOUT;
-			self._complete(JsLoader.RET.TIMEOUT);
-			self._dealError(YOM.Error.getCode(JsLoader._ID, 2));
-		}, this._opt.timeout || _TIMEOUT);
-		JsLoader.dispatchEvent(JsLoader.createEvent('start', {src: this._src, opt: this._opt}));
-		return 0;
-	};
+			self._status = _STATUS.TIMEOUT
+			self._complete(JsLoader.RET.TIMEOUT)
+			self._dealError(YOM.Error.getCode(JsLoader._ID, 2))
+		}, this._opt.timeout || _TIMEOUT)
+		JsLoader.dispatchEvent(JsLoader.createEvent('start', {src: this._src, opt: this._opt}))
+		return 0
+	}
 	
 	JsLoader.prototype.abort = function() {
 		if(this._status != _STATUS.LOADING) {
-			return 1;
+			return 1
 		}
-		this._status = _STATUS.ABORTED;
-		this._complete(JsLoader.RET.ABORTED);
-		this._onabort.call(this._bind);
-		return 0;
-	};
+		this._status = _STATUS.ABORTED
+		this._complete(JsLoader.RET.ABORTED)
+		this._onabort.call(this._bind)
+		return 0
+	}
 	
-	return JsLoader;
-});
+	return JsLoader
+})
+
 
 
 /**
@@ -3598,70 +3619,71 @@ define('./css', ['./object', './array', './class', './event', './element'], func
 		'Class': Class,
 		'Event': Evt,
 		'Element': Elem
-	};
+	}
 	
-	var _linkCount = 0;
-	var _href_id_hash = {};
+	var _linkCount = 0
+	var _href_id_hash = {}
 	
 	function load(href, force) {
-		var id, el;
+		var id, el
 		if(YOM.array.isArray(href)) {
-			id = [];
+			id = []
 			YOM.object.each(href, function(item) {
-				id.push(load(item, force));
-			});
-			return id;
+				id.push(load(item, force))
+			})
+			return id
 		}
-		id = _href_id_hash[href];
-		el = $id(id);
+		id = _href_id_hash[href]
+		el = $id(id)
 		if(id && el) {
 			if(force) {
-				unload(href);
+				unload(href)
 			} else {
-				return id;
+				return id
 			}
 		}
-		id = $getUniqueId();
+		id = $getUniqueId()
 		el = YOM.Element.create('link', {
 			id: id,
 			rel: 'stylesheet',
 			type: 'text/css',
 			media: 'screen',
 			href: href
-		});
-		YOM.Element.head.insertBefore(el, YOM.Element.head.firstChild);
-		return _href_id_hash[href] = id;
-	};
+		})
+		YOM.Element.head.insertBefore(el, YOM.Element.head.firstChild)
+		return _href_id_hash[href] = id
+	}
 	
 	function unload(href) {
-		var el;
+		var el
 		if(YOM.array.isArray(href)) {
-			el = [];
+			el = []
 			YOM.object.each(href, function(item) {
-				el.push(unload(item));
-			});
-			return el;
+				el.push(unload(item))
+			})
+			return el
 		}
-		el = $id(_href_id_hash[href]);
+		el = $id(_href_id_hash[href])
 		if(el) {
-			delete _href_id_hash[href];
-			return el.parentNode.removeChild(el);
+			delete _href_id_hash[href]
+			return el.parentNode.removeChild(el)
 		}
-		return null;
-	};
+		return null
+	}
 	
 	var Css = function() {
-		Css.superClass.constructor.apply(this, YOM.array.getArray(arguments));
-	};
-	YOM.Class.extend(Css, YOM.Event);
+		Css.superClass.constructor.apply(this, YOM.array.getArray(arguments))
+	}
+	YOM.Class.extend(Css, YOM.Event)
 	
 	return YOM.object.extend(new Css({
 	}), {
 		_ID: 106,
 		load: load,
 		unload: unload
-	});
-});
+	})
+})
+
 
 /**
  * @namespace YOM.tmpl
@@ -3671,81 +3693,82 @@ define('./tmpl', ['./browser', './string', './object'], function(browser, string
 		'browser': browser,
 		'string': string,
 		'object': object
-	};
+	}
 	
-	var _cache = {};
-	var _useArrayJoin = YOM.browser.ie;
+	var _cache = {}
+	var _useArrayJoin = YOM.browser.ie
 	
 	function _getMixinTmplStr(rawStr, mixinTmpl) {
 		if(mixinTmpl) {
 			YOM.object.each(mixinTmpl, function(val, key) {
-				var r = new RegExp('<%#' + key + '%>', 'g');
-				rawStr = rawStr.replace(r, val);
-			});
+				var r = new RegExp('<%#' + key + '%>', 'g')
+				rawStr = rawStr.replace(r, val)
+			})
 		}
-		return rawStr;
-	};
+		return rawStr
+	}
 	
 	function render(str, data, opt) {
-		var strict, key, fn;
-		str += '';
-		data = data || {};
-		opt = opt || {};
-		strict = opt.strict;
-		key = opt.key;
+		var strict, key, fn
+		str += ''
+		data = data || {}
+		opt = opt || {}
+		strict = opt.strict
+		key = opt.key
 		if(key) {
-			fn = _cache[key];
+			fn = _cache[key]
 			if(fn) {
-				return fn.call(YOM, data, opt.util);
+				return fn.call(YOM, data, opt.util)
 			}
 		}
 		if(opt.mixinTmpl) {
-			str = _getMixinTmplStr(str, opt.mixinTmpl);
+			str = _getMixinTmplStr(str, opt.mixinTmpl)
 		}
 		fn = _useArrayJoin ? 
-		new Function("$data", "$opt", "var YOM=this,_$out_=[],$print=function(str){_$out_.push(str);};" + (strict ? "" : "with($data){") + "_$out_.push('" + str
+		new Function("$data", "$opt", "var YOM=this,_$out_=[],$print=function(str){_$out_.push(str)}" + (strict ? "" : "with($data){") + "_$out_.push('" + str
 			.replace(/[\r\t\n]/g, "")
 			.replace(/(?:^|%>).*?(?:<%|$)/g, function($0) {
-				return $0.replace(/('|\\)/g, '\\$1');
+				return $0.replace(/('|\\)/g, '\\$1')
 			})
 			.replace(/<%==(.*?)%>/g, "',YOM.string.encodeHtml($1),'")
 			.replace(/<%=(.*?)%>/g, "',$1,'")
-			.split("<%").join("');")
+			.split("<%").join("')")
 			.split("%>").join("_$out_.push('")
-		+ "');" + (strict ? "" : "}") + "return _$out_.join('');") : 
-		new Function("$data", "$opt", "var YOM=this,_$out_='',$print=function(str){_$out_+=str;};" + (strict ? "" : "with($data){") + "_$out_+='" + str
+		+ "')" + (strict ? "" : "}") + "return _$out_.join('')") : 
+		new Function("$data", "$opt", "var YOM=this,_$out_='',$print=function(str){_$out_+=str}" + (strict ? "" : "with($data){") + "_$out_+='" + str
 			.replace(/[\r\t\n]/g, "")
 			.replace(/(?:^|%>).*?(?:<%|$)/g, function($0) {
-				return $0.replace(/('|\\)/g, '\\$1');
+				return $0.replace(/('|\\)/g, '\\$1')
 			})
 			.replace(/<%==(.*?)%>/g, "'+YOM.string.encodeHtml($1)+'")
 			.replace(/<%=(.*?)%>/g, "'+($1)+'")
-			.split("<%").join("';")
+			.split("<%").join("'")
 			.split("%>").join("_$out_+='")
-		+ "';" + (strict ? "" : "}") + "return _$out_;");
+		+ "'" + (strict ? "" : "}") + "return _$out_")
 		if(key) {
-			_cache[key] = fn;
+			_cache[key] = fn
 		}
-		return fn.call(YOM, data, opt.util);
-	};
+		return fn.call(YOM, data, opt.util)
+	}
 	
 	function renderId(id, data, opt) {
-		data = data || {};
-		opt = opt || {};
-		var key = opt.key = opt.key || id;
-		var fn = _cache[key];
+		data = data || {}
+		opt = opt || {}
+		var key = opt.key = opt.key || id
+		var fn = _cache[key]
 		if(fn) {
-			return fn.call(YOM, data, opt.util);
+			return fn.call(YOM, data, opt.util)
 		}
-		return render($id(id).innerHTML, data, opt);
-	};
+		return render($id(id).innerHTML, data, opt)
+	}
 	
 	return {
 		_ID: 114,
 		render: render,
 		renderId: renderId
-	};
-});
+	}
+})
+
 
 
 /**
@@ -3755,59 +3778,59 @@ define('./flash', ['./browser', './object'], function(browser, object) {
 	var YOM = {
 		'browser': browser,
 		'object': object
-	};
+	}
 	
-	var _ID = 129;
+	var _ID = 129
 	
-	var _flashVersion = null;
+	var _flashVersion = null
 	
 	/**
 	 * @returns {Array}
 	 */
 	function getVersion() {
-		var plugin, i;
+		var plugin, i
 		if(_flashVersion) {
-			return _flashVersion.concat();
+			return _flashVersion.concat()
 		}
-		_flashVersion = ['0', '0', '0', '0'];
+		_flashVersion = ['0', '0', '0', '0']
 		if(navigator.plugins && navigator.mimeTypes.length) {
-			plugin = navigator.plugins['Shockwave Flash'];
+			plugin = navigator.plugins['Shockwave Flash']
 			if(plugin) {
-				_flashVersion = plugin.description.match(/\d+/g);
+				_flashVersion = plugin.description.match(/\d+/g)
 			}
 		} else {
 			try {
 				for(i = 6, plugin = new Object(); plugin; i++) {
-					plugin = new ActiveXObject('ShockwaveFlash.ShockwaveFlash.' + i);
+					plugin = new ActiveXObject('ShockwaveFlash.ShockwaveFlash.' + i)
 				}
 			} catch(e) {
 				if(i !== 6) {
-					_flashVersion[0] = (i - 1) + '';
+					_flashVersion[0] = (i - 1) + ''
 				}
 			}
 			try {
-				_flashVersion = plugin.GetVariable('$version').match(/\d+/g);
+				_flashVersion = plugin.GetVariable('$version').match(/\d+/g)
 			} catch(e) {}
 		}
-		return _flashVersion.concat();
-	};
+		return _flashVersion.concat()
+	}
 	
 	/**
 	 * @returns {String}
 	 */
 	function getHtml(src, data) {
-		var attrs = [];
-		var params = [];
+		var attrs = []
+		var params = []
 		if(YOM.browser.ie) {
-			params.push('<param name="movie" value="', src, '" />');
-			attrs.push(' classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"');
+			params.push('<param name="movie" value="', src, '" />')
+			attrs.push(' classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"')
 		} else {
-			attrs.push(' data="', src, '"');
-			attrs.push(' type="application/x-shockwave-flash"');
+			attrs.push(' data="', src, '"')
+			attrs.push(' type="application/x-shockwave-flash"')
 		}
 		for(var p in data) {
 			if(!YOM.object.hasOwnProperty(data, p)) {
-				continue;
+				continue
 			}
 			switch(p) {
 			case 'id':
@@ -3815,14 +3838,14 @@ define('./flash', ['./browser', './object'], function(browser, object) {
 			case 'width':
 			case 'height':
 			case 'style':
-				attrs.push(' ', p, '="', data[p], '"');
-				break;
+				attrs.push(' ', p, '="', data[p], '"')
+				break
 			default :
-				params.push('<param name="', p, '" value="', data[p], '" />');
+				params.push('<param name="', p, '" value="', data[p], '" />')
 			}
 		}
-		return '<object' + attrs.join('') + '>' + params.join('') + '</object>';
-	};
+		return '<object' + attrs.join('') + '>' + params.join('') + '</object>'
+	}
 	
 	/**
 	 * @param {Obj} flashObj
@@ -3831,17 +3854,18 @@ define('./flash', ['./browser', './object'], function(browser, object) {
 	 */
 	function invoke(flashObj, methodName, args) {
 		if(flashObj && !flashObj[methodName]) {
-			eval('flashObj["' + methodName + '"] = function(){return eval(this.CallFunction("<invoke name=\\"' + methodName + '\\" returntype=\\"javascript\\">" + __flash__argumentsToXML(arguments,0) + "</invoke>"));}');
+			eval('flashObj["' + methodName + '"] = function(){return eval(this.CallFunction("<invoke name=\\"' + methodName + '\\" returntype=\\"javascript\\">" + __flash__argumentsToXML(arguments,0) + "</invoke>"))}')
 		}
-		return flashObj[methodName].apply(flashObj, args || []);
-	};
+		return flashObj[methodName].apply(flashObj, args || [])
+	}
 	
 	return {
 		getVersion: getVersion,
 		getHtml: getHtml,
 		invoke: invoke
-	};
-});
+	}
+})
+
 
 
 /**
@@ -3849,7 +3873,8 @@ define('./flash', ['./browser', './object'], function(browser, object) {
  */
 define('./widget', [], {
 	_ID: 128
-});
+})
+
 
 
 /**
@@ -3860,97 +3885,98 @@ define('./event-delegator', ['./object', './event', './element'], function(objec
 		'object': object,
 		'Event': Evt,
 		'Element': Elem
-	};
+	}
 	
-	var _pageDelegator;
+	var _pageDelegator
 	
 	/**
 	 * @class
 	 */
 	function Delegator(ele, opt) {
-		opt = opt || {};
-		this._ele = YOM.Element.query(ele);
-		this._delegatedTypes = {};
-		this._handlers = {};
-		this._eventHook = opt.eventHook;
-	};
+		opt = opt || {}
+		this._ele = YOM.Element.query(ele)
+		this._delegatedTypes = {}
+		this._handlers = {}
+		this._eventHook = opt.eventHook
+	}
 	
 	Delegator.getPageDelegator = function() {
-		_pageDelegator = _pageDelegator || new Delegator(document.body);
-		return _pageDelegator;
-	};
+		_pageDelegator = _pageDelegator || new Delegator(document.body)
+		return _pageDelegator
+	}
 	
 	Delegator.prototype = {
 		delegate: function(type, handlerName, handler, opt) {
-			type = type.toLowerCase();
-			opt = opt || {};
-			this._delegateEvent(type, opt.maxBubble >= 0 ? opt.maxBubble : 1983);
-			this._handlers[type][handlerName] = handler;
-			return this;
+			type = type.toLowerCase()
+			opt = opt || {}
+			this._delegateEvent(type, opt.maxBubble >= 0 ? opt.maxBubble : 1983)
+			this._handlers[type][handlerName] = handler
+			return this
 		},
 		
 		remove: function(type, handlerName) {
 			if(!this._delegatedTypes[type]) {
-				return;
+				return
 			}
 			if(handlerName) {
-				delete this._handlers[type][handlerName];
+				delete this._handlers[type][handlerName]
 			} else {
-				this._ele.removeEventListener(type, this._delegatedTypes[type].listener);
-				delete this._handlers[type];
-				delete this._delegatedTypes[type];
+				this._ele.removeEventListener(type, this._delegatedTypes[type].listener)
+				delete this._handlers[type]
+				delete this._delegatedTypes[type]
 			}
 		},
 		
 		_delegateEvent: function(type, maxBubble) {
-			var flag = this._delegatedTypes[type];
+			var flag = this._delegatedTypes[type]
 			if(flag) {
-				flag.maxBubble = Math.max(flag.maxBubble, maxBubble);
-				return;
+				flag.maxBubble = Math.max(flag.maxBubble, maxBubble)
+				return
 			} else {
-				var listener = YOM.object.bind(this, this._eventListener);
-				this._ele.addEventListener(type, listener);
-				this._handlers[type] = {};
-				this._delegatedTypes[type] = {maxBubble: maxBubble, listener: listener};
+				var listener = YOM.object.bind(this, this._eventListener)
+				this._ele.addEventListener(type, listener)
+				this._handlers[type] = {}
+				this._delegatedTypes[type] = {maxBubble: maxBubble, listener: listener}
 			}
 		},
 		
 		_eventListener: function(evt) {
-			var target, $target, type, flag, handler, maxBubble, bubbleTimes;
-			target = YOM.Event.getTarget(evt);
-			type = evt.type.toLowerCase();
+			var target, $target, type, flag, handler, maxBubble, bubbleTimes
+			target = YOM.Event.getTarget(evt)
+			type = evt.type.toLowerCase()
 			if(this._eventHook && this._eventHook(target, evt, type) === false) {
-				return;
+				return
 			}
-			maxBubble = this._delegatedTypes[type].maxBubble;
-			bubbleTimes = 0;
+			maxBubble = this._delegatedTypes[type].maxBubble
+			bubbleTimes = 0
 			while(target && target != this._ele) {
-				$target = new YOM.Element(target);
+				$target = new YOM.Element(target)
 				if(target.disabled || $target.getAttr('disabled')) {
-					return;
+					return
 				}
-				flag = $target.getDatasetVal('yom-' + type);
+				flag = $target.getDatasetVal('yom-' + type)
 				if(flag) {
-					flag = flag.split(' ');
-					handler = this._handlers[type][flag.shift()];
-					flag.unshift(evt);
+					flag = flag.split(' ')
+					handler = this._handlers[type][flag.shift()]
+					flag.unshift(evt)
 					if(handler && handler.apply(target, flag) === false) {
-						break;
+						break
 					}
 				}
 				if(bubbleTimes >= maxBubble) {
-					break;
+					break
 				}
-				target = target.parentNode;
-				bubbleTimes++;
+				target = target.parentNode
+				bubbleTimes++
 			}
 		},
 		
 		constructor: Delegator
-	};
+	}
 	
-	return Delegator;
-});
+	return Delegator
+})
+
 
 
 /**
@@ -3960,68 +3986,69 @@ define('./event-virtual-handler', ['./object', './event'], function(object, Evt)
 	var YOM = {
 		'object': object,
 		'Event': Evt
-	};
+	}
 	
 	var VirtualEventHandler = function(el) {
-		this._delegateEl = el;
-		this._targetEl = null;
-		this._listenerPool = [];
-		this._listenerCount = 0;
-	};
+		this._delegateEl = el
+		this._targetEl = null
+		this._listenerPool = []
+		this._listenerCount = 0
+	}
 	
 	VirtualEventHandler.prototype = {
 		_destroy: function() {
-			YOM.Event.removeCustomizedEventHandler(this.name, this._delegateEl.elEventRef);
+			YOM.Event.removeCustomizedEventHandler(this.name, this._delegateEl.elEventRef)
 		},
 		
 		_dispatch: function(e) {
 			YOM.object.each(this._listenerPool, function(listener) {
-				listener(e);
-			});
+				listener(e)
+			})
 		},
 		
 		addListener: function(listener) {
-			var found;
+			var found
 			if(!listener) {
-				return null;
+				return null
 			}
 			YOM.object.each(this._listenerPool, function(item) {
 				if(listener == item) {
-					found = 1;
-					return false;
+					found = 1
+					return false
 				}
-				return true;
-			});
+				return true
+			})
 			if(found) {
-				return null;
+				return null
 			}
-			this._listenerCount++;
-			return this._listenerPool.push(listener);
+			this._listenerCount++
+			return this._listenerPool.push(listener)
 		},
 		
 		removeListener: function(listener) {
-			var found = null;
-			var self = this;
+			var found = null
+			var self = this
 			YOM.object.each(this._listenerPool, function(item, i) {
 				if(listener == item) {
-					found = item;
-					self._listenerPool.splice(i, 1);
-					this._listenerCount--;
-					return false;
+					found = item
+					self._listenerPool.splice(i, 1)
+					this._listenerCount--
+					return false
 				}
-				return true;
-			});
+				return true
+			})
 			if(!this._listenerCount) {
-				this._destroy();
+				this._destroy()
 			}
-			return found;
+			return found
 		},
 		
 		constructor: VirtualEventHandler
-	};
+	}
 	
-	return VirtualEventHandler;
-});
+	return VirtualEventHandler
+})
+
 
 
 /**
@@ -4035,36 +4062,37 @@ define('./event-mouseenter', ['./browser', './object', './array', './class', './
 		'Class': Class,
 		'Event': Evt,
 		'Element': Elem
-	};
-	YOM.Event.VirtualEventHandler = VirtualEventHandler;
+	}
+	YOM.Event.VirtualEventHandler = VirtualEventHandler
 	
 	var MouseenterEventHandler = function(el) {
-		this.name = 'mouseenter';
-		MouseenterEventHandler.superClass.constructor.apply(this, YOM.array.getArray(arguments));
+		this.name = 'mouseenter'
+		MouseenterEventHandler.superClass.constructor.apply(this, YOM.array.getArray(arguments))
 		this._bound = {
 			mouseover: YOM.object.bind(this, this._mouseover)
-		};
-		YOM.Event.addListener(this._delegateEl, 'mouseover', this._bound.mouseover);
-	};
+		}
+		YOM.Event.addListener(this._delegateEl, 'mouseover', this._bound.mouseover)
+	}
 	
-	YOM.Class.extend(MouseenterEventHandler, YOM.Event.VirtualEventHandler);
+	YOM.Class.extend(MouseenterEventHandler, YOM.Event.VirtualEventHandler)
 	
 	MouseenterEventHandler.prototype._destroy = function() {
-		YOM.Event.removeListener(this._delegateEl, 'mouseover', this._bound.mouseover);
-		MouseenterEventHandler.superClass._destroy.apply(this, YOM.array.getArray(arguments));
-	};
+		YOM.Event.removeListener(this._delegateEl, 'mouseover', this._bound.mouseover)
+		MouseenterEventHandler.superClass._destroy.apply(this, YOM.array.getArray(arguments))
+	}
 		
 	MouseenterEventHandler.prototype._mouseover = function(e) {
 		if(!YOM.Element.contains(this._delegateEl, e.relatedTarget)) {
-			e.cType = this.name;
-			this._dispatch(e);
+			e.cType = this.name
+			this._dispatch(e)
 		}
-	};
+	}
 	
-	YOM.browser.ie || YOM.Event.addCustomizedEvent('mouseenter', MouseenterEventHandler);
+	YOM.browser.ie || YOM.Event.addCustomizedEvent('mouseenter', MouseenterEventHandler)
 	
-	return MouseenterEventHandler;
-});
+	return MouseenterEventHandler
+})
+
 
 
 /**
@@ -4078,36 +4106,37 @@ define('./event-mouseleave', ['./browser', './object', './array', './class', './
 		'Class': Class,
 		'Event': Evt,
 		'Element': Elem
-	};
-	YOM.Event.VirtualEventHandler = VirtualEventHandler;
+	}
+	YOM.Event.VirtualEventHandler = VirtualEventHandler
 	
 	var MouseleaveEventHandler = function(el) {
-		this.name = 'mouseleave';
-		MouseleaveEventHandler.superClass.constructor.apply(this, YOM.array.getArray(arguments));
+		this.name = 'mouseleave'
+		MouseleaveEventHandler.superClass.constructor.apply(this, YOM.array.getArray(arguments))
 		this._bound = {
 			mouseout: YOM.object.bind(this, this._mouseout)
-		};
-		YOM.Event.addListener(this._delegateEl, 'mouseout', this._bound.mouseout);
-	};
+		}
+		YOM.Event.addListener(this._delegateEl, 'mouseout', this._bound.mouseout)
+	}
 	
-	YOM.Class.extend(MouseleaveEventHandler, YOM.Event.VirtualEventHandler);
+	YOM.Class.extend(MouseleaveEventHandler, YOM.Event.VirtualEventHandler)
 	
 	MouseleaveEventHandler.prototype._destroy = function() {
-		YOM.Event.removeListener(this._delegateEl, 'mouseout', this._bound.mouseout);
-		MouseleaveEventHandler.superClass._destroy.apply(this, YOM.array.getArray(arguments));
-	};
+		YOM.Event.removeListener(this._delegateEl, 'mouseout', this._bound.mouseout)
+		MouseleaveEventHandler.superClass._destroy.apply(this, YOM.array.getArray(arguments))
+	}
 		
 	MouseleaveEventHandler.prototype._mouseout = function(e) {
 		if(!YOM.Element.contains(this._delegateEl, e.relatedTarget)) {
-			e.cType = this.name;
-			this._dispatch(e);
+			e.cType = this.name
+			this._dispatch(e)
 		}
-	};
+	}
 	
-	YOM.browser.ie || YOM.Event.addCustomizedEvent('mouseleave', MouseleaveEventHandler);
+	YOM.browser.ie || YOM.Event.addCustomizedEvent('mouseleave', MouseleaveEventHandler)
 	
-	return MouseleaveEventHandler;
-});
+	return MouseleaveEventHandler
+})
+
 
 
 /**
@@ -4119,10 +4148,10 @@ define('./element-fx', ['./object', './array', './element', './tween'], function
 		'array': array,
 		'Element': Elem,
 		'Tween': Tween
-	};
+	}
 	
 	YOM.object.extend(YOM.Element.prototype, (function() {
-		var _DURATION = 300;
+		var _DURATION = 300
 		var _CONF = {
 			fxShow: {style: ['overflow', 'opacity', 'width', 'height'], isShow: 1},
 			fxHide: {style: ['overflow', 'opacity', 'width', 'height']},
@@ -4131,63 +4160,63 @@ define('./element-fx', ['./object', './array', './element', './tween'], function
 			fadeOut: {style: ['opacity']},
 			slideDown: {style: ['overflow', 'height'], isShow: 1},
 			slideUp: {style: ['overflow', 'height']}
-		};
+		}
 		
 		function _doFx(type, el, duration, complete) {
-			var conf, iStyle, oStyle, tStyle, isShow, width, height;
-			YOM.Tween.stopAllTween(el);
+			var conf, iStyle, oStyle, tStyle, isShow, width, height
+			YOM.Tween.stopAllTween(el)
 			if(type == 'fxToggle') {
-				type = el.getStyle('display') == 'none' ? 'fxShow' : 'fxHide';
+				type = el.getStyle('display') == 'none' ? 'fxShow' : 'fxHide'
 			}
-			conf = _CONF[type];
-			iStyle = {};
-			oStyle = {};
-			tStyle = {};
-			isShow = conf.isShow;
-			isShow && el.show();
+			conf = _CONF[type]
+			iStyle = {}
+			oStyle = {}
+			tStyle = {}
+			isShow = conf.isShow
+			isShow && el.show()
 			YOM.object.each(conf.style, function(prop) {
 				switch(prop) {
 				case 'overflow':
-					iStyle.overflow = el.getStyle('overflow');
-					oStyle.overflow = 'hidden';
-					break;
+					iStyle.overflow = el.getStyle('overflow')
+					oStyle.overflow = 'hidden'
+					break
 				case 'opacity':
-					iStyle.opacity = 1;
+					iStyle.opacity = 1
 					if(isShow) {
-						oStyle.opacity = 0;
-						tStyle.opacity = 1;
+						oStyle.opacity = 0
+						tStyle.opacity = 1
 					} else {
-						tStyle.opacity = 0;
+						tStyle.opacity = 0
 					}
-					break;
+					break
 				case 'width':
-					width = el.getStyle('width');
-					iStyle.width = width;
-					width = width == 'auto' ? Math.max(el.getAttr('clientWidth'), el.getAttr('offsetWidth')) + 'px' : width;
+					width = el.getStyle('width')
+					iStyle.width = width
+					width = width == 'auto' ? Math.max(el.getAttr('clientWidth'), el.getAttr('offsetWidth')) + 'px' : width
 					if(isShow) {
-						oStyle.width = '0px';
-						tStyle.width = width;
+						oStyle.width = '0px'
+						tStyle.width = width
 					} else {
-						oStyle.width = width;
-						tStyle.width = '0px';
+						oStyle.width = width
+						tStyle.width = '0px'
 					}
-					break;
+					break
 				case 'height':
-					height = el.getStyle('height');
-					iStyle.height = height;
-					height = height == 'auto' ? Math.max(el.getAttr('clientHeight'), el.getAttr('offsetHeight')) + 'px' : height;
+					height = el.getStyle('height')
+					iStyle.height = height
+					height = height == 'auto' ? Math.max(el.getAttr('clientHeight'), el.getAttr('offsetHeight')) + 'px' : height
 					if(isShow) {
-						oStyle.height = '0px';
-						tStyle.height = height;
+						oStyle.height = '0px'
+						tStyle.height = height
 					} else {
-						oStyle.height = height;
-						tStyle.height = '0px';
+						oStyle.height = height
+						tStyle.height = '0px'
 					}
-					break;
+					break
 				default:
 				}
-			});
-			el.setStyle(oStyle);
+			})
+			el.setStyle(oStyle)
 			new YOM.Tween(el, duration, {
 				target: {
 					style: tStyle
@@ -4195,73 +4224,73 @@ define('./element-fx', ['./object', './array', './element', './tween'], function
 				transition: 'easeOut',
 				prior: true,
 				complete: function() {
-					isShow || el.hide();
-					el.setStyle(iStyle);
-					complete && complete.call(el, isShow ? 'SHOW' : 'HIDE');
+					isShow || el.hide()
+					el.setStyle(iStyle)
+					complete && complete.call(el, isShow ? 'SHOW' : 'HIDE')
 				}
-			}).play();
-		};
+			}).play()
+		}
 		
 		var fx = {
 			tween: function() {
-				var args = YOM.array.getArray(arguments);
+				var args = YOM.array.getArray(arguments)
 				this.each(function(el) {
-					YOM.Tween.apply(this, [el].concat(args)).play();
-				});
-				return this;
+					YOM.Tween.apply(this, [el].concat(args)).play()
+				})
+				return this
 			},
 			
 			tweenWait: function(ms) {
-				var self = this;
+				var self = this
 				return {
 					tween: function() {
-						var args = YOM.array.getArray(arguments);
+						var args = YOM.array.getArray(arguments)
 						setTimeout(function() {
-							self.tween.apply(self, args);
-						}, ms);
+							self.tween.apply(self, args)
+						}, ms)
 						return {
 							tweenWait: function(plusMs) {
-								return self.tweenWait(ms + plusMs);
+								return self.tweenWait(ms + plusMs)
 							}
-						};
+						}
 					}
-				};
+				}
 			}
-		};
+		}
 		
 		YOM.object.each(['fxShow', 'fxHide', 'fxToggle', 'fadeIn', 'fadeOut', 'slideDown', 'slideUp'], function(type) {
 			fx[type] = function(duration, complete) {
 				if(!this.size()) {
-					return this;
+					return this
 				}
-				var self = this;
-				duration = duration || _DURATION;
+				var self = this
+				duration = duration || _DURATION
 				this.each(function(el) {
-					_doFx.call(self, type, new YOM.Element(el), duration, complete);
-				});
-				return this;
-			};
-		});
+					_doFx.call(self, type, new YOM.Element(el), duration, complete)
+				})
+				return this
+			}
+		})
 		
-		return fx;
-	})(), true);
+		return fx
+	})(), true)
 	
-	return {};
-});
+	return {}
+})
 
 /**
  * @namespace
  */
 define(['require', 'exports', 'module', './object', './element', './config', './error', './browser', './string', './array', './class', './hash-array', './instance-manager', './json-sans-eval', './json', './observer', './event', './sizzle', './transition', './tween', './cookie', './xhr', './cross-domain-poster', './pos', './util', './js-loader', './css', './tmpl', './flash', './widget', './event-delegator', './event-virtual-handler', './event-mouseenter', './event-mouseleave', './element-fx', 'yom/core/element', 'yom/core/object'], function(require) {
 	var YOM = function(sel, context) {
-		return Elem.query(sel, context);
-	};
+		return Elem.query(sel, context)
+	}
 	
-	var object = require('./object');
-	var Elem = require('./element');
+	var object = require('./object')
+	var Elem = require('./element')
 	
-	YOM._ID = 100;
-	YOM.debugMode = 0;
+	YOM._ID = 100
+	YOM.debugMode = 0
 	
 	YOM = object.extend(YOM, {
 		'config': require('./config'),
@@ -4291,51 +4320,52 @@ define(['require', 'exports', 'module', './object', './element', './config', './
 		'tmpl': require('./tmpl'),
 		'flash': require('./flash'),
 		'widget': require('./widget')
-	});
+	})
 	
 	YOM.Event = object.extend(YOM.Event, {
 		'Delegator': require('./event-delegator'),
 		'VirtualEventHandler': require('./event-virtual-handler'),
 		'MouseenterEventHandler': require('./event-mouseenter'),
 		'MouseleaveEventHandler': require('./event-mouseleave')
-	});
+	})
 	
-	require('./element-fx');
+	require('./element-fx')
 	
-	return YOM;
-});
+	return YOM
+})
 
 function $id(id) {
-	return document.getElementById(id);
-};
+	return document.getElementById(id)
+}
 
 function $query(sel, context) {
-	var Element = require('yom/core/element');
-	return Element.query(sel, context);
-};
+	var Element = require('yom/core/element')
+	return Element.query(sel, context)
+}
 
 function $getClean(obj) {
-	var object = require('yom/core/object');
-	return object.getClean(obj);
-};
+	var object = require('yom/core/object')
+	return object.getClean(obj)
+}
 
 function $extend(origin, extend, check) {
-	var object = require('yom/core/object');
-	return object.extend(origin, extend, check);
-};
+	var object = require('yom/core/object')
+	return object.extend(origin, extend, check)
+}
 
 function $bind(that, fn) {
-	var object = require('yom/core/object');
-	return object.bind(that, fn);
-};
+	var object = require('yom/core/object')
+	return object.bind(that, fn)
+}
 
 function $now() {
-	return +new Date();
-};
+	return +new Date()
+}
 
-function $empty() {};
+function $empty() {}
 
-var _yom_unique_id_count = 0;
+var _yom_unique_id_count = 0
 function $getUniqueId() {
-	return 'YOM_UNIQUE_ID_' + _yom_unique_id_count++;	
-};
+	return 'YOM_UNIQUE_ID_' + _yom_unique_id_count++	
+}
+

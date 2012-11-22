@@ -4,57 +4,57 @@
 define(['require'], function(require) {
 	function _do(cb) {
 		require(['yom/local-storage/local-storage-built'], function(ls) {
-			cb(ls);
-		});
-	};
+			cb(ls)
+		})
+	}
 	
 	function get(key, cb) {
 		_do(function(ls) {
 			ls.get(key, {proxy: 1, callback: function(res) {
-				cb(res);
-			}});
-		});
-	};
+				cb(res)
+			}})
+		})
+	}
 	
 	function set(key, val, cb) {
 		_do(function(ls) {
 			ls.set(key, val, {proxy: 1, callback: function(res) {
-				cb && cb(res);
-			}});
-		});
-	};
+				cb && cb(res)
+			}})
+		})
+	}
 	
 	function remove(key, cb) {
 		_do(function(ls) {
 			ls.remove(key, {proxy: 1, callback: function(res) {
-				cb && cb(res);
-			}});
-		});
-	};
+				cb && cb(res)
+			}})
+		})
+	}
 	
 	function clear(cb) {
 		_do(function(ls) {
 			ls.clear({proxy: 1, callback: function(res) {
-				cb && cb(res);
-			}});
-		});
-	};
+				cb && cb(res)
+			}})
+		})
+	}
 	
 	function doUnlessKey(key, cb, opt) {
-		opt = opt || {};
+		opt = opt || {}
 		get(key, function(val) {
 			if(val || opt.test && opt.test(val)) {
-				return;
+				return
 			}
-			cb();
+			cb()
 			if(typeof opt.set == 'function') {
-				val = opt.set(val);
-				val === false || set(key, val);
+				val = opt.set(val)
+				val === false || set(key, val)
 			} else if(opt.set) {
-				set(key, opt.set);
+				set(key, opt.set)
 			}
-		});
-	};
+		})
+	}
 	
 	return {
 		get: get,
@@ -62,5 +62,6 @@ define(['require'], function(require) {
 		remove: remove,
 		clear: clear,
 		doUnlessKey: doUnlessKey
-	};
-});
+	}
+})
+

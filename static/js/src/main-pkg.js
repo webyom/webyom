@@ -9,7 +9,8 @@ define(function(require) {
 		ui: require('./ui'),
 		util: require('./util'),
 		Handler: require('./handler')
-	};
+	}
 	
-	return $$;
-});
+	return $$
+})
+

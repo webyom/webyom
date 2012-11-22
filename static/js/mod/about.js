@@ -1,32 +1,32 @@
 define(['require', 'yom/core/core-built', 'yom/history/history-built', 'main-pkg'], function(require, $, ajaxHistory, $$) {
 	var modKey = 'about', 
 		modName = 'ABOUT', 
-		modId = 303;
+		modId = 303
 	
 	var _TMPL = [
-	].join('');
+	].join('')
 	
-	var _cssList = [];
+	var _cssList = []
 	
 	var Handler = function(observers, modName, parent, opt) {
-		Handler.superClass.constructor.apply(this, $.array.getArray(arguments));
-	};
+		Handler.superClass.constructor.apply(this, $.array.getArray(arguments))
+	}
 	
-	$.Class.extend(Handler, $$.Handler);
+	$.Class.extend(Handler, $$.Handler)
 	
 	Handler.prototype._unload = function(parentUnloaded) {
-		$.css.unload(_cssList);
-		return Handler.superClass._unload.apply(this, $.array.getArray(arguments));
-	};
+		$.css.unload(_cssList)
+		return Handler.superClass._unload.apply(this, $.array.getArray(arguments))
+	}
 	
 	Handler.prototype.handle = function() {
-		var res = Handler.superClass.handle.apply(this, $.array.getArray(arguments));
+		var res = Handler.superClass.handle.apply(this, $.array.getArray(arguments))
 		if(res !== 0) {
-			return res;
+			return res
 		}
-		$$.ui.turnOnMenu('c');
-		return 0;
-	};
+		$$.ui.turnOnMenu('c')
+		return 0
+	}
 	
 	return new Handler({
 		beforeunloadmod: new $.Observer(),
@@ -38,5 +38,6 @@ define(['require', 'yom/core/core-built', 'yom/history/history-built', 'main-pkg
 			'contact': {p: 3, key: 'contact', title: 'Contact', id: 30302, name: 'CONTACT', url: 'mod/about-contact'}
 		},
 		defaultModkey: 'profile'
-	});
-});
+	})
+})
+

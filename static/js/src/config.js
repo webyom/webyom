@@ -2,7 +2,7 @@
  * @namespace $$.config
  */
 define(['require', 'yom/core/core-built'], function(require, $) {
-	var _updater = {};
+	var _updater = {}
 	var _config = {
 		TITLE_POSTFIX: 'Webyom - Gary\'s Blog',
 		MARK_PREFIX: 'view/',
@@ -17,46 +17,47 @@ define(['require', 'yom/core/core-built'], function(require, $) {
 			'write': {p: 3, key: 'write', title: 'Write', id: 302, name: 'WRITE_ARTICLE', url: 'mod/write-article'},
 			'about': {p: 4, key: 'about', title: 'About', id: 303, name: 'ABOUT', url: 'mod/about'}
 		}
-	};
+	}
 	
 	function _update(key) {
-		var updaters = _updater[key];
+		var updaters = _updater[key]
 		if(updaters) {
 			for(var i = 0, l = updaters.length; i < l; i++) {
-				updaters[i].call(null, get(key));
+				updaters[i].call(null, get(key))
 			}
 		}
-	};
+	}
 	
 	function get(key, updater) {
 		if(typeof updater == 'function') {
-			_updater[key] = _updater[key] || [];
-			_updater[key].push(updater);
+			_updater[key] = _updater[key] || []
+			_updater[key].push(updater)
 		}
-		return $.object.clone(_config[key], true);
-	};
+		return $.object.clone(_config[key], true)
+	}
 	
 	function set(key, val) {
-		_config[key] = val;
-		_update(key);
-		return 0;
-	};
+		_config[key] = val
+		_update(key)
+		return 0
+	}
 	
 	function extend(key, obj) {
 		if(typeof _config[key] != 'object') {
-			return 1;
+			return 1
 		}
 		for(var p in obj) {
-			_config[key][p] = obj[p];
+			_config[key][p] = obj[p]
 		}
-		_update(key);
-		return 0;
-	};
+		_update(key)
+		return 0
+	}
 	
 	return {
 		_ID: 200,
 		get: get,
 		set: set,
 		extend: extend
-	};
-});
+	}
+})
+
